@@ -1,0 +1,12 @@
+version: '3'
+services:
+  database:
+    image: postgres
+    container_name: "base_registries_db"
+    environment:
+      POSTGRES_DB: "base_registries"
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    ports:
+    - 5432:5432
+    volumes:
+    - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql

@@ -3,7 +3,7 @@ const {Client, Pool} = require('pg');
 export const POOL = new Pool({
     user: 'postgres',
     host: 'localhost',			// Change IP according to docker container of postgres
-    database: 'base_registries_db',
+    database: 'base_registries',
     password: 'oslo'
 });
 
