@@ -39,8 +39,7 @@ export default class FeedFetcher {
 
     console.log(`Starting ${name} projection at position ${lastPosition}.`);
 
-    // TODO: maybe need to add limit=500 too
-    let nextLink = `${uri}&from=${lastPosition}`;
+    let nextLink = `${uri}&limit=500&from=${lastPosition}`;
 
     //while(nextLink !== null){
 
