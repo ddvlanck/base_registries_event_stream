@@ -6,6 +6,6 @@ import FeedFetcher from "./utils/FeedFetcher";
 
 const fetcher = new FeedFetcher();
 
-waitForPostgres.wait(configuration.database);
-
-// fetcher.fetchFeeds();
+waitForPostgres
+  .wait(configuration.database)
+  .then(fetcher.fetchFeeds());
