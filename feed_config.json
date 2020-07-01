@@ -2,21 +2,21 @@
   {
     "feedURL" : "https://api.basisregisters.vlaanderen/v1/feeds/adressen.atom?embed=object,event",
     "handlerName" : "Adressen",
-    "disabled": false
+    "enabled": true
   },
   {
     "feedURL" : "https://api.basisregisters.vlaanderen.be/v1/feeds/straatnamen.atom?embed=event,object",
     "handlerName" : "Straatnamen",
-    "disabled": true
+    "enabled": false
   },
   {
     "feedURL" : "https://api.basisregisters.vlaanderen.be/v1/feeds/gemeenten.atom?embed=event,object",
     "handlerName" : "Gemeentes",
-    "disabled": true
+    "enabled": false
   },
   {
     "feedURL" : "https://api.basisregisters.vlaanderen/v1/feeds/gebouwen.atom?embed=event,object",
     "handlerName" : "Gebouwen",
-    "disabled": true
+    "enabled": false
   }
 ]

@@ -15,7 +15,7 @@ export default class FeedFetcher {
         const config = JSON.parse(rawdata.trim());
 
         for(let feed of config){
-            if(!feed.disabled){
+            if(feed.enabled){
                 this.fetchFeed(feed.feedURL, feed.handlerName);
             }
         }
