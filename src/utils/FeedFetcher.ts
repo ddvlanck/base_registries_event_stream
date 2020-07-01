@@ -1,7 +1,9 @@
 import fetch from 'node-fetch';
 import xml2js from 'xml2js';
+import querystring from 'querystring';
 
 import { configuration } from '../utils/Configuration';
+import { db } from '../utils/Db';
 
 import AdresEventHandler from '../handlers/AdresEventHandler';
 import StraatnaamEventHandler from '../handlers/StraatnaamEventHandler';
@@ -11,7 +13,7 @@ import GebouwEventHandler from '../handlers/GebouwEventHandler';
 const parser = new xml2js.Parser();
 
 export default class FeedFetcher {
-  feeds: { feedLocation: string, handlerName: string, enabled: boolean }[];
+  feeds: { name: string, feedLocation: string, enabled: boolean }[];
 
   constructor() {
     this.feeds = configuration.feeds;
@@ -19,48 +21,92 @@ export default class FeedFetcher {
 
   async fetchFeeds() {
     for (let feed of this.feeds) {
-      if (feed.enabled) {
-        await this.fetchFeed(feed.feedLocation, feed.handlerName);
-      }
+      if (!feed.enabled)
+        continue;
+
+      console.log(`Preparing to fetch feed: ${feed.name}.`);
+
+      await this.fetchFeed(
+        feed.name,
+        feed.feedLocation);
     }
   }
 
-  async fetchFeed(uri: string, handlerName: string) {
-    let nextLink = uri;
-    const handler = this.getHandler(handlerName);
+  async fetchFeed(name: string, uri: string) {
+    const self = this;
+    const handler = this.getHandler(name);
+    const lastPosition = await this.getLastProjectionPosition(name);
+
+    console.log(`Starting ${name} projection at position ${lastPosition}.`);
+
+    // TODO: maybe need to add limit=500 too
+    let nextLink = `${uri}&from=${lastPosition}`;
 
     //while(nextLink !== null){
-    await fetch(nextLink).then(res => res.text()).then(raw => {
-      parser.parseString(raw, (err, data) => {
-        nextLink = this.getNextLink(data);
-        if (data.feed.entry) {
-          handler.processPage(data);
-        }
-      })
-    });
+
+    console.log(`Fetching ${nextLink}`);
+    await fetch(nextLink)
+      .then(res => res.text())
+      .then(async raw => {
+        await parser
+          .parseStringPromise(raw)
+          .then(async function (data) {
+            nextLink = self.getNextLink(data);
+            console.log(`Next Link: ${nextLink}`);
+
+            if (data.feed.entry) {
+              console.log(`Processing entries for ${name}.`);
+              await handler.processPage(data.feed.entry);
+
+              const newPosition = Number(querystring.parse(nextLink).from);
+              console.log(`Saving position ${newPosition} for ${name} projection.`);
+              await db.setProjectionStatus(name, newPosition);
+            } else {
+              console.log(`No more entries for ${name}.`);
+            }
+          })
+          .catch(function (err) {
+            console.log('Failed to parse page.', err);
+          });
+      });
+
     //}
 
-    console.log('Done fetching pages for [' + handlerName + ']');
-  }
-
-  getNextLink(data) {
-    const result = data.feed.link.filter(obj => { return obj['$'].rel === 'next' });
-    return result.length > 0 ? result[0]['$'].href : null;
+    console.log('Done fetching pages for [' + name + ']');
   }
 
   getHandler(name: string) {
     switch (name) {
-      case 'Adressen':
-        return new AdresEventHandler();
-
-      case 'Straatnamen':
-        return new StraatnaamEventHandler();
-
-      case 'Gemeentes':
+      case 'municipality':
         return new GemeenteEventHandler();
 
-      case 'Gebouwen':
+      case 'streetname':
+        return new StraatnaamEventHandler();
+
+      case 'address':
+        return new AdresEventHandler();
+
+      case 'building':
         return new GebouwEventHandler();
     }
+  }
+
+  async getLastProjectionPosition(name: string) {
+    const lastPosition = await db.getProjectionStatus(name);
+
+    if (lastPosition.rows.length === 0) {
+      await db.initProjectionStatus(name);
+      return 0;
+    } else {
+      return lastPosition.rows[0].position;
+    }
+  }
+
+  getNextLink(data) {
+    const result = data.feed.link.filter(obj => {
+      return obj['$'].rel === 'next'
+    });
+
+    return result.length > 0 ? result[0]['$'].href : null;
   }
 }

@@ -1,4 +1,4 @@
-import { db } from "../utils/Postgres";
+import { pool } from "../utils/Postgres";
 
 const BASE_URL = 'http://localhost:3000/address';
 

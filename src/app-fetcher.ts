@@ -6,6 +6,14 @@ import FeedFetcher from "./utils/FeedFetcher";
 
 const fetcher = new FeedFetcher();
 
-waitForPostgres
-  .wait(configuration.database)
-  .then(fetcher.fetchFeeds());
+console.log('Starting Fetcher');
+
+(async () => {
+  const connected = await waitForPostgres.wait(configuration.database);
+
+  if (connected == 0) {
+    await fetcher.fetchFeeds()
+  }
+
+  console.log('Done')
+})();

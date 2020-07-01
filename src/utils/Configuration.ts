@@ -2,7 +2,7 @@ import fs from 'fs';
 
 export default class Configuration {
   database: { username: string, password: string, host: string, port: number, database: string };
-  feeds: { feedLocation: string, handlerName: string, enabled: boolean }[];
+  feeds: { name: string, feedLocation: string, enabled: boolean }[];
 
   constructor() {
     const rawdata = fs.readFileSync('config.json', 'utf8');

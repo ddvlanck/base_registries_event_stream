@@ -1,14 +1,31 @@
-// import {
-//   ADDRESS_QUERY, getRowsForAddressID,
-//   insertValues, POOL,
-//   update,
-// } from "../utils/Postgres";
+import xml2js from 'xml2js';
 
-// const xml2js = require('xml2js');
-// const parser = new xml2js.Parser();
+const parser = new xml2js.Parser();
 
 export default class AddressEventHandler {
-  processPage(data) {
+  async processPage(entries: Array<any>) {
+    const self = this;
+
+    for (let event of entries) {
+      const position = event.id[0];
+      const eventName = event.title[0].replace(`-${position}`, '');
+
+      parser
+        .parseStringPromise(event.content[0])
+        .then(async function (ev) {
+          await self.processEvent(position, eventName, ev);
+        })
+        .catch(function (err) {
+          console.log('Failed to parse event.', err);
+        });
+    }
+  }
+
+  async processEvent(position, eventName, ev) {
+    console.log(`Processing ${eventName} at position ${position}.`);
+  }
+
+
 //     for (let event of data.feed.entry) {
 //       parser.parseString(event.content, async (err, content) => {
 //         if (event.title[0].indexOf('AddressBecameComplete') >= 0) {
@@ -86,5 +103,5 @@ export default class AddressEventHandler {
 //   private createPoint(position) {
 //     const [X, Y] = position.point[0].pos[0].split(' ');
 //     return '(' + X + ',' + Y + ')';
-  }
+// }
 }

@@ -2,9 +2,13 @@
 
 ## Quick Start
 
+Start everything:
+
 ```bash
 docker-compose up
 ```
+
+You can connect to PgAdmin at [localhost:8001](http://localhost:8001) with user `dev@dev.be` and password `dev`. The database to add is at host `db` using username `postgres` and password `dev`.
 
 ## Install it
 
