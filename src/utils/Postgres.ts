@@ -4,7 +4,7 @@ import { configuration } from '../utils/Configuration';
 
 const databaseConfig = configuration.database;
 
-export const POOL = new Pool({
+export const db = new Pool({
     user: databaseConfig.user,
     password: databaseConfig.password,
     host: databaseConfig.host,
@@ -12,31 +12,33 @@ export const POOL = new Pool({
     database: databaseConfig.database,
 });
 
-POOL.on('error', (err, client) => {
-    console.error('Error:', err);
+db.on('error', (err, client) => {
+    console.error('Error: ', err);
 });
 
 export function insertValues(query, values, handlerName) {
-    POOL.connect((err, client, done) => {
+    db.connect((err, client, done) => {
         if (err) throw err;
+
         client.query(query, values, (err, res) => {
             done();
-            if (err) {
-                console.log(err.stack);
-            }
+
+            if (err) console.log(err.stack);
+
             console.log('[' + handlerName + ']: inserted event with ID ' + values[0]);
         });
     })
 }
 
 export function update(query, values, handlerName) {
-    POOL.connect((err, client, done) => {
+    db.connect((err, client, done) => {
         if (err) throw err;
+
         client.query(query, values, (err, res) => {
             done();
-            if (err) {
-                console.log(err.stack)
-            }
+
+            if (err) console.log(err.stack)
+
             console.log('[' + handlerName + ']: added ' + values[0] + ' as PURI for all records with ID ' + values[1]);
         })
     });
@@ -45,14 +47,16 @@ export function update(query, values, handlerName) {
 export function getRowsForAddressID(addressID: string): Promise<Number> {
     const query = 'SELECT * FROM brs."Addresses" WHERE "AddressID" = $1 ORDER BY "EventID" asc';
     const value = [addressID];
+
     return new Promise(resolve => {
-        POOL.connect((err, client, done) => {
+        db.connect((err, client, done) => {
             if (err) throw err;
+
             client.query(query, value, (err, res) => {
                 done();
-                if (err) {
-                    console.log(err.stack)
-                }
+
+                if (err) console.log(err.stack)
+
                 resolve(res.rows.length);
             })
         })

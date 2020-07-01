@@ -10,6 +10,15 @@ export default class Configuration {
 
         this.database = configuration.database;
         this.feeds = configuration.feeds;
+
+        this.database.user = process.env.DB_USER || this.database.user;
+        this.database.password = process.env.DB_PASSWORD || this.database.password;
+        this.database.host = process.env.DB_HOST || this.database.host;
+        this.database.user = process.env.DB_DATABASE || this.database.user;
+
+        if ('DB_PORT' in process.env) {
+            this.database.port = Number(process.env.DB_PORT);
+        }
     }
 }
 

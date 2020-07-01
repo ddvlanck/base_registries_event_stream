@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  fetcher:
+    build:
+      context: .
+      dockerfile: Dockerfile-fetcher
+    container_name: base_registries_fetcher
+    hostname: base_registries_fetcher
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: dev
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: base_registries
+    depends_on:
+      - db
+    links:
+      - db
+
+  db:
+    image: postgres
+    container_name: base_registries_db
+    hostname: base_registries_db
+    restart: always
+    environment:
+      POSTGRES_DB: base_registries
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: dev
+    ports:
+      - 5432:5432
+    volumes:
+      - ./database/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+
+  dba:
+    image: dpage/pgadmin4:4.23
+    container_name: base_registries_dba
+    hostname: base_registries_dba
+    environment:
+      PGADMIN_DEFAULT_EMAIL: dev@dev.be
+      PGADMIN_DEFAULT_PASSWORD: dev
+    ports:
+      - 8001:80
+    depends_on:
+      - db
+    links:
+      - db

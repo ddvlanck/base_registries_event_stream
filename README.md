@@ -1,5 +1,11 @@
 # Base registries event stream
 
+## Quick Start
+
+```bash
+docker-compose up
+```
+
 ## Install it
 
 Clone this repository and run `npm install`
