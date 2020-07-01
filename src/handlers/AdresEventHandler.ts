@@ -17,13 +17,22 @@ export default class AddressEventHandler {
       const position = Number(event.id[0]);
       const eventName = event.title[0].replace(`-${position}`, '');
 
+      if (event.content[0] === 'No data embedded') {
+        console.log(`Skipping ${eventName} at position ${position} because of missing embedded data.`);
+        continue;
+      }
+
       await parser
         .parseStringPromise(event.content[0])
         .then(async function (ev) {
-          await self.processEvent(client, position, eventName, ev);
+          try {
+            await self.processEvent(client, position, eventName, ev.Content);
+          } catch {
+            return;
+          }
         })
         .catch(function (err) {
-          console.log('Failed to parse event.', err);
+          console.error('Failed to parse event.', event.content[0], err);
         });
     }
   }
@@ -31,16 +40,20 @@ export default class AddressEventHandler {
   async processEvent(client: PoolClient, position: number, eventName: string, ev: any) {
     console.log(`Processing ${eventName} at position ${position}.`);
 
-    const eventBody = ev.Event[0];
+    const eventBody = ev.Event[0][Object.keys(ev.Event[0])[0]][0];
     const objectBody = ev.Object[0];
+
+    // console.log(objectBody);
 
     const isComplete = objectBody.IsCompleet[0] === 'true';
 
     // Thanks to isComplete we always know if an object can be saved or not
-    if (!isComplete)
+    if (!isComplete) {
+      console.log(`Skipping ${eventName} at position ${position} due to not having a complete object.`);
       return;
+    }
 
-    const addressId = eventBody[0].AddressId[0];
+    const addressId = eventBody.AddressId[0];
 
     const versieId = objectBody.Identificator[0].VersieId[0];
     const objectId = objectBody.Identificator[0].ObjectId[0];
@@ -56,11 +69,14 @@ export default class AddressEventHandler {
     const positionSpecification = objectBody.PositieSpecificatie[0];
     const officiallyAssigned = objectBody.OfficieelToegekend[0] === 'true';
 
+    console.log(`Adding object for ${addressId} at position ${position}.`);
     await db.addAddress(
       client,
+      position,
+      eventName,
       addressId,
       versieId,
-      objectId,
+      objectId === '' ? null : objectId,
       objectUri,
       streetnameId,
       postalCode,
@@ -73,7 +89,9 @@ export default class AddressEventHandler {
       isComplete,
       officiallyAssigned);
 
-    if (eventName === '') {
+    if (eventName === 'AddressPersistentLocalIdentifierWasAssigned') {
+      console.log(`Assigning ${objectUri} for ${addressId} at position ${position}.`);
+
       db.setAddressPersistentId(client, addressId, objectId, objectUri);
     }
   }

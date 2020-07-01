@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import xml2js from 'xml2js';
 import querystring from 'querystring';
+import sleep from 'sleep-promise';
 
 import { configuration } from '../utils/Configuration';
 import { db } from '../utils/Db';
@@ -9,6 +10,7 @@ import AdresEventHandler from '../handlers/AdresEventHandler';
 import StraatnaamEventHandler from '../handlers/StraatnaamEventHandler';
 import GemeenteEventHandler from '../handlers/GemeenteEventHandler';
 import GebouwEventHandler from '../handlers/GebouwEventHandler';
+import { URL } from 'url';
 
 const parser = new xml2js.Parser();
 
@@ -39,40 +41,43 @@ export default class FeedFetcher {
 
     console.log(`Starting ${name} projection at position ${lastPosition}.`);
 
-    let nextLink = `${uri}&limit=500&from=${lastPosition}`;
+    const rateLimitDelay = 100;
+    const eventsPerPage = 500;
+    let nextLink = new URL(`${uri}?limit=${eventsPerPage}&from=${lastPosition}&embed=event,object`);
 
-    //while(nextLink !== null){
+    while (nextLink !== null) {
+      console.log(`Fetching ${nextLink}&embed=event,object`);
+      await fetch(`${nextLink}&embed=event,object`)
+        .then(res => res.text())
+        .then(async raw => {
+          await parser
+            .parseStringPromise(raw)
+            .then(async function (data) {
+              nextLink = self.getNextLink(data);
+              console.log(`Next Link: ${nextLink}`);
 
-    console.log(`Fetching ${nextLink}`);
-    await fetch(nextLink)
-      .then(res => res.text())
-      .then(async raw => {
-        await parser
-          .parseStringPromise(raw)
-          .then(async function (data) {
-            nextLink = self.getNextLink(data);
-            console.log(`Next Link: ${nextLink}`);
+              if (data.feed.entry) {
+                console.log(`Processing entries for ${name}.`);
 
-            if (data.feed.entry) {
-              console.log(`Processing entries for ${name}.`);
+                await db.transaction(async client => {
+                  await handler.processPage(client, data.feed.entry);
 
-              await db.transaction(async client => {
-                await handler.processPage(client, data.feed.entry);
+                  let newPosition = self.getNextFrom(nextLink);
+                  console.log(`Saving position ${newPosition} for ${name} projection.`);
+                  await db.setProjectionStatus(client, name, newPosition);
+                });
+              } else {
+                console.log(`No more entries for ${name}.`);
+              }
+            })
+            .catch(function (err) {
+              console.error('Failed to parse page.', raw, err);
+            });
+        });
 
-                const newPosition = Number(querystring.parse(nextLink).from);
-                console.log(`Saving position ${newPosition} for ${name} projection.`);
-                await db.setProjectionStatus(client, name, newPosition);
-              });
-            } else {
-              console.log(`No more entries for ${name}.`);
-            }
-          })
-          .catch(function (err) {
-            console.log('Failed to parse page.', err);
-          });
-      });
-
-    //}
+      console.log(`Waiting ${rateLimitDelay}ms to not trigger rate limit.`);
+      await sleep(rateLimitDelay);
+    }
 
     console.log('Done fetching pages for [' + name + ']');
   }
@@ -104,11 +109,16 @@ export default class FeedFetcher {
     }
   }
 
-  getNextLink(data) {
+  getNextLink(data): URL | null {
     const result = data.feed.link.filter(obj => {
       return obj['$'].rel === 'next'
     });
 
-    return result.length > 0 ? result[0]['$'].href : null;
+    return result.length > 0 ? new URL(result[0]['$'].href) : null;
+  }
+
+  getNextFrom(nextLink: URL) : number {
+    const qs = nextLink.search.replace('?', '');
+    return Number(querystring.parse(qs).from);
   }
 }

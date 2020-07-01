@@ -13,67 +13,40 @@ ALTER TABLE brs.projection_status
     OWNER to postgres;
 
 COMMENT ON TABLE brs.projection_status
-    IS 'Stores the current position of the feed.'
+    IS 'Stores the current position of the feed.';
 
-CREATE TABLE brs."StreetNames"
+CREATE TABLE brs."addresses"
 (
-    "EventID" bigint NOT NULL,
-    "EventName" text COLLATE pg_catalog."default" NOT NULL,
-    "Timestamp" text COLLATE pg_catalog."default" NOT NULL,
-    "StreetNameID" text COLLATE pg_catalog."default" NOT NULL,
-    "StreetNameURI" text COLLATE pg_catalog."default",
-    "GeographicalName" text COLLATE pg_catalog."default",
-	"GeographicalNameLanguage" text COLLATE pg_catalog."default",
-    "Status" text COLLATE pg_catalog."default",
-    "NisCode" bigint,
-    "IsComplete" text COLLATE pg_catalog."default"
+    "event_id" bigint NOT NULL,
+    "event_name" character varying(200) NOT NULL,
+
+    "address_id" character varying(40) NOT NULL,
+    "timestamp" character varying(30) NOT NULL,
+
+    "object_id" bigint,
+    "object_uri" character varying(500),
+    "streetname_id" character varying(40),
+
+    "postal_code" character varying(4),
+    "house_number" character varying(10),
+    "box_number" character varying(10),
+    "address_status" character varying(40),
+    "address_position" character varying(50),
+    "position_geometry_method" character varying(40),
+    "position_specification" character varying(40),
+    "complete" boolean,
+    "officially_assigned" boolean,
+
+    PRIMARY KEY ("event_id")
 )
+
+-- TODO: Add index on object_id, complete
 
 TABLESPACE pg_default;
 
-ALTER TABLE brs."StreetNames"
+ALTER TABLE brs."addresses"
     OWNER to postgres;
 
-CREATE TABLE brs."Municipalities"
-(
-    "EventID" bigint NOT NULL,
-    "EventName" text COLLATE pg_catalog."default" NOT NULL,
-    "Timestamp" text COLLATE pg_catalog."default" NOT NULL,
-    "MunicipalityID" text COLLATE pg_catalog."default",
-    "MunicipalityURI" text COLLATE pg_catalog."default",
-    "OfficialLanguage" text[] COLLATE pg_catalog."default",
-    "GeographicalName" text[] COLLATE pg_catalog."default",
-    "GeographicalNameLanguage" text[] COLLATE pg_catalog."default",
-    "Status" text COLLATE pg_catalog."default"
-)
+COMMENT ON TABLE brs."addresses"
+    IS 'Stores the complete address objects.';
 
-TABLESPACE pg_default;
-
-ALTER TABLE brs."Municipalities"
-    OWNER to postgres;
-
-CREATE TABLE brs."Addresses"
-(
-    "EventID" bigint NOT NULL,
-    "EventName" text COLLATE pg_catalog."default" NOT NULL,
-    "Timestamp" text COLLATE pg_catalog."default" NOT NULL,
-    "AddressID" text COLLATE pg_catalog."default" NOT NULL,
-    "AddressURI" text COLLATE pg_catalog."default",
-    "StreetNameID" text COLLATE pg_catalog."default",
-    "PostalCode" bigint,
-    "AddressStatus" text COLLATE pg_catalog."default",
-    "HouseNumber" text COLLATE pg_catalog."default",
-    "FlatNumber" text COLLATE pg_catalog."default",
-    "PositionGeometryMethod" text COLLATE pg_catalog."default",
-    "PositionSpecification" text COLLATE pg_catalog."default",
-    "IsComplete" boolean,
-    "OfficiallyAssigned" boolean,
-    "AddressPosition" text COLLATE pg_catalog."default"
-)
-
--- error with type of AdresPositie, so set on text for now
-
-TABLESPACE pg_default;
-
-ALTER TABLE brs."Addresses"
-    OWNER to postgres;

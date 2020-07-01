@@ -11,4 +11,4 @@ RUN npm ci
 
 RUN npm run build
 
-CMD [ "node", "lib/app.js" ]
+CMD [ "node", "lib/api.js" ]

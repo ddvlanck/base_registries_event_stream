@@ -1,103 +1,123 @@
-import { pool } from "../utils/Postgres";
+import { db } from "../utils/Db";
 
-const BASE_URL = 'http://localhost:3000/address';
+const BASE_URL = 'http://localhost:8000/address';
+const PAGE_SIZE = 25;
 
-export async function getAddressPage(req, res) {
-  const pageSize = 25;
+export async function getAddress(req, res) {
   const page = parseInt(req.query.page, 10);
 
-  // if (!page) {
-  //   res.redirect('?page=1');
-  // } else {
-  //   const query = `SELECT * from brs."Addresses" ORDER BY "EventID" asc LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
-  //   const queryResponse = await db.query(query);
-  //   const items = queryResponse.rows;
+  if (!page) {
+    res.redirect('?page=1');
+  } else {
+    const queryResponse = await db.getAddressPaged(req.params.objectId, page, PAGE_SIZE);
+    res.json(buildResponse(queryResponse.rows, PAGE_SIZE, page));
+  }
+}
 
-  //   const blob = getContext();
-  //   blob["feed_url"] = BASE_URL;
-  //   blob['@id'] = `${BASE_URL}?page=${page}`;
+export async function getAddressPage(req, res) {
+  const page = parseInt(req.query.page, 10);
 
-  //   const tree = [];
-  //   if (items.length === pageSize) {
-  //     const nextURL = `${BASE_URL}?page=${(page + 1)}`
-  //     blob['next_url'] = nextURL;
+  if (!page) {
+    res.redirect('?page=1');
+  } else {
+    const queryResponse = await db.getAddressesPaged(page, PAGE_SIZE);
+    res.json(buildResponse(queryResponse.rows, PAGE_SIZE, page));
+  }
+}
 
-  //     tree.push({
-  //       "@type": "tree:GreaterThanRelation",
-  //       "tree:node": nextURL,
-  //       "tree:path": "prov:generatedAtTime",
-  //       "tree:value": {
-  //         "@value": items[items.length - 1]["Timestamp"],
-  //         "@type": "xsd:dateTime",
-  //       },
-  //     });
-  //   }
+function buildResponse(items, pageSize, page) {
+  const context = getContext();
+  context["feed_url"] = BASE_URL;
+  context['@id'] = `${BASE_URL}?page=${page}`;
 
-  //   if (page > 1) {
-  //     const previousURL = `${BASE_URL}?page=${(page - 1)}`;
-  //     blob['previous_url'] = previousURL;
+  const tree = [];
 
-  //     if (items.length) {
-  //       tree.push({
-  //         "@type": "tree:LessThanRelation",
-  //         "tree:node": previousURL,
-  //         "tree:path": "prov:generatedAtTime",
-  //         "tree:value": {
-  //           "@value": items[0]["Timestamp"],
-  //           "@type": "xsd:dateTime",
-  //         },
-  //       });
-  //     }
-  //   }
+  addNext(context, tree, items, pageSize, page);
+  addPrevious(context, tree, items, page);
 
-  //   if (tree.length) {
-  //     blob["tree:relation"] = tree;
-  //   }
+  if (tree.length) {
+    context["tree:relation"] = tree;
+  }
 
-  //   blob["items"] = items.map((item) => createAddressEvent(item));
-  //   res.json(blob);
+  context["items"] = items.map((item) => createAddressEvent(item));
 
-  // }
+  return context;
+}
 
+function addNext(context, tree, items, pageSize, page) {
+  if (items.length !== pageSize) return;
+
+  const nextURL = `${BASE_URL}?page=${(page + 1)}`
+  context['next_url'] = nextURL;
+
+  tree.push({
+    "@type": "tree:GreaterThanRelation",
+    "tree:node": nextURL,
+    "tree:path": "prov:generatedAtTime",
+    "tree:value": {
+      "@value": items[items.length - 1]["Timestamp"],
+      "@type": "xsd:dateTime",
+    },
+  });
+}
+
+function addPrevious(context, tree, items, page) {
+  if (page <= 1) return;
+
+  const previousURL = `${BASE_URL}?page=${(page - 1)}`;
+  context['previous_url'] = previousURL;
+
+  if (items.length) {
+    tree.push({
+      "@type": "tree:LessThanRelation",
+      "tree:node": previousURL,
+      "tree:path": "prov:generatedAtTime",
+      "tree:value": {
+        "@value": items[0]["Timestamp"],
+        "@type": "xsd:dateTime",
+      },
+    });
+  }
 }
 
 function createAddressEvent(data) {
   const addressEvent = {};
 
-  addressEvent['prov:generatedAtTime'] = data.Timestamp;
+  addressEvent['prov:generatedAtTime'] = data.timestamp;
   addressEvent['memberOf'] = BASE_URL;
-  addressEvent['eventName'] = data.EventName
-  addressEvent['isVersionOf'] = data.AddressURI;
+  addressEvent['eventName'] = data.event_name
+  addressEvent['isVersionOf'] = data.object_uri;
   addressEvent['@type'] = 'Adres';
 
   if (data.FlatNumber) {
-    addressEvent['busnummer'] = data.FlatNumber
+    addressEvent['busnummer'] = data.box_number
   }
 
   if (data.HouseNumber) {
-    addressEvent['huisnummer'] = data.HouseNumber;
+    addressEvent['huisnummer'] = data.house_number;
   }
 
   if (data.PostalCode) {
     addressEvent['heeftPostinfo'] = {
-      postcode: data.PostalCode
+      postcode: data.postal_code
     }
   }
 
-  if (data.PositionGeometryMethod) {
-    switch (data.positionGeometryMethod) {
+  if (data.position_geometry_method) {
+    switch (data.position_geometry_method) {
       case 'AfgeleidVanObject':
         addressEvent['methode'] = 'http://inspire.ec.europa.eu/codelist/GeometryMethodValue/fromFeature';
         break;
+
       case 'AangeduidDoorBeheerder':
         addressEvent['methode'] = 'http://inspire.ec.europa.eu/codelist/GeometryMethodValue/byAdministrator';
         break;
     }
   }
 
-  addressEvent['officieelToegekend'] = data.OfficiallyAssigned;
-  addressEvent['isCompleet'] = data.IsComplete;
-  addressEvent['status'] = data.AddressStatus; //TODO: map to codelist
+  addressEvent['officieelToegekend'] = data.officially_assigned;
+  addressEvent['isCompleet'] = data.complete;
+  addressEvent['status'] = data.address_status; //TODO: map to codelist
 
   //TODO: add position
 

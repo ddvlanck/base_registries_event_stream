@@ -5,8 +5,15 @@
 Start everything:
 
 ```bash
-docker-compose up
+git clone git@github.com:ddvlanck/base_registries_event_stream.git
+npm i
+docker-compose up --build
 ```
+
+Some example API endpoints you can use:
+
+* [localhost:8000/address](http://localhost:8000/address)
+* [localhost:8000/address/1305718](http://localhost:8000/address/1305718)
 
 You can connect to PgAdmin at [localhost:8001](http://localhost:8001) with user `dev@dev.be` and password `dev`. The database to add is at host `db` using username `postgres` and password `dev`.
 

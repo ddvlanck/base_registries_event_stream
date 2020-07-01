@@ -3,6 +3,37 @@ import { PoolClient } from 'pg';
 import { pool } from './Postgres';
 
 export default class Db {
+  async getAddressPaged(objectId: number, page: number, pageSize: number) {
+    const client = await pool.connect();
+    const ADDRESSES_PAGED = `
+      SELECT *
+        FROM brs.addresses
+       WHERE object_id = $1
+       ORDER BY event_id ASC
+       LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
+
+    try {
+      return await client.query(ADDRESSES_PAGED, [objectId]);
+    } finally {
+      client.release();
+    }
+  }
+
+  async getAddressesPaged(page: number, pageSize: number) {
+    const client = await pool.connect();
+    const ADDRESSES_PAGED = `
+      SELECT *
+        FROM brs.addresses
+       ORDER BY event_id ASC
+       LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
+
+    try {
+      return await client.query(ADDRESSES_PAGED);
+    } finally {
+      client.release();
+    }
+  }
+
   async transaction(f: (client: PoolClient) => any) {
     const client = await pool.connect();
 
@@ -58,9 +89,11 @@ export default class Db {
 
   async addAddress(
     client: PoolClient,
+    eventId: number,
+    eventName: string,
     addressId: string,
     timestamp: string,
-    objectId: number,
+    objectId: number | null,
     objectUri: string,
     streetnameId: string,
     postalCode: string,
@@ -75,6 +108,8 @@ export default class Db {
 
     const ADD_ADDRESS = `
       INSERT INTO brs.addresses(
+        "event_id",
+        "event_name",
         "address_id",
         "timestamp",
         "object_id",
@@ -89,11 +124,13 @@ export default class Db {
         "position_specification",
         "complete",
         "officially_assigned")
-      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`;
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`;
 
     return await client.query(
       ADD_ADDRESS,
       [
+        eventId,
+        eventName,
         addressId,
         timestamp,
         objectId,
@@ -111,7 +148,12 @@ export default class Db {
       ]);
   }
 
-  async setAddressPersistentId(client: PoolClient, addressId: string, objectId: number, objectUri: string) {
+  async setAddressPersistentId(
+    client: PoolClient,
+    addressId: string,
+    objectId: number,
+    objectUri: string) {
+
     const SET_OBJECTID = `
       UPDATE brs.addresses
          SET object_id = $1, object_uri = $2

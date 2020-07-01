@@ -9,22 +9,22 @@
   "feeds": [
     {
       "name": "municipality",
-      "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/gemeenten.atom?embed=event,object",
+      "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/gemeenten",
       "enabled": false
     },
     {
       "name": "streetname",
-      "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/straatnamen.atom?embed=event,object",
+      "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/straatnamen",
       "enabled": false
     },
     {
       "name": "address",
-      "feedLocation" : "https://api.basisregisters.dev-vlaanderen/v1/feeds/adressen.atom?embed=object,event",
+      "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/adressen",
       "enabled": true
     },
     {
       "name": "building",
-      "feedLocation" : "https://api.basisregisters.dev-vlaanderen/v1/feeds/gebouwen.atom?embed=event,object",
+      "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/gebouwen",
       "enabled": false
     }
   ]

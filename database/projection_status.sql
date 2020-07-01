@@ -11,4 +11,4 @@ ALTER TABLE brs.projection_status
     OWNER to postgres;
 
 COMMENT ON TABLE brs.projection_status
-    IS 'Stores the current position of the feed.'
+    IS 'Stores the current position of the feed.';

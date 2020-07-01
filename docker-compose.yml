@@ -1,6 +1,25 @@
 version: "3.8"
 
 services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile-api
+    container_name: base-registries-api
+    hostname: base-registries-api
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: dev
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: base_registries
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    links:
+      - db
+
   fetcher:
     build:
       context: .

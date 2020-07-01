@@ -2,7 +2,7 @@ import waitForPostgres from './../dependencies/wait-for-postgres/lib';
 
 import { configuration } from './utils/Configuration';
 
-import FeedFetcher from "./utils/FeedFetcher";
+import FeedFetcher from './utils/FeedFetcher';
 
 const fetcher = new FeedFetcher();
 
@@ -16,4 +16,4 @@ console.log('Starting Fetcher');
   }
 
   console.log('Done')
-})();
+})().catch(e => console.error(e.stack));
