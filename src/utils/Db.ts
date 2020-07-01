@@ -1,6 +1,25 @@
+import { PoolClient } from 'pg';
+
 import { pool } from './Postgres';
 
 export default class Db {
+  async transaction(f: (client: PoolClient) => any) {
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+
+      await f(client);
+
+      await client.query('COMMIT');
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
+
   async getProjectionStatus(feed: string) {
     const client = await pool.connect()
     const PROJECTION_STATUS = `

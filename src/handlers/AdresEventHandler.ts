@@ -1,19 +1,27 @@
 import xml2js from 'xml2js';
+import { PoolClient } from 'pg';
+
+import { db } from '../utils/Db';
 
 const parser = new xml2js.Parser();
 
 export default class AddressEventHandler {
   async processPage(entries: Array<any>) {
     const self = this;
+    await db.transaction(client => self.processEvents(client, entries));
+  }
+
+  async processEvents(client: PoolClient, entries: Array<any>) {
+    const self = this;
 
     for (let event of entries) {
-      const position = event.id[0];
+      const position = Number(event.id[0]);
       const eventName = event.title[0].replace(`-${position}`, '');
 
-      parser
+      await parser
         .parseStringPromise(event.content[0])
         .then(async function (ev) {
-          await self.processEvent(position, eventName, ev);
+          await self.processEvent(client, position, eventName, ev);
         })
         .catch(function (err) {
           console.log('Failed to parse event.', err);
@@ -21,8 +29,10 @@ export default class AddressEventHandler {
     }
   }
 
-  async processEvent(position, eventName, ev) {
+  async processEvent(client: PoolClient, position: number, eventName: string, ev: any) {
     console.log(`Processing ${eventName} at position ${position}.`);
+
+
   }
 
 
