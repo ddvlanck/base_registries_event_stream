@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node lib/app.js",
-    "fetch" : "node lib/app-fetcher.js",
+    "fetch": "node lib/app-fetcher.js",
     "build": "tsc -b",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -14,7 +14,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/express": "^4.17.6",
-    "@types/node": "^14.0.13",
+    "@types/node": "^14.0.14",
     "typescript": "^3.9.5"
   },
   "dependencies": {
