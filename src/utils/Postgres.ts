@@ -1,10 +1,15 @@
-const { Client, Pool } = require('pg');
+import { Pool } from 'pg';
+
+import { configuration } from '../utils/Configuration';
+
+const databaseConfig = configuration.database;
 
 export const POOL = new Pool({
-    user: 'postgres',
-    host: 'localhost',			// Change IP according to docker container of postgres
-    database: 'base_registries',
-    password: 'oslo'
+    user: databaseConfig.user,
+    password: databaseConfig.password,
+    host: databaseConfig.host,
+    port: databaseConfig.port,
+    database: databaseConfig.database,
 });
 
 POOL.on('error', (err, client) => {

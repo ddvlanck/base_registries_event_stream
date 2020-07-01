@@ -1,4 +1,11 @@
 {
+  "database": {
+    "user": "postgres",
+    "password": "oslo",
+    "host": "localhost",
+    "port": 5432,
+    "database": "base_registries"
+  },
   "feeds": [
     {
       "feedLocation" : "https://api.basisregisters.vlaanderen/v1/feeds/adressen.atom?embed=object,event",

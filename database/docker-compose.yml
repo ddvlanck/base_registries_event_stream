@@ -1,12 +1,28 @@
-version: '3'
+version: "3.8"
+
 services:
-  database:
+  db:
     image: postgres
-    container_name: "base_registries_db"
+    container_name: base_registries_db
+    hostname: base_registries_db
+    restart: always
     environment:
-      POSTGRES_DB: "base_registries"
-      POSTGRES_HOST_AUTH_METHOD: "trust"
+      POSTGRES_DB: base_registries
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
     ports:
-    - 5432:5432
+      - 5432:5432
     volumes:
-    - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+      - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+
+  dba:
+    image: dpage/pgadmin4:4.21
+    container_name: base_registries_dba
+    hostname: base_registries_dba
+    environment:
+      PGADMIN_DEFAULT_EMAIL: dev@dev.be
+      PGADMIN_DEFAULT_PASSWORD: dev
+    ports:
+      - "8001:80"
+    networks:
+      - db

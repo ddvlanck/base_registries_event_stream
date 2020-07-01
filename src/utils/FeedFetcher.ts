@@ -1,11 +1,12 @@
-import AdresEventHandler from "../handlers/AdresEventHandler";
-import StraatnaamEventHandler from "../handlers/StraatnaamEventHandler";
-import GemeenteEventHandler from "../handlers/GemeenteEventHandler";
-import GebouwEventHandler from "../handlers/GebouwEventHandler";
-
-import fs from 'fs';
 import fetch from 'node-fetch';
 import xml2js from 'xml2js';
+
+import { configuration } from '../utils/Configuration';
+
+import AdresEventHandler from '../handlers/AdresEventHandler';
+import StraatnaamEventHandler from '../handlers/StraatnaamEventHandler';
+import GemeenteEventHandler from '../handlers/GemeenteEventHandler';
+import GebouwEventHandler from '../handlers/GebouwEventHandler';
 
 const parser = new xml2js.Parser();
 
@@ -13,8 +14,7 @@ export default class FeedFetcher {
     feeds: { feedLocation: string, handlerName: string, enabled: boolean }[];
 
     constructor() {
-        const rawdata = fs.readFileSync('config.json', 'utf8');
-        this.feeds = JSON.parse(rawdata.trim()).feeds;
+        this.feeds = configuration.feeds;
     }
 
     async fetchFeeds() {
@@ -40,7 +40,7 @@ export default class FeedFetcher {
         });
         //}
 
-        console.log("Done fetching pages for [" + handlerName + "]");
+        console.log('Done fetching pages for [' + handlerName + ']');
     }
 
     getNextLink(data) {

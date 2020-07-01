@@ -20,6 +20,7 @@
     "typescript": "^3.9.5"
   },
   "dependencies": {
+    "@types/pg": "^7.14.3",
     "debug": "^4.1.1",
     "express": "^4.17.1",
     "influx": "^5.5.2",
