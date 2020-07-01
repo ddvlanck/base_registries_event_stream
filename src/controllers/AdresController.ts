@@ -1,12 +1,12 @@
-import {POOL} from "../utils/Postgres";
+import { POOL } from "../utils/Postgres";
 
 const BASE_URL = 'http://localhost:3000/address';
 
-export async function getAddressPage(req, res){
+export async function getAddressPage(req, res) {
     const pageSize = 25;
     const page = parseInt(req.query.page, 10);
 
-    if(!page){
+    if (!page) {
         res.redirect('?page=1');
     } else {
         const query = `SELECT * from brs."Addresses" ORDER BY "EventID" asc LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
@@ -18,7 +18,7 @@ export async function getAddressPage(req, res){
         blob['@id'] = `${BASE_URL}?page=${page}`;
 
         const tree = [];
-        if(items.length === pageSize){
+        if (items.length === pageSize) {
             const nextURL = `${BASE_URL}?page=${(page + 1)}`
             blob['next_url'] = nextURL;
 
@@ -33,7 +33,7 @@ export async function getAddressPage(req, res){
             });
         }
 
-        if(page > 1){
+        if (page > 1) {
             const previousURL = `${BASE_URL}?page=${(page - 1)}`;
             blob['previous_url'] = previousURL;
 
@@ -61,7 +61,7 @@ export async function getAddressPage(req, res){
 
 }
 
-function createAddressEvent(data){
+function createAddressEvent(data) {
     const addressEvent = {};
 
     addressEvent['prov:generatedAtTime'] = data.Timestamp;
@@ -70,21 +70,21 @@ function createAddressEvent(data){
     addressEvent['isVersionOf'] = data.AddressURI;
     addressEvent['@type'] = 'Adres';
 
-    if(data.FlatNumber){
+    if (data.FlatNumber) {
         addressEvent['busnummer'] = data.FlatNumber
     }
 
-    if(data.HouseNumber){
+    if (data.HouseNumber) {
         addressEvent['huisnummer'] = data.HouseNumber;
     }
 
-    if(data.PostalCode){
+    if (data.PostalCode) {
         addressEvent['heeftPostinfo'] = {
-            postcode : data.PostalCode
+            postcode: data.PostalCode
         }
     }
 
-    if(data.PositionGeometryMethod){
+    if (data.PositionGeometryMethod) {
         switch (data.positionGeometryMethod) {
             case 'AfgeleidVanObject':
                 addressEvent['methode'] = 'http://inspire.ec.europa.eu/codelist/GeometryMethodValue/fromFeature';
@@ -104,41 +104,41 @@ function createAddressEvent(data){
     return addressEvent;
 }
 
-function getContext(){
+function getContext() {
     return {
-        "@context" : {
-            "prov" : "http://www.w3.org/ns/prov#",
+        "@context": {
+            "prov": "http://www.w3.org/ns/prov#",
             "xsd": "http://www.w3.org/2001/XMLSchema#",
-            "generatedAtTime" : {
-              "@id" : "prov:generatedAtTime",
-              "@type" : "xsd:dateTime"
+            "generatedAtTime": {
+                "@id": "prov:generatedAtTime",
+                "@type": "xsd:dateTime"
             },
-            "eventName" : "http://www.w3.org/ns/adms#versionNotes",
-            "Adres" : "https://data.vlaanderen.be/ns/adres#Adres",
-            "busnummer" : "https://data.vlaanderen.be/ns/adres#busnummer",
-            "huisnummer" : "https://data.vlaanderen.be/ns/adres#huisnummer",
-            "heeftPostinfo" : "https://data.vlaanderen.be/ns/adres#Postinfo",
-            "postcode" : "https://data.vlaanderen.be/ns/adres#postcode",
-            "officieelToegekend" : "https://data.vlaanderen.be/ns/adres#officieelToegekend",
-            "status" : "https://data.vlaanderen.be/ns/adres#Straatnaam.status",
-            "methode" : {
-                "@id" : "https://data.vlaanderen.be/ns/generiek#methode",
-                "@type" : "@id"
+            "eventName": "http://www.w3.org/ns/adms#versionNotes",
+            "Adres": "https://data.vlaanderen.be/ns/adres#Adres",
+            "busnummer": "https://data.vlaanderen.be/ns/adres#busnummer",
+            "huisnummer": "https://data.vlaanderen.be/ns/adres#huisnummer",
+            "heeftPostinfo": "https://data.vlaanderen.be/ns/adres#Postinfo",
+            "postcode": "https://data.vlaanderen.be/ns/adres#postcode",
+            "officieelToegekend": "https://data.vlaanderen.be/ns/adres#officieelToegekend",
+            "status": "https://data.vlaanderen.be/ns/adres#Straatnaam.status",
+            "methode": {
+                "@id": "https://data.vlaanderen.be/ns/generiek#methode",
+                "@type": "@id"
             },
-            "specificatie" : {
-                "@id" : "https://data.vlaanderen.be/ns/generiek#specificatie",
-                "@type" : "@id"
+            "specificatie": {
+                "@id": "https://data.vlaanderen.be/ns/generiek#specificatie",
+                "@type": "@id"
             },
-            "isCompleet" : {
-                "@id" : "https://basisregisters.vlaanderen.be/ns/addressenregister#isCompleet",
-                "@type" : "xsd:boolean"
+            "isCompleet": {
+                "@id": "https://basisregisters.vlaanderen.be/ns/addressenregister#isCompleet",
+                "@type": "xsd:boolean"
             },
-            "items" : {
-                "@id" : "@graph"
+            "items": {
+                "@id": "@graph"
             },
-            "isVersionOf" : {
-                "@id" : "http://purl.org/dc/terms/isVersionOf",
-                "@type" : "@id"
+            "isVersionOf": {
+                "@id": "http://purl.org/dc/terms/isVersionOf",
+                "@type": "@id"
             },
             "hydra": "http://www.w3.org/ns/hydra/core#",
             "next_url": {

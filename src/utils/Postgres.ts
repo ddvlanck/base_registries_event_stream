@@ -1,4 +1,4 @@
-const {Client, Pool} = require('pg');
+const { Client, Pool } = require('pg');
 
 export const POOL = new Pool({
     user: 'postgres',
@@ -11,12 +11,12 @@ POOL.on('error', (err, client) => {
     console.error('Error:', err);
 });
 
-export function insertValues(query, values, handlerName){
+export function insertValues(query, values, handlerName) {
     POOL.connect((err, client, done) => {
-        if(err) throw err;
+        if (err) throw err;
         client.query(query, values, (err, res) => {
             done();
-            if(err) {
+            if (err) {
                 console.log(err.stack);
             }
             console.log('[' + handlerName + ']: inserted event with ID ' + values[0]);
@@ -26,7 +26,7 @@ export function insertValues(query, values, handlerName){
 
 export function update(query, values, handlerName) {
     POOL.connect((err, client, done) => {
-        if(err) throw err;
+        if (err) throw err;
         client.query(query, values, (err, res) => {
             done();
             if (err) {
@@ -37,15 +37,15 @@ export function update(query, values, handlerName) {
     });
 }
 
-export function getRowsForAddressID(addressID: string): Promise<Number>{
+export function getRowsForAddressID(addressID: string): Promise<Number> {
     const query = 'SELECT * FROM brs."Addresses" WHERE "AddressID" = $1 ORDER BY "EventID" asc';
     const value = [addressID];
     return new Promise(resolve => {
         POOL.connect((err, client, done) => {
-            if(err) throw err;
+            if (err) throw err;
             client.query(query, value, (err, res) => {
                 done();
-                if(err){
+                if (err) {
                     console.log(err.stack)
                 }
                 resolve(res.rows.length);

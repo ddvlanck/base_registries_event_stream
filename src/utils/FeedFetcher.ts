@@ -9,41 +9,40 @@ const xml2js = require('xml2js');
 const parser = new xml2js.Parser();
 
 export default class FeedFetcher {
-
     constructor() {
         const rawdata = fs.readFileSync('feed_config.json', 'utf8');
         const config = JSON.parse(rawdata.trim());
 
-        for(let feed of config){
-            if(feed.enabled){
+        for (let feed of config) {
+            if (feed.enabled) {
                 this.fetchFeed(feed.feedURL, feed.handlerName);
             }
         }
     }
 
-    async fetchFeed(uri: string, handlerName: string){
+    async fetchFeed(uri: string, handlerName: string) {
         let nextLink = uri;
         const handler = this.getHandler(handlerName);
         //while(nextLink !== null){
-            await fetch(nextLink).then(res => res.text()).then(raw => {
-                parser.parseString(raw, (err, data) => {
-                    nextLink = this.getNextLink(data);
-                    if(data.feed.entry){
-                        handler.processPage(data);
-                    }
-                })
-            });
+        await fetch(nextLink).then(res => res.text()).then(raw => {
+            parser.parseString(raw, (err, data) => {
+                nextLink = this.getNextLink(data);
+                if (data.feed.entry) {
+                    handler.processPage(data);
+                }
+            })
+        });
         //}
 
         console.log("Done fetching pages for [" + handlerName + "]");
     }
 
-    getNextLink(data){
-        const result =  data.feed.link.filter(obj => {return obj['$'].rel === 'next'});
+    getNextLink(data) {
+        const result = data.feed.link.filter(obj => { return obj['$'].rel === 'next' });
         return result.length > 0 ? result[0]['$'].href : null;
     }
 
-    getHandler(name: string){
+    getHandler(name: string) {
         switch (name) {
             case 'Adressen':
                 return new AdresEventHandler();

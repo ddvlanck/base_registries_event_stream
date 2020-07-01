@@ -1,7 +1,7 @@
 ﻿﻿import express = require("express");
-import {getGemeentePage} from "../controllers/GemeenteController";
+import { getGemeentePage } from "../controllers/GemeenteController";
 import { getAddressPage } from "../controllers/AdresController";
-import {getStreetNamePage} from "../controllers/StreetNameController";
+import { getStreetNamePage } from "../controllers/StreetNameController";
 
 const router = express.Router();
 

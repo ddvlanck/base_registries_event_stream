@@ -1,4 +1,3 @@
-
 export async function getGemeentePage(req, res){
     //TODO
 }

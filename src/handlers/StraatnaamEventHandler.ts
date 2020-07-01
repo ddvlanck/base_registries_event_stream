@@ -1,15 +1,14 @@
-import {STREETNAME_QUERY, insertValues, update} from "../utils/Postgres";
+import { STREETNAME_QUERY, insertValues, update } from "../utils/Postgres";
 
 const xml2js = require('xml2js');
 const parser = new xml2js.Parser();
 
 export default class StraatnaamEventHandler {
-
-    processPage(data){
+    processPage(data) {
         for (let event of data.feed.entry) {
             parser.parseString(event.content, async (err, content) => {
                 //TODO: some error with parser saying: 'Error: Non-whitespace before first tag' on event 214 (and others too)
-                if(!err) {
+                if (!err) {
 
                     /*const values = [
                         parseInt(event.id[0]),                                          // event ID

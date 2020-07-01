@@ -8,7 +8,6 @@ const xml2js = require('xml2js');
 const parser = new xml2js.Parser();
 
 export default class AddressEventHandler {
-
     processPage(data) {
         for (let event of data.feed.entry) {
             parser.parseString(event.content, async (err, content) => {
@@ -32,9 +31,9 @@ export default class AddressEventHandler {
                     ];
 
                     const numberOfRows = await getRowsForAddressID(content.Content.Object[0].Id[0]);
-                    console.log(Object.keys(content.Content.Event[0])[0] + '(' + event.id[0] + ') --> ' + numberOfRows );
+                    console.log(Object.keys(content.Content.Event[0])[0] + '(' + event.id[0] + ') --> ' + numberOfRows);
 
-                    if(numberOfRows > 0){
+                    if (numberOfRows > 0) {
                         console.log("YES: " + event.id[0]);
                     }
 
