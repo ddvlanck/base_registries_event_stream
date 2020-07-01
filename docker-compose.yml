@@ -5,8 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-fetcher
-    container_name: base_registries_fetcher
-    hostname: base_registries_fetcher
+    container_name: base-registries-fetcher
+    hostname: base-registries-fetcher
     environment:
       DB_USER: postgres
       DB_PASSWORD: dev
@@ -20,8 +20,8 @@ services:
 
   db:
     image: postgres
-    container_name: base_registries_db
-    hostname: base_registries_db
+    container_name: base-registries-db
+    hostname: base-registries-db
     restart: always
     environment:
       POSTGRES_DB: base_registries
@@ -34,8 +34,8 @@ services:
 
   dba:
     image: dpage/pgadmin4:4.23
-    container_name: base_registries_dba
-    hostname: base_registries_dba
+    container_name: base-registries-dba
+    hostname: base-registries-dba
     environment:
       PGADMIN_DEFAULT_EMAIL: dev@dev.be
       PGADMIN_DEFAULT_PASSWORD: dev

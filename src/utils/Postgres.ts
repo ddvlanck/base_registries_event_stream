@@ -4,8 +4,8 @@ import { configuration } from '../utils/Configuration';
 
 const databaseConfig = configuration.database;
 
-export const pool = new Pool({
-  user: databaseConfig.user,
+const pool = new Pool({
+  user: databaseConfig.username,
   password: databaseConfig.password,
   host: databaseConfig.host,
   port: databaseConfig.port,
@@ -17,25 +17,18 @@ pool.on('error', (err, client) => {
 });
 
 export default class Db {
-  async insertValues(query: string, values: Array<any>, handlerName) {
+  async insertValues(query: string, values: Array<any>, handlerName: string) {
     pool
       .query(query, values)
-      .then(res => console.log('[' + handlerName + ']: inserted event with ID ' + values[0]))
+      .then(_ => console.log('[' + handlerName + ']: inserted event with ID ' + values[0]))
       .catch(err => console.error('Error executing query', err.stack))
   }
 
-  async update(query, values, handlerName) {
-    pool.connect((err, client, done) => {
-      if (err) throw err;
-
-      client.query(query, values, (err, res) => {
-        done();
-
-        if (err) console.log(err.stack)
-
-        console.log('[' + handlerName + ']: added ' + values[0] + ' as PURI for all records with ID ' + values[1]);
-      })
-    });
+  async update(query: string, values: Array<any>, handlerName: string) {
+    pool
+      .query(query, values)
+      .then(_ => console.log('[' + handlerName + ']: added ' + values[0] + ' as PURI for all records with ID ' + values[1]))
+      .catch(err => console.error('Error executing query', err.stack))
   }
 
   async getRowsForAddressID(addressID: string): Promise<Number> {
@@ -43,35 +36,12 @@ export default class Db {
     const value = [addressID];
 
     return new Promise(resolve => {
-      pool.connect((err, client, done) => {
-        if (err) throw err;
-
-        client.query(query, value, (err, res) => {
-          done();
-
-          if (err) console.log(err.stack)
-
-          resolve(res.rows.length);
-        })
-      })
+      pool
+        .query(query, value)
+        .then(res => resolve(res.rows.length))
+        .catch(err => console.error('Error executing query', err.stack))
     })
   }
 }
 
-export const ADDRESS_QUERY = 'INSERT INTO brs."Addresses"("EventID", "EventName", "Timestamp", "AddressID", "AddressURI", "StreetNameID", "PostalCode", ' +
-  '"AddressStatus", ' +
-  '"HouseNumber", "FlatNumber", "PositionGeometryMethod", ' +
-  '"PositionSpecification", "IsComplete", "OfficiallyAssigned", "AddressPosition") ' +
-  'VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)';
-
-export const STREETNAME_QUERY = 'INSERT INTO brs."StreetNames" ("EventID", "EventName", "Timestamp", "StreetNameID", "StreetNameURI",' +
-  '"GeographicalName", "GeographicalNameLanguage", "Status", "NisCode", "IsComplete") ' +
-  'VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)';
-
-export const MUNICIPALITY_QUERY = 'INSERT INTO brs."Municipalities" ("EventID", "EventName", "Timestamp", "MunicipalityID", "MunicipalityURI",' +
-  '"OfficialLanguage", "GeographicalName", "GeographicalNameLanguage", "Status") ' +
-  'VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)';
-
-
-
-
+export const db = new Db();

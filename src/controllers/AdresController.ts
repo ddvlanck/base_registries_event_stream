@@ -1,4 +1,4 @@
-import { POOL } from "../utils/Postgres";
+import { db } from "../utils/Postgres";
 
 const BASE_URL = 'http://localhost:3000/address';
 
@@ -6,58 +6,58 @@ export async function getAddressPage(req, res) {
   const pageSize = 25;
   const page = parseInt(req.query.page, 10);
 
-  if (!page) {
-    res.redirect('?page=1');
-  } else {
-    const query = `SELECT * from brs."Addresses" ORDER BY "EventID" asc LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
-    const queryResponse = await POOL.query(query);
-    const items = queryResponse.rows;
+  // if (!page) {
+  //   res.redirect('?page=1');
+  // } else {
+  //   const query = `SELECT * from brs."Addresses" ORDER BY "EventID" asc LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
+  //   const queryResponse = await db.query(query);
+  //   const items = queryResponse.rows;
 
-    const blob = getContext();
-    blob["feed_url"] = BASE_URL;
-    blob['@id'] = `${BASE_URL}?page=${page}`;
+  //   const blob = getContext();
+  //   blob["feed_url"] = BASE_URL;
+  //   blob['@id'] = `${BASE_URL}?page=${page}`;
 
-    const tree = [];
-    if (items.length === pageSize) {
-      const nextURL = `${BASE_URL}?page=${(page + 1)}`
-      blob['next_url'] = nextURL;
+  //   const tree = [];
+  //   if (items.length === pageSize) {
+  //     const nextURL = `${BASE_URL}?page=${(page + 1)}`
+  //     blob['next_url'] = nextURL;
 
-      tree.push({
-        "@type": "tree:GreaterThanRelation",
-        "tree:node": nextURL,
-        "tree:path": "prov:generatedAtTime",
-        "tree:value": {
-          "@value": items[items.length - 1]["Timestamp"],
-          "@type": "xsd:dateTime",
-        },
-      });
-    }
+  //     tree.push({
+  //       "@type": "tree:GreaterThanRelation",
+  //       "tree:node": nextURL,
+  //       "tree:path": "prov:generatedAtTime",
+  //       "tree:value": {
+  //         "@value": items[items.length - 1]["Timestamp"],
+  //         "@type": "xsd:dateTime",
+  //       },
+  //     });
+  //   }
 
-    if (page > 1) {
-      const previousURL = `${BASE_URL}?page=${(page - 1)}`;
-      blob['previous_url'] = previousURL;
+  //   if (page > 1) {
+  //     const previousURL = `${BASE_URL}?page=${(page - 1)}`;
+  //     blob['previous_url'] = previousURL;
 
-      if (items.length) {
-        tree.push({
-          "@type": "tree:LessThanRelation",
-          "tree:node": previousURL,
-          "tree:path": "prov:generatedAtTime",
-          "tree:value": {
-            "@value": items[0]["Timestamp"],
-            "@type": "xsd:dateTime",
-          },
-        });
-      }
-    }
+  //     if (items.length) {
+  //       tree.push({
+  //         "@type": "tree:LessThanRelation",
+  //         "tree:node": previousURL,
+  //         "tree:path": "prov:generatedAtTime",
+  //         "tree:value": {
+  //           "@value": items[0]["Timestamp"],
+  //           "@type": "xsd:dateTime",
+  //         },
+  //       });
+  //     }
+  //   }
 
-    if (tree.length) {
-      blob["tree:relation"] = tree;
-    }
+  //   if (tree.length) {
+  //     blob["tree:relation"] = tree;
+  //   }
 
-    blob["items"] = items.map((item) => createAddressEvent(item));
-    res.json(blob);
+  //   blob["items"] = items.map((item) => createAddressEvent(item));
+  //   res.json(blob);
 
-  }
+  // }
 
 }
 
