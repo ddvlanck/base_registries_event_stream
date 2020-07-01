@@ -3,19 +3,24 @@ import StraatnaamEventHandler from "../handlers/StraatnaamEventHandler";
 import GemeenteEventHandler from "../handlers/GemeenteEventHandler";
 import GebouwEventHandler from "../handlers/GebouwEventHandler";
 
-const fs = require('fs');
-const fetch = require('node-fetch');
-const xml2js = require('xml2js');
+import fs from 'fs';
+import fetch from 'node-fetch';
+import xml2js from 'xml2js';
+
 const parser = new xml2js.Parser();
 
 export default class FeedFetcher {
-    constructor() {
-        const rawdata = fs.readFileSync('feed_config.json', 'utf8');
-        const config = JSON.parse(rawdata.trim());
+    feeds: { feedLocation: string, handlerName: string, enabled: boolean }[];
 
-        for (let feed of config) {
+    constructor() {
+        const rawdata = fs.readFileSync('config.json', 'utf8');
+        this.feeds = JSON.parse(rawdata.trim()).feeds;
+    }
+
+    async fetchFeeds() {
+        for (let feed of this.feeds) {
             if (feed.enabled) {
-                this.fetchFeed(feed.feedURL, feed.handlerName);
+                await this.fetchFeed(feed.feedLocation, feed.handlerName);
             }
         }
     }
@@ -23,6 +28,7 @@ export default class FeedFetcher {
     async fetchFeed(uri: string, handlerName: string) {
         let nextLink = uri;
         const handler = this.getHandler(handlerName);
+
         //while(nextLink !== null){
         await fetch(nextLink).then(res => res.text()).then(raw => {
             parser.parseString(raw, (err, data) => {
@@ -46,12 +52,13 @@ export default class FeedFetcher {
         switch (name) {
             case 'Adressen':
                 return new AdresEventHandler();
-                break;
+
             case 'Straatnamen':
                 return new StraatnaamEventHandler();
-                break;
+
             case 'Gemeentes':
                 return new GemeenteEventHandler();
+
             case 'Gebouwen':
                 return new GebouwEventHandler();
         }
