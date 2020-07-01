@@ -56,11 +56,14 @@ export default class FeedFetcher {
 
             if (data.feed.entry) {
               console.log(`Processing entries for ${name}.`);
-              await handler.processPage(data.feed.entry);
 
-              const newPosition = Number(querystring.parse(nextLink).from);
-              console.log(`Saving position ${newPosition} for ${name} projection.`);
-              await db.setProjectionStatus(name, newPosition);
+              await db.transaction(async client => {
+                await handler.processPage(client, data.feed.entry);
+
+                const newPosition = Number(querystring.parse(nextLink).from);
+                console.log(`Saving position ${newPosition} for ${name} projection.`);
+                await db.setProjectionStatus(client, name, newPosition);
+              });
             } else {
               console.log(`No more entries for ${name}.`);
             }

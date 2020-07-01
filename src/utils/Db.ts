@@ -23,86 +23,102 @@ export default class Db {
   async getProjectionStatus(feed: string) {
     const client = await pool.connect()
     const PROJECTION_STATUS = `
-  SELECT position
-    FROM brs.projection_status
-   WHERE feed = $1;
-  `;
+      SELECT position
+        FROM brs.projection_status
+      WHERE feed = $1;`;
 
     try {
-      return await client.query(PROJECTION_STATUS, [feed])
+      return await client.query(PROJECTION_STATUS, [feed]);
     } finally {
-      client.release()
+      client.release();
     }
   }
 
   async initProjectionStatus(feed: string) {
     const client = await pool.connect()
     const PROJECTION_INIT = `
-  INSERT INTO brs.projection_status(feed, position)
-       VALUES($1, 0);
-  `;
+      INSERT INTO brs.projection_status(feed, position)
+          VALUES($1, 0);`;
 
     try {
-      return await client.query(PROJECTION_INIT, [feed])
+      return await client.query(PROJECTION_INIT, [feed]);
     } finally {
-      client.release()
+      client.release();
     }
   }
 
-  async setProjectionStatus(feed: string, position: number) {
-    const client = await pool.connect()
+  async setProjectionStatus(client: PoolClient, feed: string, position: number) {
     const PROJECTION_UPDATE = `
-  UPDATE brs.projection_status
-     SET position = $1
-   WHERE feed = $2;
-  `;
+      UPDATE brs.projection_status
+        SET position = $1
+      WHERE feed = $2;`;
 
-    try {
-      return await client.query(PROJECTION_UPDATE, [position, feed])
-    } finally {
-      client.release()
-    }
+    return await client.query(PROJECTION_UPDATE, [position, feed]);
   }
 
-  async insertValues(query: string, values: Array<any>, handlerName: string) {
-    pool
-      .query(query, values)
-      .then(_ => console.log('[' + handlerName + ']: inserted event with ID ' + values[0]))
-      .catch(err => console.error('Error executing query', err.stack))
+  async addAddress(
+    client: PoolClient,
+    addressId: string,
+    timestamp: string,
+    objectId: number,
+    objectUri: string,
+    streetnameId: string,
+    postalCode: string,
+    houseNumber: string,
+    boxNumber: string,
+    addressStatus: string,
+    addressPosition: string,
+    positionGeometryMethod: string,
+    positionSpecification: string,
+    complete: boolean,
+    officiallyAssigned: boolean) {
+
+    const ADD_ADDRESS = `
+      INSERT INTO brs.addresses(
+        "address_id",
+        "timestamp",
+        "object_id",
+        "object_uri",
+        "streetname_id",
+        "postal_code",
+        "house_number",
+        "box_number",
+        "address_status",
+        "address_position",
+        "position_geometry_method",
+        "position_specification",
+        "complete",
+        "officially_assigned")
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`;
+
+    return await client.query(
+      ADD_ADDRESS,
+      [
+        addressId,
+        timestamp,
+        objectId,
+        objectUri,
+        streetnameId,
+        postalCode,
+        houseNumber,
+        boxNumber,
+        addressStatus,
+        addressPosition,
+        positionGeometryMethod,
+        positionSpecification,
+        complete,
+        officiallyAssigned
+      ]);
   }
 
-  async update(query: string, values: Array<any>, handlerName: string) {
-    pool
-      .query(query, values)
-      .then(_ => console.log('[' + handlerName + ']: added ' + values[0] + ' as PURI for all records with ID ' + values[1]))
-      .catch(err => console.error('Error executing query', err.stack))
-  }
+  async setAddressPersistentId(client: PoolClient, addressId: string, objectId: number, objectUri: string) {
+    const SET_OBJECTID = `
+      UPDATE brs.addresses
+         SET object_id = $1, object_uri = $2
+       WHERE address_id = $3`;
 
-  async getRowsForAddressID(addressID: string): Promise<Number> {
-    const query = 'SELECT * FROM brs."Addresses" WHERE "AddressID" = $1 ORDER BY "EventID" asc';
-    const value = [addressID];
-
-    return new Promise(resolve => {
-      pool
-        .query(query, value)
-        .then(res => resolve(res.rows.length))
-        .catch(err => console.error('Error executing query', err.stack))
-    })
+    return await client.query(SET_OBJECTID, [objectId, objectUri, addressId]);
   }
 }
 
 export const db = new Db();
-
-export const ADDRESS_QUERY = 'INSERT INTO brs."Addresses"("EventID", "EventName", "Timestamp", "AddressID", "AddressURI", "StreetNameID", "PostalCode", ' +
-  '"AddressStatus", ' +
-  '"HouseNumber", "FlatNumber", "PositionGeometryMethod", ' +
-  '"PositionSpecification", "IsComplete", "OfficiallyAssigned", "AddressPosition") ' +
-  'VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)';
-
-export const STREETNAME_QUERY = 'INSERT INTO brs."StreetNames" ("EventID", "EventName", "Timestamp", "StreetNameID", "StreetNameURI",' +
-  '"GeographicalName", "GeographicalNameLanguage", "Status", "NisCode", "IsComplete") ' +
-  'VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)';
-
-export const MUNICIPALITY_QUERY = 'INSERT INTO brs."Municipalities" ("EventID", "EventName", "Timestamp", "MunicipalityID", "MunicipalityURI",' +
-  '"OfficialLanguage", "GeographicalName", "GeographicalNameLanguage", "Status") ' +
-  'VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)';
