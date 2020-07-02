@@ -45,7 +45,7 @@ export default class FeedFetcher {
     const eventsPerPage = 10;
     let nextLink = new URL(`${uri}?limit=${eventsPerPage}&from=${lastPosition}&embed=event,object`);
 
-    while (nextLink !== null) {
+    //while (nextLink !== null) {
       console.log(`Fetching ${nextLink}&embed=event,object`);
       await fetch(`${nextLink}`)
         .then(res => res.text())
@@ -77,7 +77,7 @@ export default class FeedFetcher {
 
       console.log(`Waiting ${rateLimitDelay}ms to not trigger rate limit.`);
       await sleep(rateLimitDelay);
-    }
+    //}
 
     console.log('Done fetching pages for [' + name + ']');
   }

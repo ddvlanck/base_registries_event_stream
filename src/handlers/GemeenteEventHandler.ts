@@ -1,45 +1,84 @@
-// import { insertValues, MUNICIPALITY_QUERY } from "../utils/Postgres";
+import {PoolClient} from "pg";
+import {db} from "../utils/Db";
 
-// const xml2js = require('xml2js');
-// const parser = new xml2js.Parser();
+const xml2js = require('xml2js');
+const parser = new xml2js.Parser();
 
 export default class GemeenteEventHandler {
-  processPage(data) {
-//     for (let event of data.feed.entry) {
-//       parser.parseString(event.content, async (err, content) => {
+  async processPage(client: PoolClient, entries: Array<any>) {
+    await this.processEvents(client, entries);
+  }
 
-//         let names = [];
-//         let nameLanguages = [];
-//         let officialLanguages = [];
+  async processEvents(client: PoolClient, entries: Array<any>) {
+    const self = this;
 
-//         if (typeof content.Content.Object[0].Gemeentenamen[0] === 'object') {
-//           for (let object of content.Content.Object[0].Gemeentenamen[0].GeografischeNaam) {
-//             names.push(object.Spelling[0]);
-//             nameLanguages.push(object.Taal[0]);
-//           }
-//         }
+    for (let event of entries) {
+      const position = Number(event.id[0]);
+      const eventName = event.title[0].replace(`-${position}`, '');
 
-//         if (typeof content.Content.Object[0].OfficieleTalen[0] === 'object') {
-//           for (let language of content.Content.Object[0].OfficieleTalen[0].Taal) {
-//             officialLanguages.push(language);
-//           }
-//         }
+      if (event.content[0] === 'No data embedded') {
+        console.log(`[GemeenteEventHandler]: Skipping ${eventName} at position ${position} because of missing embedded data.`);
+        continue;
+      }
 
-//         const values = [
-//           parseInt(event.id[0]),                                          // event ID
-//           Object.keys(content.Content.Event[0])[0],                       // event name
-//           content.Content.Object[0].Identificator[0].VersieId[0],         // timestamp,
-//           content.Content.Object[0].Id[0],                                // Municipality ID
-//           content.Content.Object[0].Identificator[0].Id[0],               // Municipality URI
-//           officialLanguages,                                              // OfficialLanguages
-//           names,                                                          // Municipality names
-//           nameLanguages,                                                  // Language of the municipality names
-//           Object.keys(content.Content.Object[0].GemeenteStatus[0])[0] === '$' ? null : content.Content.Object[0].GemeenteStatus[0] // Status of the municipality
-//         ];
+      await parser
+        .parseStringPromise(event.content[0])
+        .then(async function (ev) {
+          try {
+            await self.processEvent(client, position, eventName, ev.Content);
+          } catch {
+            return;
+          }
+        })
+        .catch(function (err) {
+          console.error('Failed to parse event.', event.content[0], err);
+        });
+    }
+  }
+
+  async processEvent(client: PoolClient, position: number, eventName: string, ev: any) {
+    console.log(`Processing ${eventName} at position ${position}.`);
+
+    const eventBody = ev.Event[0][Object.keys(ev.Event[0])[0]][0];
+    const objectBody = ev.Object[0];
+
+    const status = typeof objectBody.GemeenteStatus[0] === 'object' ? null : objectBody.GemeenteStatus[0];
+
+    //console.log(objectBody);
+
+    // Thanks to hasStatus we always know if an object can be saved or not
+    if (!status) {
+      console.log(`Skipping ${eventName} at position ${position} due to not having a status (and thus not complete).`);
+      return;
+    }
+
+    const municipalityId = eventBody.MunicipalityId[0];
+
+    const versieId = objectBody.Identificator[0].VersieId[0];
+    const objectId = objectBody.Identificator[0].ObjectId[0];
+    const objectUri = objectBody.Identificator[0].Id[0];
+    const officialLangues = typeof objectBody.OfficieleTalen[0] === 'object' ? objectBody.OfficieleTalen[0].Taal: null;
+    const facilityLanguages = typeof objectBody.FaciliteitenTalen[0] === 'object' ? objectBody.FaciliteitenTalen[0].Taal: null;
+    const geographicalNames = typeof objectBody.Gemeentenamen[0] === 'object' ? objectBody.Gemeentenamen[0].GeografischeNaam[0].Spelling[0]: null;
+    const geographicalNameLanguages = typeof objectBody.Gemeentenamen[0] === 'object' ? objectBody.Gemeentenamen[0].GeografischeNaam[0].Taal[0]: null;
+
+    console.log(`Adding object for ${municipalityId} at position ${position}.`);
+    await db.addMunicipality(
+      client,
+      position,
+      eventName,
+      versieId,
+      municipalityId,
+      objectId,
+      objectUri,
+      officialLangues,
+      facilityLanguages,
+      geographicalNames,
+      geographicalNameLanguages,
+      status
+    );
 
 
-//         await insertValues(MUNICIPALITY_QUERY, values, 'GemeenteEventHandler');
-//       });
-//     }
+
   }
 }

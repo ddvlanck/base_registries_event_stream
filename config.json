@@ -11,12 +11,12 @@
     {
       "name": "municipality",
       "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/gemeenten",
-      "enabled": false
+      "enabled": true
     },
     {
       "name": "streetname",
       "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/straatnamen",
-      "enabled": true
+      "enabled": false
     },
     {
       "name": "address",

@@ -222,6 +222,54 @@ export default class Db {
        WHERE street_name_id = $3`;
     return await client.query(SET_OBJECTID, [objectId, objectUri, streetNameId]);
   }
+
+  async addMunicipality(
+    client: PoolClient,
+    eventId: number,
+    eventName: string,
+    timestamp: string,
+    municipalityId: string,
+    objectId: number | null,
+    objectUri: string,
+    officialLanguages: Array<string>,
+    facilityLanguages: Array<string>,
+    geographicalNames: Array<string>,
+    geogrpahicalNameLanguages: Array<string>,
+    status: string
+  ){
+
+    const ADD_MUNICIPALITY = `
+      INSERT INTO brs."municipalities"(
+        "event_id",
+        "event_name",
+        "timestamp",
+        "municipality_id",
+        "object_id",
+        "object_uri",
+        "official_languages",
+        "facility_languages",
+        "geographical_names",
+        "geographical_name_languages",
+        "status")
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`;
+
+    return await client.query(
+      ADD_MUNICIPALITY,
+      [
+        eventId,
+        eventName,
+        timestamp,
+        municipalityId,
+        objectId,
+        objectUri,
+        officialLanguages,
+        facilityLanguages,
+        geographicalNames,
+        geogrpahicalNameLanguages,
+        status
+      ]
+    )
+  }
 }
 
 export const db = new Db();
