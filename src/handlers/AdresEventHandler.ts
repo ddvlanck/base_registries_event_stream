@@ -18,7 +18,7 @@ export default class AddressEventHandler {
       const eventName = event.title[0].replace(`-${position}`, '');
 
       if (event.content[0] === 'No data embedded') {
-        console.log(`Skipping ${eventName} at position ${position} because of missing embedded data.`);
+        console.log(`[AdresEventHandler]: Skipping ${eventName} at position ${position} because of missing embedded data.`);
         continue;
       }
 

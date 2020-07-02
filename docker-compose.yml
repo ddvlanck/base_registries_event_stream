@@ -14,7 +14,7 @@ services:
       DB_PORT: 5432
       DB_DATABASE: base_registries
     ports:
-      - 8000:8000
+      - 3000:3000
     depends_on:
       - db
     links:

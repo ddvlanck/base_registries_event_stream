@@ -161,6 +161,67 @@ export default class Db {
 
     return await client.query(SET_OBJECTID, [objectId, objectUri, addressId]);
   }
+
+  async addStreetName(
+    client: PoolClient,
+    eventId: number,
+    eventName: string,
+    timestamp: string,
+    streetNameId: string,
+    objectId: string | null,
+    objectUri: string,
+    geographicalName: string,
+    geographicalNameLanguage: string,
+    straatNameStatus: string,
+    nisCode: number,
+    isComplete: boolean
+  ){
+
+    const ADD_STREET_NAME = `
+      INSERT INTO brs.addresses(
+        "event_id",
+        "event_name",
+        "timestamp",
+        "street_name_id",
+        "object_id",
+        "object_uri",
+        "geographical_name",
+        "geographical_name_language",
+        "street_name_status",
+        "nis_code",
+        "complete")
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`;
+
+
+    return await client.query(
+      ADD_STREET_NAME,
+      [
+        eventId,
+        eventName,
+        timestamp,
+        streetNameId,
+        objectId,
+        objectUri,
+        geographicalName,
+        geographicalNameLanguage,
+        straatNameStatus,
+        nisCode,
+        isComplete
+      ]);
+  }
+
+  async setStreetNamePersistentId(
+    client: PoolClient,
+    streetNameId: string,
+    objectId: number,
+    objectUri: string
+  ){
+    const SET_OBJECTID = `
+      UPDATE brs.street_names
+         SET object_id = $1, object_uri = $2
+       WHERE street_name_id = $3`;
+    return await client.query(SET_OBJECTID, [objectId, objectUri, streetNameId]);
+  }
 }
 
 export const db = new Db();

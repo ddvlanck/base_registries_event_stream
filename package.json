@@ -4,8 +4,8 @@
   "description": "Base registries event stream",
   "main": "index.js",
   "scripts": {
-    "start": "node lib/app.js",
-    "fetch": "node lib/app-fetcher.js",
+    "start": "node lib/api.js",
+    "fetch": "node lib/fetcher.js",
     "build": "tsc -b",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

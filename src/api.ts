@@ -32,7 +32,7 @@ app.use((err: any, req, res, next) => {
   });
 });
 
-app.set('port', process.env.PORT || 8000);
+app.set('port', process.env.PORT || 3000);
 
 (async () => {
   const connected = await waitForPostgres.wait(configuration.database);

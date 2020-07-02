@@ -42,12 +42,12 @@ export default class FeedFetcher {
     console.log(`Starting ${name} projection at position ${lastPosition}.`);
 
     const rateLimitDelay = 100;
-    const eventsPerPage = 500;
+    const eventsPerPage = 10;
     let nextLink = new URL(`${uri}?limit=${eventsPerPage}&from=${lastPosition}&embed=event,object`);
 
     while (nextLink !== null) {
       console.log(`Fetching ${nextLink}&embed=event,object`);
-      await fetch(`${nextLink}&embed=event,object`)
+      await fetch(`${nextLink}`)
         .then(res => res.text())
         .then(async raw => {
           await parser

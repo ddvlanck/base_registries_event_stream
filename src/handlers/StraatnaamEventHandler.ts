@@ -1,43 +1,89 @@
-// import { STREETNAME_QUERY, insertValues, update } from "../utils/Postgres";
+const xml2js = require('xml2js');
+const parser = new xml2js.Parser();
 
-// const xml2js = require('xml2js');
-// const parser = new xml2js.Parser();
+import {PoolClient} from "pg";
+import {db} from "../utils/Db";
 
+//TODO: gives errors when running
 export default class StraatnaamEventHandler {
-  processPage(data) {
-//     for (let event of data.feed.entry) {
-//       parser.parseString(event.content, async (err, content) => {
-//         //TODO: some error with parser saying: 'Error: Non-whitespace before first tag' on event 214 (and others too)
-//         if (!err) {
+  async processPage(client: PoolClient, entries: Array<any>) {
+    await this.processEvents(client, entries);
+  }
 
-//           /*const values = [
-//               parseInt(event.id[0]),                                          // event ID
-//               Object.keys(content.Content.Event[0])[0],                       // event name
-//               content.Content.Object[0].Identificator[0].VersieId[0],         // timestamp,
-//               content.Content.Object[0].Id[0],                                // street name ID
-//               Object.keys(content.Content.Event[0])[0] === 'StreetNamePersistentLocalIdentifierWasAssigned' ? content.Content.Object[0].Identificator[0].Id[0] : null,    // Street name PURI
-//               content.Content.Object[0].Straatnamen[0] ? content.Content.Object[0].Straatnamen[0].GeografischeNaam[0].Spelling[0] : null,    // Geographical name
-//               content.Content.Object[0].Straatnamen[0] ? content.Content.Object[0].Straatnamen[0].GeografischeNaam[0].Taal[0]: null,         // Language of name
-//               Object.keys(content.Content.Object[0].StraatnaamStatus[0])[0] === '$' ? null: content.Content.Object[0].StraatnaamStatus[0],           // Street name status
-//               content.Content.Object[0].NisCode[0],                           // NisCode
-//               content.Content.Object[0].IsCompleet[0],                        // Is complete
-//           ];*/
+  async processEvents(client: PoolClient, entries: Array<any>) {
+    const self = this;
 
-//           /*if(!content){
-//               console.log("\tEvent: " + event.id[0]);
-//               console.log(data);
-//           }*/
+    for (let event of entries) {
+      const position = Number(event.id[0]);
+      const eventName = event.title[0].replace(`-${position}`, '');
 
-//           /*await insertValues(STREETNAME_QUERY, values, 'StraatnaamEventHandler');
+      if (event.content[0] === 'No data embedded') {
+        console.log(`Skipping ${eventName} at position ${position} because of missing embedded data.`);
+        continue;
+      }
 
-//           if (Object.keys(content.Content.Event[0])[0] === 'StreetNamePersistentLocalIdentifierWasAssigned') {
-//               const updateQuery = 'UPDATE brs."StreetNames" SET "StraatnaamURI" = $1 WHERE "StraatnaamID" = $2';
-//               const updateValues = [content.Content.Object[0].Identificator[0].Id[0], content.Content.Object[0].Id[0]];
+      await parser
+        .parseStringPromise(event.content[0])
+        .then(async function (ev) {
+          try {
+            await self.processEvent(client, position, eventName, ev.Content);
+          } catch {
+            return;
+          }
+        })
+        .catch(function (err) {
+          console.error('Failed to parse event.', event.content[0], err);
+        });
+    }
+  }
 
-//               await update(updateQuery, updateValues, 'StraatnaamEventHandler');
-//           }*/
-//         }
-//       });
-//     }
+  async processEvent(client: PoolClient, position: number, eventName: string, ev: any) {
+    console.log(`Processing ${eventName} at position ${position}.`);
+
+    const eventBody = ev.Event[0][Object.keys(ev.Event[0])[0]][0];
+    const objectBody = ev.Object[0];
+
+    // console.log(objectBody);
+
+    const isComplete = objectBody.IsCompleet[0] === 'true';
+
+    // Thanks to isComplete we always know if an object can be saved or not
+    if (!isComplete) {
+      console.log(`[StreetNameEventHandler]: Skipping ${eventName} at position ${position} due to not having a complete object.`);
+      return;
+    }
+
+    const streetNameId = eventBody.StreetNameId[0];
+
+    const versionId = objectBody.Identificator[0].VersieId[0];
+    const objectId = objectBody.Identificator[0].ObjectId[0];
+    const objectUri = objectBody.Identificator[0].Id[0];
+
+    const geographicalName = objectBody.Straatnamen[0].GeografischeNaam[0].Spelling[0];
+    const geographicalNameLanguage = objectBody.Straatnamen[0].GeografischeNaam[0].Taal[0];
+    const streetNameStatus = objectBody.StraatnaamStatus[0];
+    const nisCode = objectBody.NisCode[0];
+
+    console.log(`Adding object for ${streetNameId} at position ${position}.`);
+    await db.addStreetName(
+      client,
+      position,
+      eventName,
+      versionId,
+      streetNameId,
+      objectId === '' ? null : objectId,
+      objectUri,
+      geographicalName,
+      geographicalNameLanguage,
+      streetNameStatus,
+      nisCode,
+      isComplete
+      );
+
+    if (eventName === 'StreetNamePersistentLocalIdentifierWasAssigned') {
+      console.log(`Assigning ${objectUri} for ${streetNameId} at position ${position}.`);
+
+      db.setStreetNamePersistentId(client, streetNameId, objectId, objectUri);
+    }
   }
 }
