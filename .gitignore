@@ -1,3 +1,6 @@
-lib/
 .idea
+
+lib/
+!dependencies/wait-for-postgres/lib
+
 node_modules/

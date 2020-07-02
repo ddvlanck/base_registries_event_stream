@@ -1,20 +1,3 @@
-CREATE SCHEMA brs;
-
-CREATE TABLE brs.projection_status
-(
-    "feed" character varying(40) NOT NULL,
-    "position" bigint NOT NULL,
-    PRIMARY KEY ("feed")
-)
-
-TABLESPACE pg_default;
-
-ALTER TABLE brs.projection_status
-    OWNER to postgres;
-
-COMMENT ON TABLE brs.projection_status
-    IS 'Stores the current position of the feed.';
-
 CREATE TABLE brs."addresses"
 (
     "event_id" bigint NOT NULL,
@@ -49,4 +32,3 @@ ALTER TABLE brs."addresses"
 
 COMMENT ON TABLE brs."addresses"
     IS 'Stores the complete address objects.';
-

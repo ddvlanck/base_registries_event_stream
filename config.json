@@ -1,0 +1,31 @@
+{
+  "database": {
+    "username": "postgres",
+    "password": "oslo",
+    "host": "localhost",
+    "port": 5432,
+    "database": "base_registries"
+  },
+  "feeds": [
+    {
+      "name": "municipality",
+      "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/gemeenten",
+      "enabled": false
+    },
+    {
+      "name": "streetname",
+      "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/straatnamen",
+      "enabled": false
+    },
+    {
+      "name": "address",
+      "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/adressen",
+      "enabled": true
+    },
+    {
+      "name": "building",
+      "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/gebouwen",
+      "enabled": false
+    }
+  ]
+}
