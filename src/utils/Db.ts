@@ -178,7 +178,7 @@ export default class Db {
   ){
 
     const ADD_STREET_NAME = `
-      INSERT INTO brs.addresses(
+      INSERT INTO brs.street_names(
         "event_id",
         "event_name",
         "timestamp",
@@ -239,7 +239,7 @@ export default class Db {
   ){
 
     const ADD_MUNICIPALITY = `
-      INSERT INTO brs."municipalities"(
+      INSERT INTO brs.municipalities(
         "event_id",
         "event_name",
         "timestamp",
