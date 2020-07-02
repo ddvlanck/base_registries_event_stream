@@ -43,7 +43,7 @@ export default class FeedFetcher {
     console.log(`Starting ${name} projection at position ${lastPosition}.`);
 
     const rateLimitDelay = 100;
-    const eventsPerPage = 100;
+    const eventsPerPage = 500;
     let nextLink = new URL(`${uri}?limit=${eventsPerPage}&from=${lastPosition}&embed=event,object`);
 
     //while (nextLink !== null) {
