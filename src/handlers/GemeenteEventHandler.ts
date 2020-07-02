@@ -59,8 +59,9 @@ export default class GemeenteEventHandler {
     const objectUri = objectBody.Identificator[0].Id[0];
     const officialLangues = typeof objectBody.OfficieleTalen[0] === 'object' ? objectBody.OfficieleTalen[0].Taal: null;
     const facilityLanguages = typeof objectBody.FaciliteitenTalen[0] === 'object' ? objectBody.FaciliteitenTalen[0].Taal: null;
-    const geographicalNames = typeof objectBody.Gemeentenamen[0] === 'object' ? objectBody.Gemeentenamen[0].GeografischeNaam[0].Spelling[0]: null;
-    const geographicalNameLanguages = typeof objectBody.Gemeentenamen[0] === 'object' ? objectBody.Gemeentenamen[0].GeografischeNaam[0].Taal[0]: null;
+    const geographicalNames = typeof objectBody.Gemeentenamen[0] === 'object' ? objectBody.Gemeentenamen[0].GeografischeNaam[0].Spelling: null;
+    const geographicalNameLanguages = typeof objectBody.Gemeentenamen[0] === 'object' ? objectBody.Gemeentenamen[0].GeografischeNaam[0].Taal: null;
+
 
     console.log(`Adding object for ${municipalityId} at position ${position}.`);
     await db.addMunicipality(
@@ -77,8 +78,5 @@ export default class GemeenteEventHandler {
       geographicalNameLanguages,
       status
     );
-
-
-
   }
 }
