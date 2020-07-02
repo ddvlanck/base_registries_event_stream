@@ -32,13 +32,13 @@ export default class AddressEventHandler {
           }
         })
         .catch(function (err) {
-          console.error('Failed to parse event.', event.content[0], err);
+          console.error('[AdresEventHandler]: Failed to parse event.', event.content[0], err);
         });
     }
   }
 
   async processEvent(client: PoolClient, position: number, eventName: string, ev: any) {
-    console.log(`Processing ${eventName} at position ${position}.`);
+    console.log(`[AdresEventHandler]: Processing ${eventName} at position ${position}.`);
 
     const eventBody = ev.Event[0][Object.keys(ev.Event[0])[0]][0];
     const objectBody = ev.Object[0];
@@ -49,7 +49,7 @@ export default class AddressEventHandler {
 
     // Thanks to isComplete we always know if an object can be saved or not
     if (!isComplete) {
-      console.log(`Skipping ${eventName} at position ${position} due to not having a complete object.`);
+      console.log(`[AdresEventHandler]: Skipping ${eventName} at position ${position} due to not having a complete object.`);
       return;
     }
 
@@ -69,7 +69,7 @@ export default class AddressEventHandler {
     const positionSpecification = objectBody.PositieSpecificatie[0];
     const officiallyAssigned = objectBody.OfficieelToegekend[0] === 'true';
 
-    console.log(`Adding object for ${addressId} at position ${position}.`);
+    console.log(`[AdresEventHandler]: Adding object for ${addressId} at position ${position}.`);
     await db.addAddress(
       client,
       position,
@@ -90,7 +90,7 @@ export default class AddressEventHandler {
       officiallyAssigned);
 
     if (eventName === 'AddressPersistentLocalIdentifierWasAssigned') {
-      console.log(`Assigning ${objectUri} for ${addressId} at position ${position}.`);
+      console.log(`[AdresEventHandler]: Assigning ${objectUri} for ${addressId} at position ${position}.`);
 
       db.setAddressPersistentId(client, addressId, objectId, objectUri);
     }

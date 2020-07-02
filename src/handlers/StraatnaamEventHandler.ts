@@ -4,7 +4,6 @@ const parser = new xml2js.Parser();
 import {PoolClient} from "pg";
 import {db} from "../utils/Db";
 
-//TODO: gives errors when running
 export default class StraatnaamEventHandler {
   async processPage(client: PoolClient, entries: Array<any>) {
     await this.processEvents(client, entries);
@@ -64,7 +63,7 @@ export default class StraatnaamEventHandler {
     const streetNameStatus = objectBody.StraatnaamStatus[0];
     const nisCode = objectBody.NisCode[0];
 
-    console.log(`Adding object for ${streetNameId} at position ${position}.`);
+    console.log(`[StreetNameEventHandler]: Adding object for ${streetNameId} at position ${position}.`);
     await db.addStreetName(
       client,
       position,
@@ -81,7 +80,7 @@ export default class StraatnaamEventHandler {
       );
 
     if (eventName === 'StreetNamePersistentLocalIdentifierWasAssigned') {
-      console.log(`Assigning ${objectUri} for ${streetNameId} at position ${position}.`);
+      console.log(`[StreetNameEventHandler]: Assigning ${objectUri} for ${streetNameId} at position ${position}.`);
 
       db.setStreetNamePersistentId(client, streetNameId, objectId, objectUri);
     }

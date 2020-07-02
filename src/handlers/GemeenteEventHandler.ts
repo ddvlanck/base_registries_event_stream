@@ -31,13 +31,13 @@ export default class GemeenteEventHandler {
           }
         })
         .catch(function (err) {
-          console.error('Failed to parse event.', event.content[0], err);
+          console.error('[GemeenteEventHandler]: Failed to parse event.', event.content[0], err);
         });
     }
   }
 
   async processEvent(client: PoolClient, position: number, eventName: string, ev: any) {
-    console.log(`Processing ${eventName} at position ${position}.`);
+    console.log(`[GemeenteEventHandler]: Processing ${eventName} at position ${position}.`);
 
     const eventBody = ev.Event[0][Object.keys(ev.Event[0])[0]][0];
     const objectBody = ev.Object[0];
@@ -48,7 +48,7 @@ export default class GemeenteEventHandler {
 
     // Thanks to hasStatus we always know if an object can be saved or not
     if (!status) {
-      console.log(`Skipping ${eventName} at position ${position} due to not having a status (and thus not complete).`);
+      console.log(`[GemeenteEventHandler]: Skipping ${eventName} at position ${position} due to not having a status (and thus not complete).`);
       return;
     }
 
@@ -63,7 +63,7 @@ export default class GemeenteEventHandler {
     const geographicalNameLanguages = typeof objectBody.Gemeentenamen[0] === 'object' ? objectBody.Gemeentenamen[0].GeografischeNaam[0].Taal: null;
 
 
-    console.log(`Adding object for ${municipalityId} at position ${position}.`);
+    console.log(`[GemeenteEventHandler]: Adding object for ${municipalityId} at position ${position}.`);
     await db.addMunicipality(
       client,
       position,
