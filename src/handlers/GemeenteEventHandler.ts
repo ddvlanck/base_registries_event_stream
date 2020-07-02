@@ -46,7 +46,8 @@ export default class GemeenteEventHandler {
 
     //console.log(objectBody);
 
-    // Thanks to hasStatus we always know if an object can be saved or not
+    // Thanks to status we always know if an object can be saved or not
+    // We don't want the events where the object is being built
     if (!status) {
       console.log(`[GemeenteEventHandler]: Skipping ${eventName} at position ${position} due to not having a status (and thus not complete).`);
       return;

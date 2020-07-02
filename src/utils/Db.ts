@@ -234,7 +234,7 @@ export default class Db {
     officialLanguages: Array<string>,
     facilityLanguages: Array<string>,
     geographicalNames: Array<string>,
-    geogrpahicalNameLanguages: Array<string>,
+    geographicalNameLanguages: Array<string>,
     status: string
   ){
 
@@ -265,10 +265,55 @@ export default class Db {
         officialLanguages,
         facilityLanguages,
         geographicalNames,
-        geogrpahicalNameLanguages,
+        geographicalNameLanguages,
         status
       ]
     )
+  }
+
+  async addPostalInformation(
+    client: PoolClient,
+    eventId: number,
+    eventName: string,
+    timestamp: string,
+    postalId: number,
+    objectId: number | null,
+    objectUri: string,
+    postalNames: Array<string>,
+    postalNameLanguage: Array<string>,
+    nisCode: number,
+    status: string
+  ){
+
+    const ADD_POSTAL_INFO = `
+      INSERT INTO brs.postal_information(
+        "event_id",
+        "event_name",
+        "timestamp",
+        "postal_id",
+        "object_id",
+        "object_uri",
+        "postal_names",
+        "postal_names_language",
+        "nis_code",
+        "status")
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`;
+
+    return await client.query(
+      ADD_POSTAL_INFO,
+      [
+        eventId,
+        eventName,
+        timestamp,
+        postalId,
+        objectId,
+        objectUri,
+        postalNames,
+        postalNameLanguage,
+        nisCode,
+        status
+      ]
+    );
   }
 }
 

@@ -11,6 +11,7 @@ import StraatnaamEventHandler from '../handlers/StraatnaamEventHandler';
 import GemeenteEventHandler from '../handlers/GemeenteEventHandler';
 import GebouwEventHandler from '../handlers/GebouwEventHandler';
 import { URL } from 'url';
+import PostinfoEventHandler from "../handlers/PostinfoEventHandler";
 
 const parser = new xml2js.Parser();
 
@@ -42,7 +43,7 @@ export default class FeedFetcher {
     console.log(`Starting ${name} projection at position ${lastPosition}.`);
 
     const rateLimitDelay = 100;
-    const eventsPerPage = 10;
+    const eventsPerPage = 100;
     let nextLink = new URL(`${uri}?limit=${eventsPerPage}&from=${lastPosition}&embed=event,object`);
 
     //while (nextLink !== null) {
@@ -95,6 +96,9 @@ export default class FeedFetcher {
 
       case 'building':
         return new GebouwEventHandler();
+
+      case 'postal_info':
+        return new PostinfoEventHandler();
     }
   }
 
