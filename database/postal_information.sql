@@ -24,3 +24,8 @@ ALTER TABLE brs."postal_information"
 
 COMMENT ON TABLE brs."postal_information"
     IS 'Stores the postal information objects.';
+
+CREATE INDEX post_info_index
+    ON brs.postal_information
+    (object_id ASC NULLS LAST)
+    TABLESPACE pg_default;

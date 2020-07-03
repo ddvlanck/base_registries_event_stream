@@ -31,7 +31,7 @@
     {
       "name" : "postal_info",
       "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/postinfo",
-      "enabled": false
+      "enabled": true
     }
   ]
 }

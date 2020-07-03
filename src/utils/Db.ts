@@ -49,6 +49,21 @@ export default class Db {
     }
   }
 
+  async getPostalInformationsPaged(page: number, pageSize: number){
+    const client = await pool.connect();
+    const POSTAL_INFORMATIONS_PAGED = `
+      SELECT *
+        FROM brs.postal_information
+       ORDER BY event_id ASC
+       LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
+
+    try {
+      return await client.query(POSTAL_INFORMATIONS_PAGED);
+    } finally {
+      client.release();
+    }
+  }
+
   async transaction(f: (client: PoolClient) => any) {
     const client = await pool.connect();
 
