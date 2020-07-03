@@ -34,6 +34,21 @@ export default class Db {
     }
   }
 
+  async getStreetNamesPaged(page: number, pageSize: number){
+    const client = await pool.connect();
+    const STREET_NAMES_PAGED = `
+      SELECT *
+        FROM brs.street_names
+       ORDER BY event_id ASC
+       LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
+
+    try {
+      return await client.query(STREET_NAMES_PAGED);
+    } finally {
+      client.release();
+    }
+  }
+
   async transaction(f: (client: PoolClient) => any) {
     const client = await pool.connect();
 
