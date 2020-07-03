@@ -46,7 +46,8 @@ Again, only enabled feeds will be processed, so check the configuration file if 
 ## API endpoints
 
 The API endpoints that are available are the following:
-- /address{?page} - This endpoint will return all events for all addresses, starting with the oldest event
-- /address/:objectId{?page} - This endpoint will return all events for a specific address, starting with the oldest event
+- /address{?page} - This endpoint will return all events for **all addresses**, starting with the oldest event
+- /address/:objectId{?page} - This endpoint will return all events for **a specific address**, starting with the oldest event
 - /streetname{?page} - This endpoint will return all events for **all street names**, starting with the oldest event
+- /postalInfo{?page} - This endpoint will return all events for **all postal info events**, starting with the oldest event
 
