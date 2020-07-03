@@ -1,5 +1,7 @@
 CREATE SCHEMA brs;
 
+-- Projection status table
+
 CREATE TABLE brs.projection_status
 (
     "feed" character varying(40) NOT NULL,
@@ -14,6 +16,8 @@ ALTER TABLE brs.projection_status
 
 COMMENT ON TABLE brs.projection_status
     IS 'Stores the current position of the feed.';
+
+-- Address table
 
 CREATE TABLE brs."addresses"
 (
@@ -54,6 +58,8 @@ CREATE INDEX address_index
     (object_id ASC NULLS LAST, complete)
     TABLESPACE pg_default;
 
+-- Street name table
+
 CREATE TABLE brs."street_names"
 (
     "event_id" bigint NOT NULL,
@@ -88,6 +94,8 @@ CREATE INDEX str_name_index
     (object_id ASC NULLS LAST, complete)
     TABLESPACE pg_default;
 
+-- Postal information table
+
 CREATE TABLE brs."postal_information"
 (
     "event_id" bigint NOT NULL,
@@ -117,6 +125,43 @@ COMMENT ON TABLE brs."postal_information"
 
 CREATE INDEX post_info_index
     ON brs.postal_information
+    (object_id ASC NULLS LAST)
+    TABLESPACE pg_default;
+
+-- Municipalities table
+
+CREATE TABLE brs."municipalities"
+(
+    "event_id" bigint NOT NULL,
+    "event_name" character varying(200) NOT NULL,
+
+    "timestamp" character varying(30) NOT NULL,
+    "municipality_id" character varying(40) NOT NULL,
+
+    "object_id" bigint,
+    "object_uri" character varying(500),
+
+    "official_languages" character varying(50)[],
+    "facility_languages" character varying(50),
+    "geographical_names" character varying (50)[],
+    "geographical_name_languages" character varying(50)[],
+    "status" character varying(50),
+
+    PRIMARY KEY ("event_id")
+)
+
+-- TODO: Add index on object_id, complete
+
+TABLESPACE pg_default;
+
+ALTER TABLE brs."municipalities"
+    OWNER to postgres;
+
+COMMENT ON TABLE brs."municipalities"
+    IS 'Stores the municipality objects.';
+
+CREATE INDEX municipality_index
+    ON brs.municipalities
     (object_id ASC NULLS LAST)
     TABLESPACE pg_default;
 

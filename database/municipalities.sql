@@ -32,3 +32,8 @@ ALTER TABLE brs."municipalities"
 COMMENT ON TABLE brs."municipalities"
     IS 'Stores the municipality objects.';
 
+CREATE INDEX municipality_index
+    ON brs.municipalities
+    (object_id ASC NULLS LAST)
+    TABLESPACE pg_default;
+
