@@ -2,7 +2,7 @@
   "domainName" : "http://localhost:3000",
   "database": {
     "username": "postgres",
-    "password": "oslo",
+    "password": "dev",
     "host": "localhost",
     "port": 5432,
     "database": "base_registries"
@@ -14,13 +14,13 @@
       "enabled": false
     },
     {
-      "name": "streetname",
-      "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/straatnamen",
+      "name": "address",
+      "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/adressen",
       "enabled": true
     },
     {
-      "name": "address",
-      "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/adressen",
+      "name": "streetname",
+      "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/straatnamen",
       "enabled": true
     },
     {

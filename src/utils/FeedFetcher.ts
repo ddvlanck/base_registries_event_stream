@@ -23,19 +23,25 @@ export default class FeedFetcher {
   }
 
   async fetchFeeds() {
+    let feeds = [];
     for (let feed of this.feeds) {
       if (!feed.enabled)
         continue;
 
       console.log(`Preparing to fetch feed: ${feed.name}.`);
 
-      await this.fetchFeed(
+      const eventFeed = this.fetchFeed(
         feed.name,
         feed.feedLocation);
+
+      feeds.push(eventFeed);
     }
+
+    await Promise.all(feeds);
   }
 
   async fetchFeed(name: string, uri: string) {
+    console.log("STARTING FOR: " + name);
     const self = this;
     const handler = this.getHandler(name);
     const lastPosition = await this.getLastProjectionPosition(name);
