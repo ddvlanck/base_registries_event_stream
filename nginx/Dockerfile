@@ -1,7 +1,7 @@
 # Use the standard Nginx image from Docker Hub
 FROM nginx
 # The Dockerfile's author
-LABEL BASE_REGISTRIES
+LABEL BASE REGISTRIES
 # Copy the configuration file from the current directory and paste
 # it inside the container to use it as Nginx's default config.
 COPY nginx.conf /etc/nginx/nginx.conf
