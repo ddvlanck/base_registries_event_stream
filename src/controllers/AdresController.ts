@@ -1,9 +1,11 @@
 import {db} from "../utils/Db";
 import {configuration} from '../utils/Configuration';
+import {addNext, addPrevious} from "../utils/HypermediaControls";
 
 const BASE_URL = `${configuration.domainName}/address`;
 const PAGE_SIZE = 25;
 
+// Get all events for a specific address (based on object_id)
 export async function getAddress(req, res) {
   const page = parseInt(req.query.page, 10);
 
@@ -15,6 +17,7 @@ export async function getAddress(req, res) {
   }
 }
 
+// Get all events for all addresses
 export async function getAddressPage(req, res) {
   const page = parseInt(req.query.page, 10);
 
@@ -33,8 +36,8 @@ function buildResponse(items, pageSize, page) {
 
   const tree = [];
 
-  addNext(response, tree, items, pageSize, page);
-  addPrevious(response, tree, items, page);
+  addNext(response, tree, items, pageSize, page, BASE_URL);
+  addPrevious(response, tree, items, page, BASE_URL);
 
   if (tree.length) {
     response["tree:relation"] = tree;
@@ -44,42 +47,6 @@ function buildResponse(items, pageSize, page) {
   response["items"].unshift(getShape(`${BASE_URL}?page=${page}`));
 
   return response;
-}
-
-function addNext(context, tree, items, pageSize, page) {
-  if (items.length !== pageSize) return;
-
-  const nextURL = `${BASE_URL}?page=${(page + 1)}`
-  context['next_url'] = nextURL;
-
-  tree.push({
-    "@type": "tree:GreaterThanRelation",
-    "tree:node": nextURL,
-    "tree:path": "prov:generatedAtTime",
-    "tree:value": {
-      "@value": items[items.length - 1]["timestamp"],
-      "@type": "xsd:dateTime",
-    },
-  });
-}
-
-function addPrevious(context, tree, items, page) {
-  if (page <= 1) return;
-
-  const previousURL = `${BASE_URL}?page=${(page - 1)}`;
-  context['previous_url'] = previousURL;
-
-  if (items.length) {
-    tree.push({
-      "@type": "tree:LessThanRelation",
-      "tree:node": previousURL,
-      "tree:path": "prov:generatedAtTime",
-      "tree:value": {
-        "@value": items[0]["timestamp"],
-        "@type": "xsd:dateTime",
-      },
-    });
-  }
 }
 
 function createAddressEvent(data) {
@@ -109,7 +76,10 @@ function createAddressEvent(data) {
     "@type": "GeografischePositie",
     "geometrie": {
       "@type": "Punt",
-      "gml": data.address_position
+      "gml" : {
+        "@type" : "http://www.opengis.net/ont/geosparql#gmlLiteral",
+        "@value" : data.address_position
+      }
     }
   }
 
@@ -159,9 +129,9 @@ function createAddressEvent(data) {
   return addressEvent;
 }
 
-function getShape(pageID: string) {
+function getShape(pageId: string) {
   return {
-    "@id": pageID,
+    "@id": pageId,
     "tree:shape": {
       "sh:property": [
         {
