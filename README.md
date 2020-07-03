@@ -4,7 +4,9 @@ This repository publishes event streams of base registries, such as addresses an
 
 ## Get started
 
-Clone this repository and run `npm install`. There's a special dependency `depdencies/wait-for-postgres` that needs to be installed too. So navigate to this folder and run the `npm install` command again.
+Clone this repository and run `npm install`. There's a special dependency `dependencies/wait-for-postgres` that needs to be installed too. So navigate to this folder and run the `npm install` command again.
+
+**NOTE: when running with Docker, the docker-compose file will do the `npm install` for application, but the user still needs to run the `npm install` for the dependency.**
 
 ### Configuration
 
