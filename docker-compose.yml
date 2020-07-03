@@ -64,3 +64,10 @@ services:
       - db
     links:
       - db
+  loadbalancer:
+    build: ./nginx
+    tty: true
+    links:
+      - api
+    ports:
+    - 5000:5000
