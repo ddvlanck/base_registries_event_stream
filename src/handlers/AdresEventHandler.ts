@@ -98,6 +98,6 @@ export default class AddressEventHandler {
 
   private createPoint(position) {
     const [X, Y] = position.point[0].pos[0].split(' ');
-    return '(' + X + ',' + Y + ')';
+    return  X + ',' + Y;
   }
 }
