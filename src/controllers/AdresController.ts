@@ -192,13 +192,13 @@ function getShape(pageId: string) {
               },
               {
                 "sh:path" : "https://data.vlaanderen.be/ns/generiek#methode",
-                "sh:nodeKind" : "sh:IRI",
+                "sh:datatype" : "http://www.w3.org/2004/02/skos/core#Concept",
                 "sh:minCount" : 1,
                 "sh:maxCount" : 1
               },
               {
                 "sh:path" : "https://data.vlaanderen.be/ns/generiek#specificatie",
-                "sh:nodeKind" : "sh:IRI",
+                "sh:datatype" : "http://www.w3.org/2004/02/skos/core#Concept",
                 "sh:minCount" : 1,
                 "sh:maxCount" : 1
               }
@@ -239,6 +239,7 @@ function getContext() {
         "GeografischePositie" : "https://data.vlaanderen.be/ns/generiek#GeografischePositie",
         "gml" : "https://data.vlaanderen.be/doc/applicatieprofiel/generiek-basis/#Geometrie%3Agml",
         "eventName": "http://www.w3.org/ns/adms#versionNotes",
+        "generatedAtTime" : "prov:generatedAtTime",
         "methode": {
           "@id": "https://data.vlaanderen.be/ns/generiek#methode",
           "@type": "@id"
