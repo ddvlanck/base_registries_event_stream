@@ -23,7 +23,6 @@ CREATE TABLE brs."addresses"
     PRIMARY KEY ("event_id")
 )
 
--- TODO: Add index on object_id, complete
 
 TABLESPACE pg_default;
 
@@ -32,3 +31,8 @@ ALTER TABLE brs."addresses"
 
 COMMENT ON TABLE brs."addresses"
     IS 'Stores the complete address objects.';
+
+CREATE INDEX address_index
+    ON brs.addresses
+    (object_id ASC NULLS LAST, complete)
+    TABLESPACE pg_default;

@@ -13,13 +13,11 @@ CREATE TABLE brs."street_names"
     "geographical_name_language" character varying (4),
 
     "street_name_status" character varying(40),
-    "nis_code" bigint,
+    "nis_code" character varying(20),
     "complete" boolean,
 
     PRIMARY KEY ("event_id")
 )
-
--- TODO: Add index on object_id, complete
 
 TABLESPACE pg_default;
 
@@ -28,3 +26,8 @@ ALTER TABLE brs."street_names"
 
 COMMENT ON TABLE brs."street_names"
     IS 'Stores the complete street name objects.';
+
+CREATE INDEX str_name_index
+    ON brs.street_names
+    (object_id ASC NULLS LAST, complete)
+    TABLESPACE pg_default;
