@@ -17,7 +17,7 @@ export default class StraatnaamEventHandler {
       const eventName = event.title[0].replace(`-${position}`, '');
 
       if (event.content[0] === 'No data embedded') {
-        console.log(`Skipping ${eventName} at position ${position} because of missing embedded data.`);
+        console.log(`[StreetNameEventHandler]: Skipping ${eventName} at position ${position} because of missing embedded data.`);
         continue;
       }
 
@@ -31,13 +31,13 @@ export default class StraatnaamEventHandler {
           }
         })
         .catch(function (err) {
-          console.error('Failed to parse event.', event.content[0], err);
+          console.error('[StreetNameEventHandler]: Failed to parse event.', event.content[0], err);
         });
     }
   }
 
   async processEvent(client: PoolClient, position: number, eventName: string, ev: any) {
-    console.log(`Processing ${eventName} at position ${position}.`);
+    console.log(`[StreetNameEventHandler]: Processing ${eventName} at position ${position}.`);
 
     const eventBody = ev.Event[0][Object.keys(ev.Event[0])[0]][0];
     const objectBody = ev.Object[0];

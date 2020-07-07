@@ -3,7 +3,7 @@
 import { getGemeentePage } from '../controllers/GemeenteController';
 import { getAddressPage, getAddress } from '../controllers/AdresController';
 import { getStreetNamePage } from '../controllers/StraatnaamController';
-import {getPostalInfoPage} from "../controllers/PostinfoController";
+import { getPostalInfoPage } from '../controllers/PostinfoController';
 
 const router = express.Router();
 

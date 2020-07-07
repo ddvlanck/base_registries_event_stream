@@ -1,8 +1,9 @@
-import {PoolClient} from "pg";
-import {db} from "../utils/Db";
-import {type} from "os";
+import xml2js from 'xml2js';
+import { PoolClient } from 'pg';
+import { type } from 'os';
 
-const xml2js = require('xml2js');
+import { db } from '../utils/Db';
+
 const parser = new xml2js.Parser();
 
 export default class PostinfoEventHandler {
