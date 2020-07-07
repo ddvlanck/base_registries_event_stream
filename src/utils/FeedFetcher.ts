@@ -10,16 +10,19 @@ import AdresEventHandler from '../handlers/AdresEventHandler';
 import StraatnaamEventHandler from '../handlers/StraatnaamEventHandler';
 import GemeenteEventHandler from '../handlers/GemeenteEventHandler';
 import GebouwEventHandler from '../handlers/GebouwEventHandler';
+import PostinfoEventHandler from '../handlers/PostinfoEventHandler';
+
 import { URL } from 'url';
-import PostinfoEventHandler from "../handlers/PostinfoEventHandler";
 
 const parser = new xml2js.Parser();
 
 export default class FeedFetcher {
+  apikey: string;
   feeds: { name: string, feedLocation: string, enabled: boolean }[];
 
   constructor() {
     this.feeds = configuration.feeds;
+    this.apikey = configuration.apikey;
   }
 
   async fetchFeeds() {
@@ -41,7 +44,8 @@ export default class FeedFetcher {
   }
 
   async fetchFeed(name: string, uri: string) {
-    console.log("STARTING FOR: " + name);
+    console.log(`STARTING FOR: ${name}`);
+
     const self = this;
     const handler = this.getHandler(name);
     const lastPosition = await this.getLastProjectionPosition(name);
@@ -52,9 +56,14 @@ export default class FeedFetcher {
     const eventsPerPage = 500;
     let nextLink = new URL(`${uri}?limit=${eventsPerPage}&from=${lastPosition}&embed=event,object`);
 
+    const headers = {
+      'User-Agent': 'OSLO POC SlowMovingData',
+      'x-api-key': this.apikey,
+    }
+
     while (nextLink !== null) {
       console.log(`Fetching ${nextLink}&embed=event,object`);
-      await fetch(`${nextLink}&embed=event,object`)
+      await fetch(`${nextLink}&embed=event,object`, { headers })
         .then(res => res.text())
         .then(async raw => {
           await parser

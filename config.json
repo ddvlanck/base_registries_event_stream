@@ -7,6 +7,7 @@
     "port": 5432,
     "database": "base_registries"
   },
+  "apikey": "xxxx",
   "feeds": [
     {
       "name": "municipality",

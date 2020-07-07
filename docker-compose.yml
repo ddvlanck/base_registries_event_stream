@@ -32,6 +32,7 @@ services:
       DB_HOST: db
       DB_PORT: 5432
       DB_DATABASE: base_registries
+      API_KEY: xxx
     depends_on:
       - db
     links:
