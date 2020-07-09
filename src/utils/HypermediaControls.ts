@@ -6,7 +6,7 @@ export function addNext(context, tree, items, pageSize, page, base_url){
   context['next_url'] = nextURL;
 
   tree.push({
-    "@type": "tree:GreaterThanRelation",
+    "@type": "tree:GreaterOrEqualThanRelation",
     "tree:node": nextURL,
     "tree:path": "prov:generatedAtTime",
     "tree:value": {
@@ -24,7 +24,7 @@ export function addPrevious(context, tree, items, page, base_url){
 
   if (items.length) {
     tree.push({
-      "@type": "tree:LessThanRelation",
+      "@type": "tree:LessOrEqualThanRelation",
       "tree:node": previousURL,
       "tree:path": "prov:generatedAtTime",
       "tree:value": {
