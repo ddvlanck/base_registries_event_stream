@@ -7,7 +7,7 @@ export function addHeaders(response: Response, pageSize: number, numberOfObjects
 
   // When the number of objects returned is lower than the page size
   // We reached the last page
-  if(numberOfObjects < pageSize){
+  if(numberOfObjects === pageSize){
     response.setHeader('Cache-control', 'public, max-age=31557600');  // Cache it for one year
   }
 }
