@@ -2,7 +2,7 @@ import {configuration} from "../utils/Configuration";
 import {db} from "../utils/Db";
 import {addNext, addPrevious} from "../utils/HypermediaControls";
 
-const BASE_URL = `${configuration.domainName}/streetnames`;
+const BASE_URL = `${configuration.domainName}/streetname`;
 const PAGE_SIZE = 250;
 
 // Get all events for all street names
