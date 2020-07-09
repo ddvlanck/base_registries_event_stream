@@ -63,7 +63,7 @@ export default class FeedFetcher {
 
     while (nextLink !== null) {
       console.log(`Fetching ${nextLink}&embed=event,object`);
-      await fetch(`${nextLink}&embed=event,object`, { headers })
+      await fetch(`${nextLink}&embed=event,object`, { headers: headers })
         .then(res => res.text())
         .then(async raw => {
           await parser

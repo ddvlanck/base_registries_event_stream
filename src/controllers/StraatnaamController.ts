@@ -3,7 +3,7 @@ import {db} from "../utils/Db";
 import {addNext, addPrevious} from "../utils/HypermediaControls";
 
 const BASE_URL = `${configuration.domainName}/streetnames`;
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 250;
 
 // Get all events for all street names
 export async function getStreetNamePage(req, res) {

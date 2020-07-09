@@ -3,7 +3,7 @@ import {db} from "../utils/Db";
 import {addNext, addPrevious} from "../utils/HypermediaControls";
 
 const BASE_URL = `${configuration.domainName}/postalInfo`;
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 250;
 
 export async function getPostalInfoPage(req, res){
   const page = parseInt(req.query.page, 10);
