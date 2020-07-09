@@ -9,7 +9,7 @@ export default class Db {
       SELECT *
         FROM brs.addresses
        WHERE object_id = $1
-       ORDER BY event_id ASC
+       ORDER BY timestamp ASC, event_id ASC
        LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
 
     try {
@@ -24,7 +24,7 @@ export default class Db {
     const ADDRESSES_PAGED = `
       SELECT *
         FROM brs.addresses
-       ORDER BY event_id ASC
+       ORDER BY timestamp ASC, event_id ASC
        LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
 
     try {
@@ -39,7 +39,7 @@ export default class Db {
     const STREET_NAMES_PAGED = `
       SELECT *
         FROM brs.street_names
-       ORDER BY event_id ASC
+       ORDER BY timestamp ASC, event_id ASC
        LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
 
     try {
@@ -54,7 +54,7 @@ export default class Db {
     const POSTAL_INFORMATIONS_PAGED = `
       SELECT *
         FROM brs.postal_information
-       ORDER BY event_id ASC
+       ORDER BY timestamp ASC, event_id ASC
        LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
 
     try {
