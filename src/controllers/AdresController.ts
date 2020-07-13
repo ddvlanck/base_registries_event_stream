@@ -14,6 +14,7 @@ export async function getAddress(req, res) {
     res.redirect('?page=1');
   } else {
     const queryResponse = await db.getAddressPaged(req.params.objectId, page, PAGE_SIZE);
+    addHeaders(res, PAGE_SIZE, queryResponse.rows.length);
     res.json(buildResponse(queryResponse.rows, PAGE_SIZE, page));
   }
 }

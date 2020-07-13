@@ -1,6 +1,7 @@
 import {configuration} from "../utils/Configuration";
 import {db} from "../utils/Db";
 import {addNext, addPrevious} from "../utils/HypermediaControls";
+import {addHeaders} from "../utils/Headers";
 
 const BASE_URL = `${configuration.domainName}/streetname`;
 const PAGE_SIZE = 250;
@@ -13,6 +14,7 @@ export async function getStreetNamePage(req, res) {
     res.redirect('?page=1');
   } else {
     const queryResponse = await db.getStreetNamesPaged(page, PAGE_SIZE);
+    addHeaders(res, PAGE_SIZE, queryResponse.rows.length);
     res.json(buildResponse(queryResponse.rows, PAGE_SIZE, page));
   }
 }
