@@ -79,7 +79,7 @@ export default class Db {
     }
   }
 
-  async getBuildingUnitsForBuildingVersion(unitId: string, eventId: number){
+  async getBuildingUnitForBuildingVersion(unitId: string, eventId: number){
     const client = await pool.connect();
     const BUILDING_UNITS = `
       SELECT *

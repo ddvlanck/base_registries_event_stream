@@ -61,14 +61,15 @@ function createBuildingEvent(data){
   }
 
   //TODO: have to wait for the response, but method does not include building units
+  let units = [];
   if(data.building_units.length){
     for(let unitID of data.building_units){
-      db.getBuildingUnitsForBuildingVersion(unitID, data.event_id).then(response => {
-        buildingEvent['bestaat_uit'] = response.rows.map((unit) => createBuildingUnit(unit));
-        console.log(buildingEvent['bestaat_uit']);
+      db.getBuildingUnitForBuildingVersion(unitID, data.event_id).then(response => {
+        units.push(createBuildingUnit(response.rows[0]));
       });
     }
   }
+  buildingEvent['bestaat_uit'] = units;
   return buildingEvent;
 }
 
