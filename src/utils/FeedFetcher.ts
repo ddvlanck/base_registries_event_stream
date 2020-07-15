@@ -61,7 +61,7 @@ export default class FeedFetcher {
       'x-api-key': this.apikey,
     }
 
-    //while (nextLink !== null) {
+    while (nextLink !== null) {
       console.log(`Fetching ${nextLink}`);
       await fetch(`${nextLink}`, { headers: headers })
         .then(res => res.text())
@@ -93,7 +93,7 @@ export default class FeedFetcher {
 
       console.log(`Waiting ${rateLimitDelay}ms to not trigger rate limit.`);
       await sleep(rateLimitDelay);
-    //}
+    }
 
     console.log('Done fetching pages for [' + name + ']');
   }

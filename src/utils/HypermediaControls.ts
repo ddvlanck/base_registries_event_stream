@@ -1,4 +1,4 @@
-export function addNext(context, tree, items, pageSize, page, base_url) {
+export function addNext(context, tree, items, pageSize: number, page: number, base_url) {
   if (items.length !== pageSize) return;
 
   const nextURL = `${base_url}?page=${(page + 1)}`
@@ -15,7 +15,7 @@ export function addNext(context, tree, items, pageSize, page, base_url) {
   });
 }
 
-export function addPrevious(context, tree, items, page, base_url) {
+export function addPrevious(context, tree, items, page: number, base_url) {
   if (page <= 1) return;
 
   const previousURL = `${base_url}?page=${(page - 1)}`;

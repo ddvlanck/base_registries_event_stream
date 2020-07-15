@@ -18,7 +18,7 @@ export async function getPostalInfoPage(req, res) {
   }
 }
 
-function buildResponse(items, pageSize, page) {
+function buildResponse(items: any[], pageSize: number, page: number) {
   const response = getContext();
   response['feed_url'] = BASE_URL;
   response['@id'] = `${BASE_URL}?page=${page}`;
@@ -32,7 +32,7 @@ function buildResponse(items, pageSize, page) {
     response['tree:relation'] = tree;
   }
 
-  response['items'] = items.map((item) => createPostalInformationEvent(item));
+  response['items'] = items.map(item => createPostalInformationEvent(item));
   response['items'].unshift(getShape(`${BASE_URL}?page=${page}`));
 
   return response;

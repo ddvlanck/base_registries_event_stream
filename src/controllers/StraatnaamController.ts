@@ -19,7 +19,7 @@ export async function getStreetNamePage(req, res) {
   }
 }
 
-function buildResponse(items, pageSize, page) {
+function buildResponse(items: any[], pageSize: number, page: number) {
   const response = getContext();
   response['feed_url'] = BASE_URL;
   response['@id'] = `${BASE_URL}?page=${page}`;
