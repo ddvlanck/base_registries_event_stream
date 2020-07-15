@@ -64,6 +64,36 @@ export default class Db {
     }
   }
 
+  async getBuildingsPaged(page: number, pageSize: number){
+    const client = await pool.connect();
+    const BUILDINGS_PAGED = `
+      SELECT *
+        FROM brs.buildings
+      ORDER BY timestamp asc, event_id ASC
+      LIMIT ${pageSize} OFFSET ${(page-1) * pageSize}`;
+
+    try {
+      return await client.query(BUILDINGS_PAGED);
+    } finally {
+      client.release();
+    }
+  }
+
+  async getBuildingUnitsForBuildingVersion(unitId: string, eventId: number){
+    const client = await pool.connect();
+    const BUILDING_UNITS = `
+      SELECT *
+        FROM brs.building_units
+      WHERE event_id = $1 AND building_unit_id = $2
+      ORDER BY event_id ASC`;
+
+    try {
+      return await client.query(BUILDING_UNITS, [eventId, unitId]);
+    } finally {
+      client.release();
+    }
+  }
+
   async transaction(f: (client: PoolClient) => any) {
     const client = await pool.connect();
 
@@ -344,6 +374,123 @@ export default class Db {
         status
       ]
     );
+  }
+
+  async addBuilding(
+    client: PoolClient,
+    eventId: number,
+    eventName: string,
+    buildingId: string,
+    timestamp: string,
+    objectId: number | null,
+    objectUri: string,
+    buildingStatus: string,
+    geometryMethod: string,
+    geometryPolygon: string,
+    buildingUnitsIDs: Array<string>,
+    complete: boolean
+  ){
+    const ADD_BUILDING = `
+      INSERT INTO brs.buildings(
+        "event_id",
+        "event_name",
+        "timestamp",
+        "building_id",
+        "object_id",
+        "object_uri",
+        "building_status",
+        "geometry_method",
+        "geometry_polygon",
+        "building_units",
+        "complete")
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`;
+
+    return await client.query(
+      ADD_BUILDING,
+      [
+        eventId,
+        eventName,
+        timestamp,
+        buildingId,
+        objectId,
+        objectUri,
+        buildingStatus,
+        geometryMethod,
+        geometryPolygon,
+        buildingUnitsIDs,
+        complete
+      ]
+    )
+  }
+
+  async setBuildingPersistentId(
+    client: PoolClient,
+    buildingId: string,
+    objectId: number,
+    objectUri: string
+  ){
+    const SET_OBJECTID = `
+      UPDATE brs.buildings
+         SET object_id = $1, object_uri = $2
+       WHERE building_id = $3`;
+    return await client.query(SET_OBJECTID, [objectId, objectUri, buildingId]);
+  }
+
+  async addBuildingUnit(
+    client: PoolClient,
+    eventId: number,
+    buildingUnitId: string,
+    buildingId: string,
+    buildingUnitObjectId: number | null,
+    buildingUnitObjectUri: string,
+    buildingUnitStatus: string,
+    positionGeometryMethod: string,
+    geometryPoint: string,
+    unitFunction: string,
+    complete: boolean
+  ){
+    const ADD_BUILDING_UNIT = `
+      INSERT INTO brs.building_units(
+        "building_unit_id",
+        "event_id",
+        "building_id",
+        "object_id",
+        "object_uri",
+        "building_unit_status",
+        "position_geometry_method",
+        "geometry_point",
+        "function",
+        "complete")
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`
+
+    return await client.query(
+      ADD_BUILDING_UNIT,
+      [
+        buildingUnitId,
+        eventId,
+        buildingId,
+        buildingUnitObjectId,
+        buildingUnitObjectUri,
+        buildingUnitStatus,
+        positionGeometryMethod,
+        geometryPoint,
+        unitFunction,
+        complete
+      ]
+    )
+  }
+
+  async setBuildingUnitPersistentId(
+    client: PoolClient,
+    buildingUnitId: string,
+    objectId: number,
+    objectUri: string
+  ){
+    const SET_OBJECTID = `
+      UPDATE brs.building_units
+         SET object_id = $1, object_uri = $2
+       WHERE building_unit_id = $3`;
+    return await client.query(SET_OBJECTID, [objectId, objectUri, buildingUnitId]);
   }
 }
 
