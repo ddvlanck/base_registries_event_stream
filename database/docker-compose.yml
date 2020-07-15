@@ -23,6 +23,6 @@ services:
       PGADMIN_DEFAULT_EMAIL: dev@dev.be
       PGADMIN_DEFAULT_PASSWORD: dev
     ports:
-      - "8001:80"
+      - 8001:80
     networks:
       - db

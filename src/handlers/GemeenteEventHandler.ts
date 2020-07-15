@@ -1,7 +1,7 @@
-import {PoolClient} from "pg";
-import {db} from "../utils/Db";
+import xml2js from 'xml2js';
+import { PoolClient } from 'pg';
+import { db } from '../utils/Db';
 
-const xml2js = require('xml2js');
 const parser = new xml2js.Parser();
 
 export default class GemeenteEventHandler {

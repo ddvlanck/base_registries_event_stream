@@ -64,10 +64,10 @@ export default class PostinfoEventHandler {
     let postNamen = [];
     let postNamenTaal = [];
 
-    if(typeof objectBody.Postnamen[0] === 'object'){
+    if (typeof objectBody.Postnamen[0] === 'object') {
       const postnamen = objectBody.Postnamen[0].Postnaam;
 
-      for(let postnaam of postnamen){
+      for (let postnaam of postnamen) {
         postNamen.push(postnaam.GeografischeNaam[0].Spelling[0]);
         postNamenTaal.push(postnaam.GeografischeNaam[0].Taal[0]);
       }

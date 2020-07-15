@@ -1,8 +1,7 @@
-import {PoolClient} from "pg";
-import {db} from "../utils/Db";
-import {type} from "os";
+import xml2js from 'xml2js';
+import { PoolClient } from 'pg';
+import { db } from '../utils/Db';
 
-const xml2js = require('xml2js');
 const parser = new xml2js.Parser();
 
 export default class GebouwEventHandler {
@@ -60,14 +59,13 @@ export default class GebouwEventHandler {
     if (typeof objectBody.Gebouweenheden[0] === 'object') {
       const buildingUnits = objectBody.Gebouweenheden[0].Gebouweenheid
 
-      for (let unit of buildingUnits){
+      for (let unit of buildingUnits) {
         const isComplete = unit.IsCompleet[0] === 'true';
 
-        if(!isComplete){
+        if (!isComplete) {
           console.log(`[GebouwEventHandler]: One of the building units is not complete yet, so skipping ${eventName} at position ${position} `)
           return;
         }
-
 
         const buildingUnitObjectId = unit.Identificator[0].ObjectId[0];
         const buildingUnitObjectUri = unit.Identificator[0].Id[0];
@@ -78,7 +76,7 @@ export default class GebouwEventHandler {
         const unitFunction = unit.Functie[0];
         let geometryPoint = null;
 
-        if(unit.GeometriePunt[0].hasOwnProperty('point')){
+        if (unit.GeometriePunt[0].hasOwnProperty('point')) {
           geometryPoint = unit.GeometriePunt[0].point[0].pos[0]
         }
 
@@ -98,7 +96,6 @@ export default class GebouwEventHandler {
       }
     }
 
-
     const versieId = objectBody.Identificator[0].VersieId[0];
     const objectId = objectBody.Identificator[0].ObjectId[0];
     const objectUri = objectBody.Identificator[0].Id[0];
@@ -108,7 +105,6 @@ export default class GebouwEventHandler {
     const buildingStatus = objectBody.GebouwStatus[0];
     const geometryMethod = objectBody.GeometrieMethode[0];
     const geometryPolygon = objectBody.GeometriePolygoon[0].polygon[0].exterior[0].LinearRing[0].posList[0]
-
 
     console.log(`[GebouwEventHandler]: Adding object for ${buildingId} at position ${position}.`);
     await db.addBuilding(
@@ -123,12 +119,11 @@ export default class GebouwEventHandler {
       geometryMethod,
       geometryPolygon,
       buildingUnitIDs,
-      isComplete
-    );
+      isComplete);
 
-    if(buildingUnitIDs.length > 0){
+    if (buildingUnitIDs.length > 0) {
       console.log(`[GebouwEventHandler]: Adding ${buildingUnitIDs.length} building unit(s) for ${buildingId} at position ${position}.`);
-      for(let unit of buildingUnitObjects){
+      for (let unit of buildingUnitObjects) {
         await db.addBuildingUnit(
           client,
           position,
@@ -140,17 +135,16 @@ export default class GebouwEventHandler {
           unit.positionGeometryMethod,
           unit.geometryPoint,
           unit.unitFunction,
-          unit.isComplete
-        )
+          unit.isComplete);
 
-        if(eventName === 'BuildingUnitPersistentLocalIdentifierWasAssigned' && unit.buildingUnitId === eventBody.BuildingUnitId[0]){
+        if (eventName === 'BuildingUnitPersistentLocalIdentifierWasAssigned' && unit.buildingUnitId === eventBody.BuildingUnitId[0]) {
           console.log(`[GebouwEventHandler]: Assigning ${unit.buildingUnitObjectUri} for building unit ${unit.buildingUnitId} at position ${position}.`);
           db.setBuildingUnitPersistentId(client, unit.buildingUnitId, unit.buildingUnitObjectId, unit.buildingUnitObjectUri);
         }
       }
     }
 
-    if(eventName === 'BuildingPersistentLocalIdentifierWasAssigned'){
+    if (eventName === 'BuildingPersistentLocalIdentifierWasAssigned') {
       console.log(`[GebouwEventHandler]: Assigning ${objectUri} for building ${buildingId} at position ${position}.`);
 
       db.setBuildingPersistentId(client, buildingId, objectId, objectUri);
