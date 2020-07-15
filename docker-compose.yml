@@ -50,7 +50,13 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ./database/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+      - ./database/init_db.sql:/docker-entrypoint-initdb.d/01-init_db.sql
+      - ./database/projection_status.sql:/docker-entrypoint-initdb.d/02-projection_status.sql
+      - ./database/municipalities.sql:/docker-entrypoint-initdb.d/03-municipalities.sql
+      - ./database/postal_information.sql:/docker-entrypoint-initdb.d/04-postal_information.sql
+      - ./database/street_names.sql:/docker-entrypoint-initdb.d/05-street_names.sql
+      - ./database/addresses.sql:/docker-entrypoint-initdb.d/06-addresses.sql
+      - ./database/buildings.sql:/docker-entrypoint-initdb.d/07-buildings.sql
 
   dba:
     image: dpage/pgadmin4:4.23
