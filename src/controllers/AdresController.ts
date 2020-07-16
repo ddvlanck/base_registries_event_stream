@@ -183,7 +183,7 @@ function getShape(pageId: string) {
           'sh:node': {
             'sh:property' : [
               {
-                'sh:path' : 'http://www.w3.org/ns/locn#Geometry',
+                'sh:path' : 'http://www.w3.org/ns/locn#geometry',
                 'sh:node' : {
                   'sh:property' : {
                     'sh:path' : 'http://www.opengis.net/ont/geosparql#asGML',
