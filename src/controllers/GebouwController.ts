@@ -4,7 +4,7 @@ import {addHeaders} from '../utils/Headers';
 import {addNext, addPrevious} from '../utils/HypermediaControls';
 
 const BASE_URL = `${configuration.domainName}/building`;
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 250;
 
 export async function getBuildingPage(req, res) {
   const page = parseInt(req.query.page, 10);
