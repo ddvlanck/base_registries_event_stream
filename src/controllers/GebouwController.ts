@@ -1,12 +1,12 @@
-import {configuration} from "../utils/Configuration";
-import {db} from "../utils/Db";
-import {addHeaders} from "../utils/Headers";
-import {addNext, addPrevious} from "../utils/HypermediaControls";
+import { configuration } from '../utils/Configuration';
+import { db } from '../utils/Db';
+import { addHeaders } from '../utils/Headers';
+import { addNext, addPrevious } from '../utils/HypermediaControls';
 
 const BASE_URL = `${configuration.domainName}/building`;
 const PAGE_SIZE = 5;
 
-export async function getBuildingPage(req, res){
+export async function getBuildingPage(req, res) {
   const page = parseInt(req.query.page, 10);
 
   if (!page) {
@@ -14,13 +14,13 @@ export async function getBuildingPage(req, res){
   } else {
     const queryResponse = await db.getBuildingsPaged(page, PAGE_SIZE);
     addHeaders(res, PAGE_SIZE, queryResponse.rows.length);
-    res.json(buildResponse(queryResponse.rows, PAGE_SIZE, page));
+    res.json(await buildResponse(queryResponse.rows, PAGE_SIZE, page));
   }
 }
 
-function buildResponse(items, pageSize, page){
+async function buildResponse(items: any[], pageSize: number, page: number) {
   const response = getContext();
-  response["feed_url"] = BASE_URL;
+  response['feed_url'] = BASE_URL;
   response['@id'] = `${BASE_URL}?page=${page}`;
 
   const tree = [];
@@ -29,16 +29,17 @@ function buildResponse(items, pageSize, page){
   addPrevious(response, tree, items, page, BASE_URL);
 
   if (tree.length) {
-    response["tree:relation"] = tree;
+    response['tree:relation'] = tree;
   }
 
-  response["items"] = items.map((item) => createBuildingEvent(item));
-  //response["items"].unshift(getShape(`${BASE_URL}?page=${page}`));
+  response['items'] = await Promise.all(items.map(item => createBuildingEvent(item)));
+
+  //response['items'].unshift(getShape(`${BASE_URL}?page=${page}`));
   //TODO: enabe getshape
   return response;
 }
 
-function createBuildingEvent(data){
+async function createBuildingEvent(data) {
   const buildingEvent = {};
 
   buildingEvent['isVersionOf'] = data.object_uri;
@@ -60,20 +61,19 @@ function createBuildingEvent(data){
     }
   }
 
-  //TODO: have to wait for the response, but method does not include building units
   let units = [];
-  if(data.building_units.length){
-    for(let unitID of data.building_units){
-      db.getBuildingUnitForBuildingVersion(unitID, data.event_id).then(response => {
-        units.push(createBuildingUnit(response.rows[0]));
-      });
+  if (data.building_units.length) {
+    for (let unitID of data.building_units) {
+      var queryResult = await db.getBuildingUnitForBuildingVersion(unitID, data.event_id);
+      units.push(createBuildingUnit(queryResult.rows[0]));
     }
   }
+
   buildingEvent['bestaat_uit'] = units;
   return buildingEvent;
 }
 
-function createBuildingUnit(unit){
+function createBuildingUnit(unit) {
   const buildingUnit = {};
 
   buildingUnit['isVersionOf'] = unit.object_uri;
@@ -106,63 +106,63 @@ function createBuildingUnit(unit){
   return buildingUnit;
 }
 
-function getShape(pageId: string){
+function getShape(pageId: string) {
 
 }
 
-function getContext(){
+function getContext() {
   return {
-    "@context": [
-      "http://data.vlaanderen.be/context/gebouw.jsonld",
+    '@context': [
+      'http://data.vlaanderen.be/context/gebouw.jsonld',
       {
-        "xsd": "http://www.w3.org/2001/XMLSchema#",
-        "prov" : "http://www.w3.org/ns/prov#",
-        "eventName": "http://www.w3.org/ns/adms#versionNotes",
-        "generatedAtTime" : "prov:generatedAtTime",
-        "isCompleet": {
-          "@id": "https://basisregisters.vlaanderen.be/ns/gebouwenregister#isCompleet",
-          "@type": "xsd:boolean"
+        'xsd': 'http://www.w3.org/2001/XMLSchema#',
+        'prov' : 'http://www.w3.org/ns/prov#',
+        'eventName': 'http://www.w3.org/ns/adms#versionNotes',
+        'generatedAtTime' : 'prov:generatedAtTime',
+        'isCompleet': {
+          '@id': 'https://basisregisters.vlaanderen.be/ns/gebouwenregister#isCompleet',
+          '@type': 'xsd:boolean'
         },
-        "items": {
-          "@id": "@graph"
+        'items': {
+          '@id': '@graph'
         },
-        "isVersionOf": {
-          "@id": "http://purl.org/dc/terms/isVersionOf",
-          "@type": "@id"
+        'isVersionOf': {
+          '@id': 'http://purl.org/dc/terms/isVersionOf',
+          '@type': '@id'
         },
-        "hydra": "http://www.w3.org/ns/hydra/core#",
-        "next_url": {
-          "@id": "hydra:next",
-          "@type": "@id"
+        'hydra': 'http://www.w3.org/ns/hydra/core#',
+        'next_url': {
+          '@id': 'hydra:next',
+          '@type': '@id'
         },
-        "previous_url": {
-          "@id": "hydra:previous",
-          "@type": "@id"
+        'previous_url': {
+          '@id': 'hydra:previous',
+          '@type': '@id'
         },
-        "tree": "https://w3id.org/tree#",
-        "feed_url": {
-          "@reverse": "tree:view",
-          "@type": "@id"
+        'tree': 'https://w3id.org/tree#',
+        'feed_url': {
+          '@reverse': 'tree:view',
+          '@type': '@id'
         },
-        "memberOf": {
-          "@reverse": "tree:member",
-          "@type": "@id"
+        'memberOf': {
+          '@reverse': 'tree:member',
+          '@type': '@id'
         },
-        "tree:node": {
-          "@type": "@id"
+        'tree:node': {
+          '@type': '@id'
         },
-        "tree:path": {
-          "@type": "@id"
+        'tree:path': {
+          '@type': '@id'
         },
-        "sh": "https://www.w3.org/ns/shacl#",
-        "sh:nodeKind": {
-          "@type": "@id",
+        'sh': 'https://www.w3.org/ns/shacl#',
+        'sh:nodeKind': {
+          '@type': '@id',
         },
-        "sh:path": {
-          "@type": "@id",
+        'sh:path': {
+          '@type': '@id',
         },
-        "sh:datatype": {
-          "@type": "@id",
+        'sh:datatype': {
+          '@type': '@id',
         },
       }
     ]

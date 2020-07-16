@@ -5,6 +5,7 @@ import { pool } from './Postgres';
 export default class Db {
   async getAddressPaged(objectId: number, page: number, pageSize: number) {
     const client = await pool.connect();
+
     const ADDRESSES_PAGED = `
       SELECT *
         FROM brs.addresses
@@ -21,6 +22,7 @@ export default class Db {
 
   async getAddressesPaged(page: number, pageSize: number) {
     const client = await pool.connect();
+
     const ADDRESSES_PAGED = `
       SELECT *
         FROM brs.addresses
@@ -34,8 +36,9 @@ export default class Db {
     }
   }
 
-  async getStreetNamesPaged(page: number, pageSize: number){
+  async getStreetNamesPaged(page: number, pageSize: number) {
     const client = await pool.connect();
+
     const STREET_NAMES_PAGED = `
       SELECT *
         FROM brs.street_names
@@ -49,8 +52,9 @@ export default class Db {
     }
   }
 
-  async getPostalInformationsPaged(page: number, pageSize: number){
+  async getPostalInformationsPaged(page: number, pageSize: number) {
     const client = await pool.connect();
+
     const POSTAL_INFORMATIONS_PAGED = `
       SELECT *
         FROM brs.postal_information
@@ -64,13 +68,14 @@ export default class Db {
     }
   }
 
-  async getBuildingsPaged(page: number, pageSize: number){
+  async getBuildingsPaged(page: number, pageSize: number) {
     const client = await pool.connect();
+
     const BUILDINGS_PAGED = `
       SELECT *
         FROM brs.buildings
-      ORDER BY timestamp asc, event_id ASC
-      LIMIT ${pageSize} OFFSET ${(page-1) * pageSize}`;
+       ORDER BY timestamp asc, event_id ASC
+       LIMIT ${pageSize} OFFSET ${(page-1) * pageSize}`;
 
     try {
       return await client.query(BUILDINGS_PAGED);
@@ -79,13 +84,14 @@ export default class Db {
     }
   }
 
-  async getBuildingUnitForBuildingVersion(unitId: string, eventId: number){
+  async getBuildingUnitForBuildingVersion(unitId: string, eventId: number) {
     const client = await pool.connect();
+
     const BUILDING_UNITS = `
       SELECT *
         FROM brs.building_units
-      WHERE event_id = $1 AND building_unit_id = $2
-      ORDER BY event_id ASC`;
+       WHERE event_id = $1 AND building_unit_id = $2
+       ORDER BY event_id ASC`;
 
     try {
       return await client.query(BUILDING_UNITS, [eventId, unitId]);
@@ -112,7 +118,8 @@ export default class Db {
   }
 
   async getProjectionStatus(feed: string) {
-    const client = await pool.connect()
+    const client = await pool.connect();
+
     const PROJECTION_STATUS = `
       SELECT position
         FROM brs.projection_status
@@ -126,7 +133,8 @@ export default class Db {
   }
 
   async initProjectionStatus(feed: string) {
-    const client = await pool.connect()
+    const client = await pool.connect();
+
     const PROJECTION_INIT = `
       INSERT INTO brs.projection_status(feed, position)
           VALUES($1, 0);`;
@@ -234,8 +242,7 @@ export default class Db {
     geographicalNameLanguage: string,
     straatNameStatus: string,
     nisCode: number,
-    isComplete: boolean
-  ){
+    isComplete: boolean) {
 
     const ADD_STREET_NAME = `
       INSERT INTO brs.street_names(
@@ -251,7 +258,6 @@ export default class Db {
         "nis_code",
         "complete")
       VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`;
-
 
     return await client.query(
       ADD_STREET_NAME,
@@ -274,12 +280,13 @@ export default class Db {
     client: PoolClient,
     streetNameId: string,
     objectId: number,
-    objectUri: string
-  ){
+    objectUri: string) {
+
     const SET_OBJECTID = `
       UPDATE brs.street_names
          SET object_id = $1, object_uri = $2
        WHERE street_name_id = $3`;
+
     return await client.query(SET_OBJECTID, [objectId, objectUri, streetNameId]);
   }
 
@@ -295,8 +302,7 @@ export default class Db {
     facilityLanguages: Array<string>,
     geographicalNames: Array<string>,
     geographicalNameLanguages: Array<string>,
-    status: string
-  ){
+    status: string) {
 
     const ADD_MUNICIPALITY = `
       INSERT INTO brs.municipalities(
@@ -342,8 +348,7 @@ export default class Db {
     postalNames: Array<string>,
     postalNameLanguage: Array<string>,
     nisCode: number,
-    status: string
-  ){
+    status: string) {
 
     const ADD_POSTAL_INFO = `
       INSERT INTO brs.postal_information(
@@ -388,8 +393,8 @@ export default class Db {
     geometryMethod: string,
     geometryPolygon: string,
     buildingUnitsIDs: Array<string>,
-    complete: boolean
-  ){
+    complete: boolean) {
+
     const ADD_BUILDING = `
       INSERT INTO brs.buildings(
         "event_id",
@@ -427,12 +432,13 @@ export default class Db {
     client: PoolClient,
     buildingId: string,
     objectId: number,
-    objectUri: string
-  ){
+    objectUri: string) {
+
     const SET_OBJECTID = `
       UPDATE brs.buildings
          SET object_id = $1, object_uri = $2
        WHERE building_id = $3`;
+
     return await client.query(SET_OBJECTID, [objectId, objectUri, buildingId]);
   }
 
@@ -447,8 +453,8 @@ export default class Db {
     positionGeometryMethod: string,
     geometryPoint: string,
     unitFunction: string,
-    complete: boolean
-  ){
+    complete: boolean) {
+
     const ADD_BUILDING_UNIT = `
       INSERT INTO brs.building_units(
         "building_unit_id",
@@ -484,12 +490,13 @@ export default class Db {
     client: PoolClient,
     buildingUnitId: string,
     objectId: number,
-    objectUri: string
-  ){
+    objectUri: string) {
+
     const SET_OBJECTID = `
       UPDATE brs.building_units
          SET object_id = $1, object_uri = $2
        WHERE building_unit_id = $3`;
+
     return await client.query(SET_OBJECTID, [objectId, objectUri, buildingUnitId]);
   }
 }

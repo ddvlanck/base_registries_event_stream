@@ -1,8 +1,8 @@
-const xml2js = require('xml2js');
-const parser = new xml2js.Parser();
+import xml2js from 'xml2js';
+import { PoolClient } from 'pg';
+import { db } from '../utils/Db';
 
-import {PoolClient} from "pg";
-import {db} from "../utils/Db";
+const parser = new xml2js.Parser();
 
 export default class StraatnaamEventHandler {
   async processPage(client: PoolClient, entries: Array<any>) {

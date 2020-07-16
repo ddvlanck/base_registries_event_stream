@@ -1,7 +1,7 @@
-import {db} from "../utils/Db";
-import {configuration} from '../utils/Configuration';
-import {addNext, addPrevious} from "../utils/HypermediaControls";
-import {addHeaders} from "../utils/Headers";
+import { db } from '../utils/Db';
+import { configuration } from '../utils/Configuration';
+import { addNext, addPrevious } from '../utils/HypermediaControls';
+import { addHeaders } from '../utils/Headers';
 
 const BASE_URL = `${configuration.domainName}/address`;
 const PAGE_SIZE = 250;
@@ -32,9 +32,9 @@ export async function getAddressPage(req, res) {
   }
 }
 
-function buildResponse(items, pageSize, page) {
+function buildResponse(items: any[], pageSize: number, page: number) {
   const response = getContext();
-  response["feed_url"] = BASE_URL;
+  response['feed_url'] = BASE_URL;
   response['@id'] = `${BASE_URL}?page=${page}`;
 
   const tree = [];
@@ -43,11 +43,11 @@ function buildResponse(items, pageSize, page) {
   addPrevious(response, tree, items, page, BASE_URL);
 
   if (tree.length) {
-    response["tree:relation"] = tree;
+    response['tree:relation'] = tree;
   }
 
-  response["items"] = items.map((item) => createAddressEvent(item));
-  response["items"].unshift(getShape(`${BASE_URL}?page=${page}`));
+  response['items'] = items.map(item => createAddressEvent(item));
+  response['items'].unshift(getShape(`${BASE_URL}?page=${page}`));
 
   return response;
 }
@@ -76,12 +76,12 @@ function createAddressEvent(data) {
   }
 
   addressEvent['positie'] = {
-    "@type": "GeografischePositie",
-    "geometrie": {
-      "@type": "Punt",
-      "gml" : {
-        "@type" : "http://www.opengis.net/ont/geosparql#gmlLiteral",
-        "@value" : data.address_position
+    '@type': 'GeografischePositie',
+    'geometrie': {
+      '@type': 'Punt',
+      'gml' : {
+        '@type' : 'http://www.opengis.net/ont/geosparql#gmlLiteral',
+        '@value' : data.address_position
       }
     }
   }
@@ -96,7 +96,7 @@ function createAddressEvent(data) {
         addressEvent['positie']['methode'] = 'http://inspire.ec.europa.eu/codelist/GeometryMethodValue/byAdministrator';
         break;
       case 'Geïnterpoleerd':
-        addressEvent['positie']['methode'] = "";
+        addressEvent['positie']['methode'] = '';
         break;
     }
   }
@@ -104,16 +104,16 @@ function createAddressEvent(data) {
   if (data.position_specification) {
     switch (data.position_specification) {
       case 'Ingang':
-        addressEvent['positie']['specificatie'] = "http://inspire.ec.europa.eu/codelist/GeometrySpecificationValue/entrance";
+        addressEvent['positie']['specificatie'] = 'http://inspire.ec.europa.eu/codelist/GeometrySpecificationValue/entrance';
         break;
       case 'Gebouweenheid':
-        addressEvent['positie']['specificatie'] = "http://inspire.ec.europa.eu/codelist/GeometrySpecificationValue/building";
+        addressEvent['positie']['specificatie'] = 'http://inspire.ec.europa.eu/codelist/GeometrySpecificationValue/building';
         break;
       case 'Perceel':
-        addressEvent['positie']['specificatie'] = "http://inspire.ec.europa.eu/codelist/GeometrySpecificationValue/parcel";
+        addressEvent['positie']['specificatie'] = 'http://inspire.ec.europa.eu/codelist/GeometrySpecificationValue/parcel';
         break;
       case 'Wegsegment':
-        addressEvent['positie']['specificatie'] = "https://inspire.ec.europa.eu/codelist/GeometrySpecificationValue/segment";
+        addressEvent['positie']['specificatie'] = 'https://inspire.ec.europa.eu/codelist/GeometrySpecificationValue/segment';
         break;
     }
   }
@@ -134,97 +134,97 @@ function createAddressEvent(data) {
 
 function getShape(pageId: string) {
   return {
-    "@id": pageId,
-    "tree:shape": {
-      "sh:property": [
+    '@id': pageId,
+    'tree:shape': {
+      'sh:property': [
         {
-          "sh:path": "http://purl.org/dc/terms/isVersionOf",
-          "sh:nodeKind": "sh:IRI",
-          "sh:minCount": 1,
-          "sh:maxCount": 1,
+          'sh:path': 'http://purl.org/dc/terms/isVersionOf',
+          'sh:nodeKind': 'sh:IRI',
+          'sh:minCount': 1,
+          'sh:maxCount': 1,
         },
         {
-          "sh:path": "http://www.w3.org/ns/prov#generatedAtTime",
-          "sh:datatype": "xsd:dateTime",
-          "sh:minCount": 1,
-          "sh:maxCount": 1
+          'sh:path': 'http://www.w3.org/ns/prov#generatedAtTime',
+          'sh:datatype': 'xsd:dateTime',
+          'sh:minCount': 1,
+          'sh:maxCount': 1
         },
         {
-          "sh:path": "http://www.w3.org/ns/adms#versionNotes",
-          "sh:datatype": "xsd:string",
-          "sh:minCount": 1,
-          "sh:maxCount": 1
+          'sh:path': 'http://www.w3.org/ns/adms#versionNotes',
+          'sh:datatype': 'xsd:string',
+          'sh:minCount': 1,
+          'sh:maxCount': 1
         },
         {
-          "sh:path": "https://data.vlaanderen.be/ns/adres#huisnummer",
-          "sh:datetype": "xsd:string",
-          "sh:maxCount": 1
+          'sh:path': 'https://data.vlaanderen.be/ns/adres#huisnummer',
+          'sh:datetype': 'xsd:string',
+          'sh:maxCount': 1
         },
         {
-          "sh:path": "https://data.vlaanderen.be/ns/adres#huisnummer",
-          "sh:datatype": "xsd:string",
-          "sh:maxCount": 1
+          'sh:path': 'https://data.vlaanderen.be/ns/adres#huisnummer',
+          'sh:datatype': 'xsd:string',
+          'sh:maxCount': 1
         },
         {
-          "sh:path": "https://data.vlaanderen.be/ns/adres#heeftPostinfo",
-          "sh:node": {
-            "sh:property": {
-              "sh:path": "https://data.vlaanderen.be/ns/adres#postcode",
-              "sh:datatype": "xsd:string",
-              "sh:minCount": 1,
-              "sh:maxCount": 1
+          'sh:path': 'https://data.vlaanderen.be/ns/adres#heeftPostinfo',
+          'sh:node': {
+            'sh:property': {
+              'sh:path': 'https://data.vlaanderen.be/ns/adres#postcode',
+              'sh:datatype': 'xsd:string',
+              'sh:minCount': 1,
+              'sh:maxCount': 1
             }
           },
-          "sh:minCount": 1,
-          "sh:maxCount": 1
+          'sh:minCount': 1,
+          'sh:maxCount': 1
         },
         {
-          "sh:path" : "https://data.vlaanderen.be/ns/adres#positie",
-          "sh:node": {
-            "sh:property" : [
+          'sh:path' : 'https://data.vlaanderen.be/ns/adres#positie',
+          'sh:node': {
+            'sh:property' : [
               {
-                "sh:path" : "http://www.w3.org/ns/locn#Geometry",
-                "sh:node" : {
-                  "sh:property" : {
-                    "sh:path" : "http://www.opengis.net/ont/geosparql#asGML",
-                    "sh:datatype" : "xsd:string",
-                    "sh:minCount" : 1,
-                    "sh:maxCount" : 1
+                'sh:path' : 'http://www.w3.org/ns/locn#Geometry',
+                'sh:node' : {
+                  'sh:property' : {
+                    'sh:path' : 'http://www.opengis.net/ont/geosparql#asGML',
+                    'sh:datatype' : 'xsd:string',
+                    'sh:minCount' : 1,
+                    'sh:maxCount' : 1
                   }
                 }
               },
               {
-                "sh:path" : "https://data.vlaanderen.be/ns/generiek#methode",
-                "sh:datatype" : "http://www.w3.org/2004/02/skos/core#Concept",
-                "sh:minCount" : 1,
-                "sh:maxCount" : 1
+                'sh:path' : 'https://data.vlaanderen.be/ns/generiek#methode',
+                'sh:datatype' : 'http://www.w3.org/2004/02/skos/core#Concept',
+                'sh:minCount' : 1,
+                'sh:maxCount' : 1
               },
               {
-                "sh:path" : "https://data.vlaanderen.be/ns/generiek#specificatie",
-                "sh:datatype" : "http://www.w3.org/2004/02/skos/core#Concept",
-                "sh:minCount" : 1,
-                "sh:maxCount" : 1
+                'sh:path' : 'https://data.vlaanderen.be/ns/generiek#specificatie',
+                'sh:datatype' : 'http://www.w3.org/2004/02/skos/core#Concept',
+                'sh:minCount' : 1,
+                'sh:maxCount' : 1
               }
             ]
           }
         },
         {
-          "sh:path": "https://data.vlaanderen.be/ns/adres#officieelToegekend",
-          "sh:datatype": "xsd:boolean",
-          "sh:minCount": 1,
-          "sh:maxCount": 1
+          'sh:path': 'https://data.vlaanderen.be/ns/adres#officieelToegekend',
+          'sh:datatype': 'xsd:boolean',
+          'sh:minCount': 1,
+          'sh:maxCount': 1
         },
         {
-          "sh:path": "https://basisregisters.vlaanderen.be/ns/addressenregister#isCompleet",
-          "sh:datatype": "xsd:boolean",
-          "sh:minCount": 1,
-          "sh:maxCount": 1
+          'sh:path': 'https://basisregisters.vlaanderen.be/ns/addressenregister#isCompleet',
+          'sh:datatype': 'xsd:boolean',
+          'sh:minCount': 1,
+          'sh:maxCount': 1
         },
         {
-          "sh:path": "https://data.vlaanderen.be/ns/adres#Adres.status",
-          "sh:datatype": "xsd:string",
-          "sh:minCount": 1,
-          "sh:maxCount": 1
+          'sh:path': 'https://data.vlaanderen.be/ns/adres#Adres.status',
+          'sh:datatype': 'xsd:string',
+          'sh:minCount': 1,
+          'sh:maxCount': 1
         }
       ]
     }
@@ -233,70 +233,69 @@ function getShape(pageId: string) {
 
 function getContext() {
   return {
-    "@context": [
-      "https://data.vlaanderen.be/context/adresregister.jsonld",
+    '@context': [
+      'https://data.vlaanderen.be/context/adresregister.jsonld',
       {
-        "xsd": "http://www.w3.org/2001/XMLSchema#",
-        "prov" : "http://www.w3.org/ns/prov#",
-        "Punt": "http://www.opengis.net/ont/sf#Point",
-        "GeografischePositie" : "https://data.vlaanderen.be/ns/generiek#GeografischePositie",
-        "gml" : "https://data.vlaanderen.be/doc/applicatieprofiel/generiek-basis/#Geometrie%3Agml",
-        "eventName": "http://www.w3.org/ns/adms#versionNotes",
-        "generatedAtTime" : "prov:generatedAtTime",
-        "methode": {
-          "@id": "https://data.vlaanderen.be/ns/generiek#methode",
-          "@type": "@id"
+        'xsd': 'http://www.w3.org/2001/XMLSchema#',
+        'prov' : 'http://www.w3.org/ns/prov#',
+        'Punt': 'http://www.opengis.net/ont/sf#Point',
+        'GeografischePositie' : 'https://data.vlaanderen.be/ns/generiek#GeografischePositie',
+        'gml' : 'https://data.vlaanderen.be/doc/applicatieprofiel/generiek-basis/#Geometrie%3Agml',
+        'eventName': 'http://www.w3.org/ns/adms#versionNotes',
+        'generatedAtTime' : 'prov:generatedAtTime',
+        'methode': {
+          '@id': 'https://data.vlaanderen.be/ns/generiek#methode',
+          '@type': '@id'
         },
-        "specificatie": {
-          "@id": "https://data.vlaanderen.be/ns/generiek#specificatie",
-          "@type": "@id"
+        'specificatie': {
+          '@id': 'https://data.vlaanderen.be/ns/generiek#specificatie',
+          '@type': '@id'
         },
-        "isCompleet": {
-          "@id": "https://basisregisters.vlaanderen.be/ns/addressenregister#isCompleet",
-          "@type": "xsd:boolean"
+        'isCompleet': {
+          '@id': 'https://basisregisters.vlaanderen.be/ns/addressenregister#isCompleet',
+          '@type': 'xsd:boolean'
         },
-        "items": {
-          "@id": "@graph"
+        'items': {
+          '@id': '@graph'
         },
-        "isVersionOf": {
-          "@id": "http://purl.org/dc/terms/isVersionOf",
-          "@type": "@id"
+        'isVersionOf': {
+          '@id': 'http://purl.org/dc/terms/isVersionOf',
+          '@type': '@id'
         },
-        "hydra": "http://www.w3.org/ns/hydra/core#",
-        "next_url": {
-          "@id": "hydra:next",
-          "@type": "@id"
+        'hydra': 'http://www.w3.org/ns/hydra/core#',
+        'next_url': {
+          '@id': 'hydra:next',
+          '@type': '@id'
         },
-        "previous_url": {
-          "@id": "hydra:previous",
-          "@type": "@id"
+        'previous_url': {
+          '@id': 'hydra:previous',
+          '@type': '@id'
         },
-        "tree": "https://w3id.org/tree#",
-        "feed_url": {
-          "@reverse": "tree:view",
-          "@type": "@id"
+        'tree': 'https://w3id.org/tree#',
+        'feed_url': {
+          '@reverse': 'tree:view',
+          '@type': '@id'
         },
-        "memberOf": {
-          "@reverse": "tree:member",
-          "@type": "@id"
+        'memberOf': {
+          '@reverse': 'tree:member',
+          '@type': '@id'
         },
-        "tree:node": {
-          "@type": "@id"
+        'tree:node': {
+          '@type': '@id'
         },
-        "tree:path": {
-          "@type": "@id"
+        'tree:path': {
+          '@type': '@id'
         },
-        "sh": "https://www.w3.org/ns/shacl#",
-        "sh:nodeKind": {
-          "@type": "@id",
+        'sh': 'https://www.w3.org/ns/shacl#',
+        'sh:nodeKind': {
+          '@type': '@id',
         },
-        "sh:path": {
-          "@type": "@id",
+        'sh:path': {
+          '@type': '@id',
         },
-        "sh:datatype": {
-          "@type": "@id",
+        'sh:datatype': {
+          '@type': '@id',
         },
-
       }
     ]
   }
