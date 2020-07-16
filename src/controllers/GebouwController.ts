@@ -1,7 +1,7 @@
-import { configuration } from '../utils/Configuration';
-import { db } from '../utils/Db';
-import { addHeaders } from '../utils/Headers';
-import { addNext, addPrevious } from '../utils/HypermediaControls';
+import {configuration} from '../utils/Configuration';
+import {db} from '../utils/Db';
+import {addHeaders} from '../utils/Headers';
+import {addNext, addPrevious} from '../utils/HypermediaControls';
 
 const BASE_URL = `${configuration.domainName}/building`;
 const PAGE_SIZE = 5;
@@ -33,9 +33,7 @@ async function buildResponse(items: any[], pageSize: number, page: number) {
   }
 
   response['items'] = await Promise.all(items.map(item => createBuildingEvent(item)));
-
-  //response['items'].unshift(getShape(`${BASE_URL}?page=${page}`));
-  //TODO: enabe getshape
+  response['items'].unshift(getShape(`${BASE_URL}?page=${page}`));
   return response;
 }
 
@@ -48,15 +46,15 @@ async function createBuildingEvent(data) {
   buildingEvent['memberOf'] = BASE_URL;
   buildingEvent['@type'] = 'Gebouw';
 
-  buildingEvent['gebouwstatus'] = data.building_status;
-  buildingEvent['geometrie'] = {
-    '@type' : '2D-Gebouwgeometrie',
-    'methode' : data.geometry_method,
-    'geometrie' : {
-      '@type' : 'Geometrie',
-      'gml' : {
-        '@type' : 'http://www.opengis.net/ont/geosparql#gmlLiteral',
-        '@value' : data.geometry_polygon
+  buildingEvent['status'] = data.building_status;
+  buildingEvent['Gebouw.geometrie'] = {
+    '@type': '2DGebouwgeometrie',
+    'methode': data.geometry_method,
+    'geometrie': {
+      '@type': 'Geometrie',
+      'gml': {
+        '@type': 'http://www.opengis.net/ont/geosparql#gmlLiteral',
+        '@value': data.geometry_polygon
       }
     }
   }
@@ -67,9 +65,9 @@ async function createBuildingEvent(data) {
       var queryResult = await db.getBuildingUnitForBuildingVersion(unitID, data.event_id);
       units.push(createBuildingUnit(queryResult.rows[0]));
     }
+    buildingEvent['bestaatUit'] = units;
   }
 
-  buildingEvent['bestaat_uit'] = units;
   return buildingEvent;
 }
 
@@ -79,7 +77,7 @@ function createBuildingUnit(unit) {
   buildingUnit['isVersionOf'] = unit.object_uri;
   buildingUnit['@type'] = 'Gebouweenheid';
   buildingUnit['functie'] = unit.function;
-  buildingUnit['status'] = unit.building_unit_status;
+  buildingUnit['Gebouweenheid.status'] = unit.building_unit_status;
 
   let geometryMethod;
   switch (unit.position_geometry_method) {
@@ -94,12 +92,12 @@ function createBuildingUnit(unit) {
       break;
   }
 
-  buildingUnit['positie'] = {
-    '@type' : 'GeografischePositie',
-    'methode' : geometryMethod,
-    'geometrie' : {
-      '@type' : 'Point',
-      'gml' : unit.geometry_point
+  buildingUnit['Gebouweenheid.methode'] = geometryMethod;     // No definition found for method of building unit
+  buildingUnit['Gebouweenheid.geometrie'] = {
+    '@type': 'Geometrie',
+    'gml': {
+      '@type': 'http://www.opengis.net/ont/geosparql#gmlLiteral',
+      '@value': unit.geometry_point
     }
   }
 
@@ -107,18 +105,129 @@ function createBuildingUnit(unit) {
 }
 
 function getShape(pageId: string) {
-
+  return {
+    '@id': pageId,
+    'tree:shape': {
+      'sh:property': [
+        {
+          'sh:path': 'http://purl.org/dc/terms/isVersionOf',
+          'sh:nodeKind': 'sh:IRI',
+          'sh:minCount': 1,
+          'sh:maxCount': 1,
+        },
+        {
+          'sh:path': 'http://www.w3.org/ns/prov#generatedAtTime',
+          'sh:datatype': 'xsd:dateTime',
+          'sh:minCount': 1,
+          'sh:maxCount': 1
+        },
+        {
+          'sh:path': 'http://www.w3.org/ns/adms#versionNotes',
+          'sh:datatype': 'xsd:string',
+          'sh:minCount': 1,
+          'sh:maxCount': 1
+        },
+        {
+          'sh:path': 'https://data.vlaanderen.be/ns/gebouw#Gebouw.status',
+          'sh:datatype': 'http://www.w3.org/2004/02/skos/core#Concept',
+          'sh:minCount': 1,
+          'sh:maxCount': 1
+        },
+        {
+          'sh:path': 'https://data.vlaanderen.be/ns/gebouw#Gebouw.geometrie',
+          'sh:node': {
+            'sh:property': [
+              {
+                'sh:path': 'https://data.vlaanderen.be/ns/gebouw#methode',
+                'sh:datatype': 'http://www.w3.org/2004/02/skos/core#Concept',
+                'sh:minCount': 1,
+                'sh:maxCount': 1
+              },
+              {
+                'sh:path': 'http://www.w3.org/ns/locn#geometry',
+                'sh:node': {
+                  'sh:property': {
+                    'sh:path': 'http://www.opengis.net/ont/geosparql#asGML',
+                    'sh:datatype': 'xsd:string',
+                    'sh:minCount': 1,
+                    'sh:maxCount': 1
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          'sh:path' : 'https://data.vlaanderen.be/ns/gebouw#bestaatUit',
+          'sh:node' : {
+            'sh:property' : [
+              {
+                'sh:path': 'http://purl.org/dc/terms/isVersionOf',
+                'sh:nodeKind': 'sh:IRI',
+                'sh:minCount': 1,
+                'sh:maxCount': 1,
+              },
+              {
+                'sh:path': 'https://data.vlaanderen.be/ns/gebouw#functie',
+                'sh:datatype' : 'http://www.w3.org/2004/02/skos/core#Concept',
+                'sh:minCount': 1,
+                'sh:maxCount': 1
+              },
+              {
+                'sh:path': 'https://data.vlaanderen.be/ns/gebouw#Gebouweenheid.status',
+                'sh:datatype': 'http://www.w3.org/2004/02/skos/core#Concept',
+                'sh:minCount': 1,
+                'sh:maxCount': 1
+              },
+              {
+                'sh:path': 'http://example.org/Gebouweenheid#methode',
+                'sh:datatype' : 'http://www.w3.org/2004/02/skos/core#Concept',
+                'sh:minCount': 1,
+                'sh:maxCount': 1
+              },
+              {
+                'sh:path': 'https://data.vlaanderen.be/ns/gebouw#Gebouweenheid.geometrie',
+                'sh:node': {
+                  'sh:property': {
+                    'sh:path': 'http://www.opengis.net/ont/geosparql#asGML',
+                    'sh:datatype': 'xsd:string',
+                    'sh:minCount': 1,
+                    'sh:maxCount': 1
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
 }
 
 function getContext() {
   return {
     '@context': [
-      'http://data.vlaanderen.be/context/gebouw.jsonld',
+      'https://data.vlaanderen.be/doc/applicatieprofiel/gebouwenregister',
+      'https://data.vlaanderen.be/context/generiek-basis.jsonld',
       {
         'xsd': 'http://www.w3.org/2001/XMLSchema#',
-        'prov' : 'http://www.w3.org/ns/prov#',
+        'prov': 'http://www.w3.org/ns/prov#',
         'eventName': 'http://www.w3.org/ns/adms#versionNotes',
-        'generatedAtTime' : 'prov:generatedAtTime',
+        'generatedAtTime': 'prov:generatedAtTime',
+        '2DGebouwgeometrie': 'https://data.vlaanderen.be/ns/gebouw#2DGebouwgeometrie',
+        'Geometrie': 'http://www.w3.org/ns/locn#Geometry',
+        'Gebouweenheid.methode': {
+          '@id': 'http://example.org/Gebouweenheid#methode',
+          '@type': 'http://www.w3.org/2004/02/skos/core#Concept'
+        },
+        'status': {
+          '@id': 'https://data.vlaanderen.be/ns/gebouw#Gebouw.status',
+          '@type': 'http://www.w3.org/2004/02/skos/core#Concept'
+        },
+        'methode': {
+          '@id': 'https://data.vlaanderen.be/ns/gebouw#methode',
+          '@type': 'http://www.w3.org/2004/02/skos/core#Concept'
+        },
         'isCompleet': {
           '@id': 'https://basisregisters.vlaanderen.be/ns/gebouwenregister#isCompleet',
           '@type': 'xsd:boolean'
