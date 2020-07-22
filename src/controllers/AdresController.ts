@@ -242,7 +242,10 @@ function getContext() {
         'GeografischePositie' : 'https://data.vlaanderen.be/ns/generiek#GeografischePositie',
         'gml' : 'https://data.vlaanderen.be/doc/applicatieprofiel/generiek-basis/#Geometrie%3Agml',
         'eventName': 'http://www.w3.org/ns/adms#versionNotes',
-        'generatedAtTime' : 'prov:generatedAtTime',
+        'generatedAtTime' : {
+          '@id' : 'prov:generatedAtTime',
+          '@type' : 'xsd:dateTime'
+        },
         'methode': {
           '@id': 'https://data.vlaanderen.be/ns/generiek#methode',
           '@type': '@id'

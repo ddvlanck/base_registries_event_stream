@@ -27,7 +27,7 @@
     {
       "name": "building",
       "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/gebouwen",
-      "enabled": true
+      "enabled": false
     },
     {
       "name" : "postal_info",

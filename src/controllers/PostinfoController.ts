@@ -104,7 +104,10 @@ function getContext() {
         'xsd': 'http://www.w3.org/2001/XMLSchema#',
         'prov' : 'http://www.w3.org/ns/prov#',
         'eventName': 'http://www.w3.org/ns/adms#versionNotes',
-        'generatedAtTime' : 'prov:generatedAtTime',
+        'generatedAtTime' : {
+          '@id' : 'prov:generatedAtTime',
+          '@type' : 'xsd:dateTime'
+        },
         'Postinfo' : 'https://data.vlaanderen.be/ns/adres#Postinfo',
         'postcode' : 'https://data.vlaanderen.be/ns/adres#postcode',
         'postnaam' : 'https://data.vlaanderen.be/ns/adres#postnaam',

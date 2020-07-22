@@ -131,7 +131,10 @@ function getContext() {
         'xsd': 'http://www.w3.org/2001/XMLSchema#',
         'prov' : 'http://www.w3.org/ns/prov#',
         'eventName': 'http://www.w3.org/ns/adms#versionNotes',
-        'generatedAtTime' : 'prov:generatedAtTime',
+        'generatedAtTime' : {
+          '@id' : 'prov:generatedAtTime',
+          '@type' : 'xsd:dateTime'
+        },
         'straatnaam' : 'http://www.w3.org/2000/01/rdf-schema#label',
         'isCompleet': {
           '@id': 'https://basisregisters.vlaanderen.be/ns/addressenregister#isCompleet',
