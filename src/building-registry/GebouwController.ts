@@ -1,5 +1,5 @@
 import {configuration} from '../utils/Configuration';
-import {db} from '../utils/Db';
+import {db} from '../utils/DatabaseQueries';
 import {addHeaders} from '../utils/Headers';
 import {addNext, addPrevious} from '../utils/HypermediaControls';
 
@@ -25,8 +25,8 @@ async function buildResponse(items: any[], pageSize: number, page: number) {
 
   const tree = [];
 
-  addNext(response, tree, items, pageSize, page, BASE_URL);
-  addPrevious(response, tree, items, page, BASE_URL);
+  addNext(tree, items.length, pageSize, page, BASE_URL);
+  addPrevious(tree, items.length, page, BASE_URL);
 
   if (tree.length) {
     response['tree:relation'] = tree;
@@ -213,7 +213,10 @@ function getContext() {
         'xsd': 'http://www.w3.org/2001/XMLSchema#',
         'prov': 'http://www.w3.org/ns/prov#',
         'eventName': 'http://www.w3.org/ns/adms#versionNotes',
-        'generatedAtTime': 'prov:generatedAtTime',
+        'generatedAtTime': {
+          '@id' : 'prov:generatedAtTime',
+          '@type' : 'xsd:dateTime'
+        },
         '2DGebouwgeometrie': 'https://data.vlaanderen.be/ns/gebouw#2DGebouwgeometrie',
         'Geometrie': 'http://www.w3.org/ns/locn#Geometry',
         'Gebouweenheid.methode': {

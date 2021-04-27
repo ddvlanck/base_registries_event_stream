@@ -1,6 +1,6 @@
--- Table: brs.Municipalities
+-- Table: brs.municipalities
 
--- DROP TABLE brs."Municipalities";
+-- DROP TABLE brs."municipalities";
 
 CREATE TABLE brs."municipalities"
 (
@@ -13,16 +13,13 @@ CREATE TABLE brs."municipalities"
     "object_id" bigint,
     "object_uri" character varying(500),
 
-    "official_languages" character varying(50)[],
-    "facility_languages" character varying(50),
-    "geographical_names" character varying (50)[],
-    "geographical_name_languages" character varying(50)[],
-    "status" character varying(50),
+    "official_language" character varying(50)[],
+    "facility_language" character varying(50)[],
+    "municipality_name" jsonb,
+    "status" character varying,
 
     PRIMARY KEY ("event_id")
 )
-
--- TODO: Add index on object_id, complete
 
 TABLESPACE pg_default;
 

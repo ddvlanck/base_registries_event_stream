@@ -50,13 +50,14 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ./database/init_db.sql:/docker-entrypoint-initdb.d/01-init_db.sql
-      - ./database/projection_status.sql:/docker-entrypoint-initdb.d/02-projection_status.sql
-      - ./database/municipalities.sql:/docker-entrypoint-initdb.d/03-municipalities.sql
-      - ./database/postal_information.sql:/docker-entrypoint-initdb.d/04-postal_information.sql
-      - ./database/street_names.sql:/docker-entrypoint-initdb.d/05-street_names.sql
-      - ./database/addresses.sql:/docker-entrypoint-initdb.d/06-addresses.sql
-      - ./database/buildings.sql:/docker-entrypoint-initdb.d/07-buildings.sql
+      - ./init_db.sql:/docker-entrypoint-initdb.d/01-init_db.sql
+      - ./projection_status.sql:/docker-entrypoint-initdb.d/02-projection_status.sql
+      - ./municipalities.sql:/docker-entrypoint-initdb.d/03-municipalities.sql
+      - ./postal_information.sql:/docker-entrypoint-initdb.d/04-postal_information.sql
+      - ./street_names.sql:/docker-entrypoint-initdb.d/05-street_names.sql
+      - ./addresses.sql:/docker-entrypoint-initdb.d/06-addresses.sql
+      - ./address_municipality.sql:/docker-entrypoint-initdb.d/07-address_municipality.sql
+      - ./address_streetname.sql:/docker-entrypoint-initdb.d/08-address_streetname.sql
 
   dba:
     image: dpage/pgadmin4:4.23
@@ -72,9 +73,10 @@ services:
     links:
       - db
   loadbalancer:
+    container_name: base-registries-nginx
     build: ./nginx
     tty: true
     links:
       - api
     ports:
-    - 5000:5000
+    - 80:80

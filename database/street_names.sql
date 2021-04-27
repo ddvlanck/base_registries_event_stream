@@ -1,20 +1,18 @@
 CREATE TABLE brs."street_names"
 (
     "event_id" bigint NOT NULL,
-    "event_name" character varying(200) NOT NULL,
+    "event_name" character varying NOT NULL,
 
-    "timestamp" character varying(30) NOT NULL,
-    "street_name_id" character varying(40) NOT NULL,
+    "timestamp" character varying NOT NULL,
+    "street_name_id" character varying NOT NULL,
 
     "object_id" bigint,
-    "object_uri" character varying(500),
+    "object_uri" character varying,
 
-    "geographical_name" character varying(500),
-    "geographical_name_language" character varying (4),
+    "geographical_name" jsonb,
 
-    "street_name_status" character varying(40),
-    "nis_code" character varying(20),
-    "complete" boolean,
+    "street_name_status" character varying,
+    "nis_code" character varying,
 
     PRIMARY KEY ("event_id")
 )
@@ -29,5 +27,5 @@ COMMENT ON TABLE brs."street_names"
 
 CREATE INDEX str_name_index
     ON brs.street_names
-    (object_id ASC NULLS LAST, complete)
+    (object_id ASC NULLS LAST)
     TABLESPACE pg_default;

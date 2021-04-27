@@ -1,19 +1,20 @@
 ﻿﻿import express from 'express';
 
-import { getGemeentePage } from '../controllers/GemeenteController';
-import { getAddressPage, getAddress } from '../controllers/AdresController';
-import { getStreetNamePage } from '../controllers/StraatnaamController';
-import { getPostalInfoPage } from '../controllers/PostinfoController';
-import { getBuildingPage } from '../controllers/GebouwController';
+import {getMunicipalityPage, getMunicipalityShape} from "../municipality-registry/GemeenteController";
+import {getAddressPage, getAddressShape} from '../address-registry/AdresController';
+import { getStreetNamePage, getStreetNameShape } from '../streetname-registry/StraatnaamController';
+import { getPostalInfoPage, getPostalInfoShape } from '../postal-information-registry/PostinfoController';
+import { getBuildingPage } from '../building-registry/GebouwController';
 
 const router = express.Router();
 
-router.get('/address', getAddressPage);
-router.get('/address/:objectId', getAddress);
-
-router.get('/streetname', getStreetNamePage);
-router.get('/postalInfo', getPostalInfoPage);
-router.get('/municipality', getGemeentePage);
-router.get('/building', getBuildingPage);
+router.get('/adres', getAddressPage);
+router.get('/adres/shape', getAddressShape);
+router.get('/straatnaam', getStreetNamePage);
+router.get('/straatnaam/shape', getStreetNameShape);
+router.get('/postinfo', getPostalInfoPage);
+router.get('/postinfo/shape', getPostalInfoShape);
+router.get('/gemeente', getMunicipalityPage);
+router.get('/gemeente/shape', getMunicipalityShape);
 
 export default router;

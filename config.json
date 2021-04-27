@@ -7,7 +7,6 @@
     "port": 5432,
     "database": "base_registries"
   },
-  "apikey": "",
   "feeds": [
     {
       "name": "municipality",
@@ -17,12 +16,12 @@
     {
       "name": "address",
       "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/adressen",
-      "enabled": true
+      "enabled": false
     },
     {
       "name": "streetname",
       "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/straatnamen",
-      "enabled": true
+      "enabled": false
     },
     {
       "name": "building",
@@ -32,7 +31,12 @@
     {
       "name" : "postal_info",
       "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/postinfo",
-      "enabled": true
+      "enabled": false
+    },
+    {
+      "name" : "parcel",
+      "feedLocation" : "https://api.basisregisters.dev-vlaanderen.be/v1/feeds/percelen",
+      "enabled": false
     }
   ]
 }

@@ -1,35 +1,22 @@
-export function addNext(context, tree, items, pageSize: number, page: number, base_url) {
-  if (items.length !== pageSize) return;
+export function addNext(tree: Array<object>, itemsLength: number, pageSize: number, page: number, baseUrl: string): void {
+  if (itemsLength > 0 && itemsLength !== pageSize) return;
 
-  const nextURL = `${base_url}?page=${(page + 1)}`
-  context['next_url'] = nextURL;
+  const nextURL = `${baseUrl}?page=${(page + 1)}`;
 
   tree.push({
-    '@type': 'tree:GreaterOrEqualThanRelation',
-    'tree:node': nextURL,
-    'tree:path': 'prov:generatedAtTime',
-    'tree:value': {
-      '@value': items[items.length - 1]['timestamp'],
-      '@type': 'xsd:dateTime',
-    },
+    '@type': 'tree:Relation',
+    'tree:node': nextURL
   });
 }
 
-export function addPrevious(context, tree, items, page: number, base_url) {
+export function addPrevious(tree: Array<object>, itemsLength: number, page: number, baseUrl: string): void {
   if (page <= 1) return;
 
-  const previousURL = `${base_url}?page=${(page - 1)}`;
-  context['previous_url'] = previousURL;
+  const previousURL = `${baseUrl}?page=${(page - 1)}`;
 
-  if (items.length) {
+  if (itemsLength > 0)
     tree.push({
-      '@type': 'tree:LessOrEqualThanRelation',
-      'tree:node': previousURL,
-      'tree:path': 'prov:generatedAtTime',
-      'tree:value': {
-        '@value': items[0]['timestamp'],
-        '@type': 'xsd:dateTime',
-      },
+      '@type': 'tree:Relation',
+      'tree:node': previousURL
     });
-  }
 }

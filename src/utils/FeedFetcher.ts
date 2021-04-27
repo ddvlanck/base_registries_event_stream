@@ -4,13 +4,13 @@ import querystring from 'querystring';
 import sleep from 'sleep-promise';
 
 import { configuration } from '../utils/Configuration';
-import { db } from '../utils/Db';
+import { db } from './DatabaseQueries';
 
-import AdresEventHandler from '../handlers/AdresEventHandler';
-import StraatnaamEventHandler from '../handlers/StraatnaamEventHandler';
-import GemeenteEventHandler from '../handlers/GemeenteEventHandler';
-import GebouwEventHandler from '../handlers/GebouwEventHandler';
-import PostinfoEventHandler from '../handlers/PostinfoEventHandler';
+import AdresEventHandler from '../address-registry/AdresEventHandler';
+import StraatnaamEventHandler from '../streetname-registry/StraatnaamEventHandler';
+import GemeenteEventHandler from '../municipality-registry/GemeenteEventHandler';
+import GebouwEventHandler from '../building-registry/GebouwEventHandler';
+import PostinfoEventHandler from '../postal-information-registry/PostinfoEventHandler';
 
 import { URL } from 'url';
 
@@ -20,9 +20,9 @@ export default class FeedFetcher {
   apikey: string;
   feeds: { name: string, feedLocation: string, enabled: boolean }[];
 
-  constructor() {
+  constructor(apikey: string) {
     this.feeds = configuration.feeds;
-    this.apikey = configuration.apikey;
+    this.apikey = apikey;
   }
 
   async fetchFeeds() {
@@ -44,8 +44,6 @@ export default class FeedFetcher {
   }
 
   async fetchFeed(name: string, uri: string) {
-    console.log(`STARTING FOR: ${name}`);
-
     const self = this;
     const handler = this.getHandler(name);
     const lastPosition = await this.getLastProjectionPosition(name);
@@ -57,7 +55,6 @@ export default class FeedFetcher {
     let nextLink = new URL(`${uri}?limit=${eventsPerPage}&from=${lastPosition}&embed=event,object`);
 
     const headers = {
-      'User-Agent': 'OSLO POC SlowMovingData',
       'x-api-key': this.apikey,
     }
 
@@ -77,7 +74,6 @@ export default class FeedFetcher {
 
                 await db.transaction(async client => {
                   await handler.processPage(client, data.feed.entry);
-
                   let newPosition = self.getNextFrom(nextLink);
                   console.log(`Saving position ${newPosition} for ${name} projection.`);
                   await db.setProjectionStatus(client, name, newPosition);

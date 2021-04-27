@@ -1,10 +1,10 @@
 import { Pool } from 'pg';
 
-import { configuration } from '../utils/Configuration';
+import { configuration } from './Configuration';
 
 const databaseConfig = configuration.database;
 
-export const pool = new Pool({
+export const clientPool = new Pool({
   user: databaseConfig.username,
   password: databaseConfig.password,
   host: databaseConfig.host,
@@ -12,6 +12,6 @@ export const pool = new Pool({
   database: databaseConfig.database,
 });
 
-pool.on('error', (err, client) => {
+clientPool.on('error', (err, client) => {
   console.error('Error: ', err);
 });

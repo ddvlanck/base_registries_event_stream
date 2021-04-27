@@ -1,32 +1,33 @@
-import { PoolClient } from 'pg';
+import {PoolClient} from 'pg';
+import {clientPool} from './DatabaseConfiguration';
 
-import { pool } from './Postgres';
+export default class DatabaseQueries {
 
-export default class Db {
-  async getAddressPaged(objectId: number, page: number, pageSize: number) {
-    const client = await pool.connect();
-
-    const ADDRESSES_PAGED = `
-      SELECT *
-        FROM brs.addresses
-       WHERE object_id = $1
-       ORDER BY timestamp ASC, event_id ASC
-       LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
-
-    try {
-      return await client.query(ADDRESSES_PAGED, [objectId]);
-    } finally {
-      client.release();
-    }
-  }
+  //#region "SELECT queries"
 
   async getAddressesPaged(page: number, pageSize: number) {
-    const client = await pool.connect();
+    const client = await clientPool.connect();
 
     const ADDRESSES_PAGED = `
-      SELECT *
-        FROM brs.addresses
-       ORDER BY timestamp ASC, event_id ASC
+      SELECT event_name,
+        brs.addresses.timestamp AS timestamp,
+        object_uri,
+        postal_code,
+        house_number,
+        box_number,
+        address_status,
+        address_geometry,
+        position_geometry_method,
+        position_specification,
+        officially_assigned,
+        brs.address_streetname.persistent_identifier AS streetname_puri,
+        brs.address_municipality.persistent_identifier AS municipality_puri,
+        brs.address_municipality.municipality_name AS municipality_name
+       FROM brs.addresses
+       INNER JOIN brs.address_streetname ON brs.addresses.streetname_id = brs.address_streetname.streetname_id
+       INNER JOIN brs.address_municipality ON brs.address_streetname.nis_code = brs.address_municipality.nis_code
+       WHERE event_can_be_published = 'true'
+       ORDER BY brs.addresses.event_id ASC
        LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
 
     try {
@@ -37,12 +38,12 @@ export default class Db {
   }
 
   async getStreetNamesPaged(page: number, pageSize: number) {
-    const client = await pool.connect();
+    const client = await clientPool.connect();
 
     const STREET_NAMES_PAGED = `
       SELECT *
         FROM brs.street_names
-       ORDER BY timestamp ASC, event_id ASC
+       ORDER BY event_id ASC
        LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
 
     try {
@@ -52,30 +53,62 @@ export default class Db {
     }
   }
 
-  async getPostalInformationsPaged(page: number, pageSize: number) {
-    const client = await pool.connect();
+  async getPostalInformationPaged(page: number, pageSize: number) {
+    const client = await clientPool.connect();
 
-    const POSTAL_INFORMATIONS_PAGED = `
+    const POSTAL_INFORMATION_PAGED = `
       SELECT *
         FROM brs.postal_information
-       ORDER BY timestamp ASC, event_id ASC
+       ORDER BY event_id ASC
        LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
 
     try {
-      return await client.query(POSTAL_INFORMATIONS_PAGED);
+      return await client.query(POSTAL_INFORMATION_PAGED);
     } finally {
       client.release();
     }
   }
 
+  async getMunicipalitiesPaged(page: number, pageSize: number) {
+    const client = await clientPool.connect();
+
+    const MUNICIPALITIES_PAGED = `
+        SELECT *
+        FROM brs.municipalities
+        ORDER BY event_id ASC
+        LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
+
+    try {
+      return await client.query(MUNICIPALITIES_PAGED);
+    } finally {
+      client.release();
+    }
+  }
+
+  async getParcelsPaged(page: number, pageSize: number){
+    const client = await clientPool.connect();
+    const PARCELS_PAGED = `
+        SELECT *
+        FROM brs.parcels
+        ORDER BY timestamp ASC, event_id ASC
+        LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
+
+    try {
+      return await client.query(PARCELS_PAGED);
+    } finally {
+      client.release();
+    }
+
+  }
+
   async getBuildingsPaged(page: number, pageSize: number) {
-    const client = await pool.connect();
+    const client = await clientPool.connect();
 
     const BUILDINGS_PAGED = `
       SELECT *
         FROM brs.buildings
        ORDER BY timestamp asc, event_id ASC
-       LIMIT ${pageSize} OFFSET ${(page-1) * pageSize}`;
+       LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
 
     try {
       return await client.query(BUILDINGS_PAGED);
@@ -85,7 +118,7 @@ export default class Db {
   }
 
   async getBuildingUnitForBuildingVersion(unitId: string, eventId: number) {
-    const client = await pool.connect();
+    const client = await clientPool.connect();
 
     const BUILDING_UNITS = `
       SELECT *
@@ -100,8 +133,12 @@ export default class Db {
     }
   }
 
+  //#endregion "Select queries"
+
+  //#region "Database utils"
+
   async transaction(f: (client: PoolClient) => any) {
-    const client = await pool.connect();
+    const client = await clientPool.connect();
 
     try {
       await client.query('BEGIN');
@@ -118,7 +155,7 @@ export default class Db {
   }
 
   async getProjectionStatus(feed: string) {
-    const client = await pool.connect();
+    const client = await clientPool.connect();
 
     const PROJECTION_STATUS = `
       SELECT position
@@ -133,7 +170,7 @@ export default class Db {
   }
 
   async initProjectionStatus(feed: string) {
-    const client = await pool.connect();
+    const client = await clientPool.connect();
 
     const PROJECTION_INIT = `
       INSERT INTO brs.projection_status(feed, position)
@@ -155,6 +192,10 @@ export default class Db {
     return await client.query(PROJECTION_UPDATE, [position, feed]);
   }
 
+  //#endregion "Database utils"
+
+  //#region "Insert queries"
+
   async addAddress(
     client: PoolClient,
     eventId: number,
@@ -171,8 +212,8 @@ export default class Db {
     addressPosition: string,
     positionGeometryMethod: string,
     positionSpecification: string,
-    complete: boolean,
-    officiallyAssigned: boolean) {
+    officiallyAssigned: boolean,
+    versionCanBePublished: boolean) {
 
     const ADD_ADDRESS = `
       INSERT INTO brs.addresses(
@@ -187,11 +228,11 @@ export default class Db {
         "house_number",
         "box_number",
         "address_status",
-        "address_position",
+        "address_geometry",
         "position_geometry_method",
         "position_specification",
-        "complete",
-        "officially_assigned")
+        "officially_assigned",
+        "event_can_be_published")
       VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`;
 
     return await client.query(
@@ -211,8 +252,8 @@ export default class Db {
         addressPosition,
         positionGeometryMethod,
         positionSpecification,
-        complete,
-        officiallyAssigned
+        officiallyAssigned,
+        versionCanBePublished
       ]);
   }
 
@@ -230,6 +271,18 @@ export default class Db {
     return await client.query(SET_OBJECTID, [objectId, objectUri, addressId]);
   }
 
+  async addressWasRemoved(
+    client: PoolClient,
+    addressId: string) {
+
+      const ADDRESS_WAS_REMOVED = `
+        UPDATE brs.addresses
+          SET event_can_be_published = 'false'
+        WHERE address_id = $1`;
+
+      return await client.query(ADDRESS_WAS_REMOVED, [addressId]);  
+    }
+
   async addStreetName(
     client: PoolClient,
     eventId: number,
@@ -238,11 +291,9 @@ export default class Db {
     streetNameId: string,
     objectId: string | null,
     objectUri: string,
-    geographicalName: string,
-    geographicalNameLanguage: string,
+    geographicalNames: string,
     straatNameStatus: string,
-    nisCode: number,
-    isComplete: boolean) {
+    nisCode: number) {
 
     const ADD_STREET_NAME = `
       INSERT INTO brs.street_names(
@@ -253,11 +304,9 @@ export default class Db {
         "object_id",
         "object_uri",
         "geographical_name",
-        "geographical_name_language",
         "street_name_status",
-        "nis_code",
-        "complete")
-      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`;
+        "nis_code")
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)`;
 
     return await client.query(
       ADD_STREET_NAME,
@@ -268,11 +317,9 @@ export default class Db {
         streetNameId,
         objectId,
         objectUri,
-        geographicalName,
-        geographicalNameLanguage,
+        geographicalNames,
         straatNameStatus,
-        nisCode,
-        isComplete
+        nisCode
       ]);
   }
 
@@ -300,8 +347,7 @@ export default class Db {
     objectUri: string,
     officialLanguages: Array<string>,
     facilityLanguages: Array<string>,
-    geographicalNames: Array<string>,
-    geographicalNameLanguages: Array<string>,
+    municipalityNames: string,
     status: string) {
 
     const ADD_MUNICIPALITY = `
@@ -312,12 +358,11 @@ export default class Db {
         "municipality_id",
         "object_id",
         "object_uri",
-        "official_languages",
-        "facility_languages",
-        "geographical_names",
-        "geographical_name_languages",
+        "official_language",
+        "facility_language",
+        "municipality_name",
         "status")
-      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`;
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`;
 
     return await client.query(
       ADD_MUNICIPALITY,
@@ -330,8 +375,7 @@ export default class Db {
         objectUri,
         officialLanguages,
         facilityLanguages,
-        geographicalNames,
-        geographicalNameLanguages,
+        municipalityNames,
         status
       ]
     )
@@ -342,12 +386,10 @@ export default class Db {
     eventId: number,
     eventName: string,
     timestamp: string,
-    postalId: number,
+    postalCode: number,
     objectId: number | null,
     objectUri: string,
-    postalNames: Array<string>,
-    postalNameLanguage: Array<string>,
-    nisCode: number,
+    postalNames: any,
     status: string) {
 
     const ADD_POSTAL_INFO = `
@@ -355,14 +397,12 @@ export default class Db {
         "event_id",
         "event_name",
         "timestamp",
-        "postal_id",
+        "postal_code",
         "object_id",
         "object_uri",
         "postal_names",
-        "postal_names_language",
-        "nis_code",
         "status")
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`;
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`;
 
     return await client.query(
       ADD_POSTAL_INFO,
@@ -370,135 +410,89 @@ export default class Db {
         eventId,
         eventName,
         timestamp,
-        postalId,
+        postalCode,
         objectId,
         objectUri,
         postalNames,
-        postalNameLanguage,
-        nisCode,
         status
       ]
     );
   }
 
-  async addBuilding(
+  async updateAddressMunicipalityTable(
     client: PoolClient,
-    eventId: number,
-    eventName: string,
-    buildingId: string,
-    timestamp: string,
-    objectId: number | null,
+    municipalityId: string,
     objectUri: string,
-    buildingStatus: string,
-    geometryMethod: string,
-    geometryPolygon: string,
-    buildingUnitsIDs: Array<string>,
-    complete: boolean) {
-
-    const ADD_BUILDING = `
-      INSERT INTO brs.buildings(
-        "event_id",
-        "event_name",
-        "timestamp",
-        "building_id",
-        "object_id",
-        "object_uri",
-        "building_status",
-        "geometry_method",
-        "geometry_polygon",
-        "building_units",
-        "complete")
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`;
-
-    return await client.query(
-      ADD_BUILDING,
-      [
-        eventId,
-        eventName,
-        timestamp,
-        buildingId,
-        objectId,
-        objectUri,
-        buildingStatus,
-        geometryMethod,
-        geometryPolygon,
-        buildingUnitsIDs,
-        complete
-      ]
-    )
-  }
-
-  async setBuildingPersistentId(
-    client: PoolClient,
-    buildingId: string,
-    objectId: number,
-    objectUri: string) {
-
-    const SET_OBJECTID = `
-      UPDATE brs.buildings
-         SET object_id = $1, object_uri = $2
-       WHERE building_id = $3`;
-
-    return await client.query(SET_OBJECTID, [objectId, objectUri, buildingId]);
-  }
-
-  async addBuildingUnit(
-    client: PoolClient,
+    objectId: string,
+    municipalityName: string | null,
     eventId: number,
-    buildingUnitId: string,
-    buildingId: string,
-    buildingUnitObjectId: number | null,
-    buildingUnitObjectUri: string,
-    buildingUnitStatus: string,
-    positionGeometryMethod: string,
-    geometryPoint: string,
-    unitFunction: string,
-    complete: boolean) {
-
-    const ADD_BUILDING_UNIT = `
-      INSERT INTO brs.building_units(
-        "building_unit_id",
+    timestamp: string
+  ) {
+    const UPDATE_ADDRESS_MUNICIPALITY = `
+      INSERT INTO brs.address_municipality(
+        "municipality_id",
+        "persistent_identifier",
+        "nis_code",
         "event_id",
-        "building_id",
-        "object_id",
-        "object_uri",
-        "building_unit_status",
-        "position_geometry_method",
-        "geometry_point",
-        "function",
-        "complete")
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`
+        "timestamp",
+        "municipality_name") 
+      VALUES ($1,$2,$3,$4,$5,$6)
+      ON CONFLICT ("municipality_id") DO UPDATE
+      SET persistent_identifier = EXCLUDED.persistent_identifier,
+       nis_code = EXCLUDED.nis_code,
+       event_id = EXCLUDED.event_id,
+       timestamp = EXCLUDED.timestamp,
+       municipality_name = EXCLUDED.municipality_name`;
 
     return await client.query(
-      ADD_BUILDING_UNIT,
+      UPDATE_ADDRESS_MUNICIPALITY,
       [
-        buildingUnitId,
+        municipalityId,
+        objectUri,
+        objectId,
         eventId,
-        buildingId,
-        buildingUnitObjectId,
-        buildingUnitObjectUri,
-        buildingUnitStatus,
-        positionGeometryMethod,
-        geometryPoint,
-        unitFunction,
-        complete
+        timestamp,
+        municipalityName
       ]
     )
   }
 
-  async setBuildingUnitPersistentId(
+  async updateAddressStreetnameTable(
     client: PoolClient,
-    buildingUnitId: string,
-    objectId: number,
-    objectUri: string) {
+    streetNameId: string,
+    objectUri: string,
+    nisCode: string,
+    eventId: number,
+    timestamp: string
+  ){
+    const UPDATE_ADDRESS_STREETNAME = `
+      INSERT INTO brs.address_streetname(
+        "streetname_id",
+        "persistent_identifier",
+        "nis_code",
+        "event_id",
+        "timestamp") 
+      VALUES ($1,$2,$3,$4,$5)
+      ON CONFLICT ("streetname_id") DO UPDATE
+      SET nis_code = EXCLUDED.nis_code,
+          persistent_identifier = EXCLUDED.persistent_identifier,
+          event_id = EXCLUDED.event_id,
+          timestamp = EXCLUDED.timestamp`;
 
-    const SET_OBJECTID = `
-      UPDATE brs.building_units
-         SET object_id = $1, object_uri = $2
-       WHERE building_unit_id = $3`;
+    return await client.query(
+      UPDATE_ADDRESS_STREETNAME,
+      [
+        streetNameId,
+        objectUri,
+        nisCode,
+        eventId,
+        timestamp
+      ]
+    )      
 
-    return await client.query(SET_OBJECTID, [objectId, objectUri, buildingUnitId]);
   }
 }
 
-export const db = new Db();
+//#endregion "Insert queries"
+
+export const db = new DatabaseQueries();

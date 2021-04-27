@@ -1,9 +1,12 @@
 import { configuration } from '../utils/Configuration';
-import { db } from '../utils/Db';
+import { db } from '../utils/DatabaseQueries';
 import { addNext, addPrevious } from '../utils/HypermediaControls';
 import { addHeaders } from '../utils/Headers';
+import StraatnaamUtils from './StraatnaamUtils';
 
-const BASE_URL = `${configuration.domainName}/streetname`;
+const STREETNAME_PAGE_BASE_URL = `${configuration.domainName}/streetname`;
+const STREETNAME_SHACL_BASE_URL = `${configuration.domainName}/streetname/shape`;
+const MUNICIPALITY_NAMESPACE = `https://data.vlaanderen.be/id/gemeente`;
 const PAGE_SIZE = 250;
 
 // Get all events for all street names
@@ -15,26 +18,46 @@ export async function getStreetNamePage(req, res) {
   } else {
     const queryResponse = await db.getStreetNamesPaged(page, PAGE_SIZE);
     addHeaders(res, PAGE_SIZE, queryResponse.rows.length);
-    res.json(buildResponse(queryResponse.rows, PAGE_SIZE, page));
+    res.json(buildStreetNamePageResponse(queryResponse.rows, PAGE_SIZE, page));
   }
 }
 
-function buildResponse(items: any[], pageSize: number, page: number) {
-  const response = getContext();
-  response['feed_url'] = BASE_URL;
-  response['@id'] = `${BASE_URL}?page=${page}`;
+export async function getStreetNameShape(req, res){
+  res.json(buildStreetNameShaclResponse());
+}
+
+function buildStreetNamePageResponse(items: any[], pageSize: number, page: number) {
+  const response = StraatnaamUtils.getStreetNameContext();
+  
+  response['@id'] = `${STREETNAME_PAGE_BASE_URL}?page=${page}`;
+  response['viewOf'] = `${STREETNAME_PAGE_BASE_URL}`;
 
   const tree = [];
 
-  addNext(response, tree, items, pageSize, page, BASE_URL);
-  addPrevious(response, tree, items, page, BASE_URL);
+  addNext( tree, items.length, pageSize, page, STREETNAME_PAGE_BASE_URL);
+  addPrevious( tree, items.length, page, STREETNAME_PAGE_BASE_URL);
 
   if (tree.length) {
     response['tree:relation'] = tree;
   }
 
+  response['shacl'] = {
+    '@id' : STREETNAME_PAGE_BASE_URL,
+    'tree:shape' : STREETNAME_SHACL_BASE_URL
+  }
+
   response['items'] = items.map((item) => createStreetNameEvent(item));
-  response['items'].unshift(getShape(`${BASE_URL}?page=${page}`));
+
+  return response;
+}
+
+function buildStreetNameShaclResponse(){
+  const response = StraatnaamUtils.getStreetNameShaclContext();
+
+  response['@id'] = STREETNAME_SHACL_BASE_URL;
+  response['@type'] = "NodeShape";
+  response['shapeOf'] = STREETNAME_PAGE_BASE_URL;
+  response['sh:property'] = StraatnaamUtils.getStreetNameShape();
 
   return response;
 }
@@ -42,32 +65,20 @@ function buildResponse(items: any[], pageSize: number, page: number) {
 function createStreetNameEvent(data) {
   const streetNameEvent = {};
 
+  const hash = StraatnaamUtils.createObjectHash(data);
+
+  streetNameEvent['@id'] = `${STREETNAME_PAGE_BASE_URL}#${hash}`;
   streetNameEvent['isVersionOf'] = data.object_uri;
   streetNameEvent['generatedAtTime'] = data.timestamp;
   streetNameEvent['eventName'] = data.event_name;
-  streetNameEvent['memberOf'] = BASE_URL;
+  streetNameEvent['memberOf'] = STREETNAME_PAGE_BASE_URL;
+  
   streetNameEvent['@type'] = 'Straatnaam';
+  streetNameEvent['straatnaam'] = data.geographical_name;
 
-  streetNameEvent['straatnaam'] = {
-    '@language' : data.geographical_name_language,
-    '@value' : data.geographical_name
-  }
+  streetNameEvent['isToegekendDoor'] = `${MUNICIPALITY_NAMESPACE}/${data.nis_code}`;
+  streetNameEvent['status'] = data.street_name_status;
 
-  streetNameEvent['isToegekendDoor'] = 'https://data.vlaanderen.be/id/gemeente/' + data.nis_code;
-
-  switch (data.street_name_status) {
-    case 'Voorgesteld':
-      streetNameEvent['Straatnaam.status'] = 'http://inspire.ec.europa.eu/codelist/StatusValue/proposed';
-      break;
-    case 'InGebruik':
-      streetNameEvent['Straatnaam.status'] = 'http://inspire.ec.europa.eu/codelist/StatusValue/current';
-      break;
-    case 'Gehistoreed':
-      streetNameEvent['Straatnaam.status'] = 'http://inspire.ec.europa.eu/codelist/StatusValue/retired';
-      break;
-  }
-
-  streetNameEvent['isCompleet'] = data.complete;
   return streetNameEvent;
 }
 

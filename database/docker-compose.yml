@@ -19,7 +19,8 @@ services:
       - ./postal_information.sql:/docker-entrypoint-initdb.d/04-postal_information.sql
       - ./street_names.sql:/docker-entrypoint-initdb.d/05-street_names.sql
       - ./addresses.sql:/docker-entrypoint-initdb.d/06-addresses.sql
-      - ./buildings.sql:/docker-entrypoint-initdb.d/07-buildings.sql
+      - ./address_municipality.sql:/docker-entrypoint-initdb.d/07-address_municipality.sql
+      - ./address_streetname.sql:/docker-entrypoint-initdb.d/08-address_streetname.sql
 
   dba:
     image: dpage/pgadmin4:4.21

@@ -1,8 +1,10 @@
 import xml2js from 'xml2js';
-import { PoolClient } from 'pg';
-import { db } from '../utils/Db';
+import {PoolClient} from 'pg';
+import {db} from '../utils/DatabaseQueries';
+import GebouweenheidEventHandler from "./GebouweenheidEventHandler";
 
 const parser = new xml2js.Parser();
+const gebouweenheidEventHandler = new GebouweenheidEventHandler();
 
 export default class GebouwEventHandler {
   async processPage(client: PoolClient, entries: Array<any>) {
@@ -25,7 +27,12 @@ export default class GebouwEventHandler {
         .parseStringPromise(event.content[0])
         .then(async function (ev) {
           try {
-            await self.processEvent(client, position, eventName, ev.Content);
+
+            if (eventName.indexOf('BuildingUnit') >= 0) {
+              await gebouweenheidEventHandler.processEvent(client, position, eventName, ev.Content);
+            } else {
+              await self.processEvent(client, position, eventName, ev.Content);
+            }
           } catch {
             return;
           }
@@ -44,56 +51,12 @@ export default class GebouwEventHandler {
 
     // console.log(objectBody);
 
-    const isComplete = objectBody.IsCompleet[0] === 'true';
+    /*const isComplete = objectBody.IsCompleet[0] === 'true';
 
     // Thanks to isComplete we always know if an object can be saved or not
     if (!isComplete) {
       console.log(`[GebouwEventHandler]: Skipping ${eventName} at position ${position} due to not having a complete object.`);
       return;
-    }
-
-    // We check if there is a building unit
-    let buildingUnitObjects = [];
-    let buildingUnitIDs = [];
-
-    if (typeof objectBody.Gebouweenheden[0] === 'object') {
-      const buildingUnits = objectBody.Gebouweenheden[0].Gebouweenheid
-
-      for (let unit of buildingUnits) {
-        const isComplete = unit.IsCompleet[0] === 'true';
-
-        if (!isComplete) {
-          console.log(`[GebouwEventHandler]: One of the building units is not complete yet, so skipping ${eventName} at position ${position} `)
-          return;
-        }
-
-        const buildingUnitObjectId = unit.Identificator[0].ObjectId[0];
-        const buildingUnitObjectUri = unit.Identificator[0].Id[0];
-
-        const buildingUnitId = unit.Id[0];
-        const buildingUnitStatus = unit.GebouweenheidStatus[0];
-        const positionGeometryMethod = unit.PositieGeometrieMethode[0];
-        const unitFunction = unit.Functie[0];
-        let geometryPoint = null;
-
-        if (unit.GeometriePunt[0].hasOwnProperty('point')) {
-          geometryPoint = unit.GeometriePunt[0].point[0].pos[0]
-        }
-
-        buildingUnitObjects.push({
-          buildingUnitObjectId: buildingUnitObjectId,
-          buildingUnitObjectUri: buildingUnitObjectUri,
-          buildingUnitId: buildingUnitId,
-          buildingUnitStatus: buildingUnitStatus,
-          positionGeometryMethod: positionGeometryMethod,
-          unitFunction: unitFunction,
-          geometryPoint: geometryPoint,
-          isComplete: isComplete
-        })
-
-        buildingUnitIDs.push(buildingUnitId);
-        // Maybe add property for 'Locatieaanduiding' -- Address field in data
-      }
     }
 
     const versieId = objectBody.Identificator[0].VersieId[0];
@@ -104,7 +67,9 @@ export default class GebouwEventHandler {
 
     const buildingStatus = objectBody.GebouwStatus[0];
     const geometryMethod = objectBody.GeometrieMethode[0];
-    const geometryPolygon = objectBody.GeometriePolygoon[0].polygon[0].exterior[0].LinearRing[0].posList[0]
+    const geometryPolygon = objectBody.GeometriePolygoon[0].polygon[0].exterior[0].LinearRing[0].posList[0];
+
+    //TODO: Check for building unit IDs
 
     console.log(`[GebouwEventHandler]: Adding object for ${buildingId} at position ${position}.`);
     await db.addBuilding(
@@ -129,7 +94,7 @@ export default class GebouwEventHandler {
           position,
           unit.buildingUnitId,
           buildingId,
-          unit.buildingUnitObjectId === '' ? null: unit.buildingUnitObjectId,
+          unit.buildingUnitObjectId === '' ? null : unit.buildingUnitObjectId,
           unit.buildingUnitObjectUri,
           unit.buildingUnitStatus,
           unit.positionGeometryMethod,
@@ -148,7 +113,7 @@ export default class GebouwEventHandler {
       console.log(`[GebouwEventHandler]: Assigning ${objectUri} for building ${buildingId} at position ${position}.`);
 
       db.setBuildingPersistentId(client, buildingId, objectId, objectUri);
-    }
+    }*/
 
     //TODO: process the event where PURI is assigned to building unit
     // need to add 2 extra columns: object_id and object_uri

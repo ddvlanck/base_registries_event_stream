@@ -4,7 +4,7 @@ CREATE TABLE brs."addresses"
     "event_name" character varying(200) NOT NULL,
 
     "address_id" character varying(40) NOT NULL,
-    "timestamp" character varying(30) NOT NULL,
+    "timestamp" character varying(50) NOT NULL,
 
     "object_id" bigint,
     "object_uri" character varying(500),
@@ -13,12 +13,12 @@ CREATE TABLE brs."addresses"
     "postal_code" character varying(4),
     "house_number" character varying(10),
     "box_number" character varying(10),
-    "address_status" character varying(40),
-    "address_position" character varying(50),
-    "position_geometry_method" character varying(40),
-    "position_specification" character varying(40),
-    "complete" boolean,
+    "address_status" character varying,
+    "address_geometry" character varying,
+    "position_geometry_method" character varying,
+    "position_specification" character varying,
     "officially_assigned" boolean,
+    "event_can_be_published" boolean,
 
     PRIMARY KEY ("event_id")
 )
@@ -34,5 +34,5 @@ COMMENT ON TABLE brs."addresses"
 
 CREATE INDEX address_index
     ON brs.addresses
-    (object_id ASC NULLS LAST, complete)
+    (object_id ASC NULLS LAST, event_can_be_published)
     TABLESPACE pg_default;

@@ -1,8 +1,14 @@
 import xml2js from 'xml2js';
 import { PoolClient } from 'pg';
-import { db } from '../utils/Db';
+import { db } from '../utils/DatabaseQueries';
+import StraatnaamUtils from './StraatnaamUtils';
 
 const parser = new xml2js.Parser();
+
+const eventsToIgnore = [
+  'StreetNameBecameComplete',
+  'StreetNameBecameIncomplete'
+]
 
 export default class StraatnaamEventHandler {
   async processPage(client: PoolClient, entries: Array<any>) {
@@ -18,6 +24,11 @@ export default class StraatnaamEventHandler {
 
       if (event.content[0] === 'No data embedded') {
         console.log(`[StreetNameEventHandler]: Skipping ${eventName} at position ${position} because of missing embedded data.`);
+        continue;
+      }
+
+      if(eventsToIgnore.includes(eventName)){
+        console.log(`[StreetNameEventHandler]: Skipping ${eventName} at position ${position} because these events have to be ignored.`);
         continue;
       }
 
@@ -42,13 +53,14 @@ export default class StraatnaamEventHandler {
     const eventBody = ev.Event[0][Object.keys(ev.Event[0])[0]][0];
     const objectBody = ev.Object[0];
 
-    // console.log(objectBody);
+    const addToDatabase = StraatnaamUtils.checkIfVersionCanBeAddedToDatabase(
+      objectBody.Straatnamen[0].GeografischeNaam,
+      objectBody.StraatnaamStatus[0],
+      objectBody.NisCode[0]
+    );
 
-    const isComplete = objectBody.IsCompleet[0] === 'true';
-
-    // Thanks to isComplete we always know if an object can be saved or not
-    if (!isComplete) {
-      console.log(`[StreetNameEventHandler]: Skipping ${eventName} at position ${position} due to not having a complete object.`);
+    if(!addToDatabase){
+      console.log(`[StreetNameEventHandler]: Skipping ${eventName} at position ${position} due to not having a complete object`);
       return;
     }
 
@@ -58,9 +70,10 @@ export default class StraatnaamEventHandler {
     const objectId = objectBody.Identificator[0].ObjectId[0];
     const objectUri = objectBody.Identificator[0].Id[0];
 
-    const geographicalName = objectBody.Straatnamen[0].GeografischeNaam[0].Spelling[0];
-    const geographicalNameLanguage = objectBody.Straatnamen[0].GeografischeNaam[0].Taal[0];
-    const streetNameStatus = objectBody.StraatnaamStatus[0];
+    let geographicalNames = []
+    geographicalNames = StraatnaamUtils.mapGeographicalNames(objectBody.Straatnamen[0].GeografischeNaam);
+    
+    const streetNameStatus = StraatnaamUtils.mapStreetNameStatus(objectBody.StraatnaamStatus[0]);
     const nisCode = objectBody.NisCode[0];
 
     console.log(`[StreetNameEventHandler]: Adding object for ${streetNameId} at position ${position}.`);
@@ -72,11 +85,9 @@ export default class StraatnaamEventHandler {
       streetNameId,
       objectId === '' ? null : objectId,
       objectUri,
-      geographicalName,
-      geographicalNameLanguage,
+      JSON.stringify(geographicalNames),
       streetNameStatus,
-      nisCode,
-      isComplete
+      nisCode
       );
 
     if (eventName === 'StreetNamePersistentLocalIdentifierWasAssigned') {
@@ -84,5 +95,15 @@ export default class StraatnaamEventHandler {
 
       db.setStreetNamePersistentId(client, streetNameId, objectId, objectUri);
     }
+
+    console.log(`[StreetNameEventHandler]: Adding object for ${streetNameId} at position ${position} for address-streetname.`);
+    await db.updateAddressStreetnameTable(
+      client,
+      streetNameId,
+      objectUri,
+      nisCode,
+      position,
+      versionId
+    );
   }
 }

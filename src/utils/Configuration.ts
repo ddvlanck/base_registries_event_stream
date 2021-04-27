@@ -4,7 +4,6 @@ export default class Configuration {
   database: { username: string, password: string, host: string, port: number, database: string };
   feeds: { name: string, feedLocation: string, enabled: boolean }[];
   domainName: string;
-  apikey: string;
 
   constructor() {
     const rawdata = fs.readFileSync('config.json', 'utf8');
@@ -12,7 +11,6 @@ export default class Configuration {
 
     this.database = configuration.database;
     this.feeds = configuration.feeds;
-    this.apikey = process.env.API_KEY || configuration.apikey;
 
     this.database.username = process.env.DB_USER || this.database.username;
     this.database.password = process.env.DB_PASSWORD || this.database.password;
