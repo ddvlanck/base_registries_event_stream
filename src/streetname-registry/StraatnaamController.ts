@@ -4,8 +4,8 @@ import { addNext, addPrevious } from '../utils/HypermediaControls';
 import { addHeaders } from '../utils/Headers';
 import StraatnaamUtils from './StraatnaamUtils';
 
-const STREETNAME_PAGE_BASE_URL = `${configuration.domainName}/streetname`;
-const STREETNAME_SHACL_BASE_URL = `${configuration.domainName}/streetname/shape`;
+const STREETNAME_PAGE_BASE_URL = `${configuration.domainName}/straatnaam`;
+const STREETNAME_SHACL_BASE_URL = `${configuration.domainName}/straatnaam/shape`;
 const MUNICIPALITY_NAMESPACE = `https://data.vlaanderen.be/id/gemeente`;
 const PAGE_SIZE = 250;
 

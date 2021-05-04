@@ -3,7 +3,7 @@ import {db} from '../utils/DatabaseQueries';
 import {addHeaders} from '../utils/Headers';
 import {addNext, addPrevious} from '../utils/HypermediaControls';
 
-const BASE_URL = `${configuration.domainName}/building`;
+const BASE_URL = `${configuration.domainName}/gebouw`;
 const PAGE_SIZE = 250;
 
 export async function getBuildingPage(req, res) {
