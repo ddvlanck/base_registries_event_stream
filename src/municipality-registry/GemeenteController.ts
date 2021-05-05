@@ -5,7 +5,7 @@ import {addNext, addPrevious} from "../utils/HypermediaControls";
 import GemeenteUtils from "./GemeenteUtils";
 
 const MUNICIPALITY_PAGE_BASE_URL = `${configuration.domainName}/gemeente`;
-const MUNICIPALITY_SHACL_BASE_URL = `${configuration.domainName}/gemeente/shacl`;
+const MUNICIPALITY_SHACL_BASE_URL = `${configuration.domainName}/gemeente/shape`;
 const PAGE_SIZE = 250;
 
 export async function getMunicipalityPage(req, res) {

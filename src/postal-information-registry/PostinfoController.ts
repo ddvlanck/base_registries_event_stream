@@ -5,7 +5,7 @@ import { addHeaders } from '../utils/Headers';
 import PostinfoUtils from './PostinfoUtils';
 
 const POSTAL_INFO_PAGE_BASE_URL = `${configuration.domainName}/postinfo`;
-const POSTAL_INFO_SHACL_BASE_URL = `${configuration.domainName}/postinfo/shacl`;
+const POSTAL_INFO_SHACL_BASE_URL = `${configuration.domainName}/postinfo/shape`;
 const PAGE_SIZE = 250;
 
 export async function getPostalInfoPage(req, res) {

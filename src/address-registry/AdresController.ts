@@ -5,7 +5,7 @@ import { addHeaders } from '../utils/Headers';
 import AdresUtils from './AdresUtils';
 
 const ADDRESS_PAGE_BASE_URL = `${configuration.domainName}/adres`;
-const ADDRESS_SHACL_BASE_URL = `${configuration.domainName}/adres/shacl`;
+const ADDRESS_SHACL_BASE_URL = `${configuration.domainName}/adres/shape`;
 const PAGE_SIZE = 250;
 
 
