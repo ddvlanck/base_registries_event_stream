@@ -2,9 +2,7 @@ version: "3.8"
 
 services:
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile-api
+    build: .
     container_name: base-registries-api
     hostname: base-registries-api
     environment:
@@ -19,11 +17,10 @@ services:
       - db
     links:
       - db
+    command: [ "node", "lib/api.js" ]
 
   fetcher:
-    build:
-      context: .
-      dockerfile: Dockerfile-fetcher
+    build: .
     container_name: base-registries-fetcher
     hostname: base-registries-fetcher
     environment:
@@ -37,9 +34,10 @@ services:
       - db
     links:
       - db
+    command: [ "node", "lib/fetcher.js" ]
 
   db:
-    image: postgres
+    build: ./database
     container_name: base-registries-db
     hostname: base-registries-db
     restart: always
@@ -49,15 +47,6 @@ services:
       POSTGRES_PASSWORD: dev
     ports:
       - 5432:5432
-    volumes:
-      - ./init_db.sql:/docker-entrypoint-initdb.d/01-init_db.sql
-      - ./projection_status.sql:/docker-entrypoint-initdb.d/02-projection_status.sql
-      - ./municipalities.sql:/docker-entrypoint-initdb.d/03-municipalities.sql
-      - ./postal_information.sql:/docker-entrypoint-initdb.d/04-postal_information.sql
-      - ./street_names.sql:/docker-entrypoint-initdb.d/05-street_names.sql
-      - ./addresses.sql:/docker-entrypoint-initdb.d/06-addresses.sql
-      - ./address_municipality.sql:/docker-entrypoint-initdb.d/07-address_municipality.sql
-      - ./address_streetname.sql:/docker-entrypoint-initdb.d/08-address_streetname.sql
 
   dba:
     image: dpage/pgadmin4:4.23

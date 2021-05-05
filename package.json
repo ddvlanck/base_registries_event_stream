@@ -21,7 +21,6 @@
     "typescript": "^3.9.5"
   },
   "dependencies": {
-    "bluebird": "^3.7.2",
     "commander": "^7.0.0",
     "debug": "^4.1.1",
     "express": "^4.17.1",
