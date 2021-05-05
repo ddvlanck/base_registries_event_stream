@@ -1,4 +1,4 @@
-const md5 = require('md5');
+const hash = require('object-hash');
 
 export default class StraatnaamUtils {
   public static checkIfVersionCanBeAddedToDatabase(
@@ -31,7 +31,7 @@ export default class StraatnaamUtils {
   }
 
   public static createObjectHash(streetnameObject: any) {
-    return md5(streetnameObject);
+    return hash(streetnameObject);
   }
 
   public static mapStreetNameStatus(status: string): string {

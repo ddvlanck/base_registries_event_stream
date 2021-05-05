@@ -1,4 +1,4 @@
-const md5 = require('md5');
+const hash = require('object-hash');
 
 export default class AdresUtils {
     public static checkIfVersionCanBePublished(
@@ -28,7 +28,7 @@ export default class AdresUtils {
     }
 
     public static createObjectHash(addressObject: any){
-        return md5(addressObject);
+        return hash(addressObject);
     }
 
     public static mapAddressStatus(status: string){

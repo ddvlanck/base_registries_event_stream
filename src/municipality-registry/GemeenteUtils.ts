@@ -1,4 +1,4 @@
-const md5 = require('md5');
+const hash = require('object-hash');
 
 export default class GemeenteUtils {
   public static checkIfVersionCanBeAddedToDatabase(
@@ -56,7 +56,7 @@ export default class GemeenteUtils {
   }
 
   public static createObjectHash(municipalityObject: any) {
-    return md5(municipalityObject);
+    return hash(municipalityObject);
   }
 
   public static getMunicipalityShape() {

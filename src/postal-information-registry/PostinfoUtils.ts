@@ -1,4 +1,4 @@
-const md5 = require('md5');
+const hash = require('object-hash');
 
 export default class PostinfoUtils {
   public static mapPostnamen(xmlPostnamen: any) {
@@ -30,7 +30,7 @@ export default class PostinfoUtils {
   }
 
   public static createObjectHash(postalInfoObject: any) {
-    return md5(postalInfoObject);
+    return hash(postalInfoObject);
   }
 
   public static getPostalInfoShape() {
