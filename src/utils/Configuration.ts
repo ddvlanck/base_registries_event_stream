@@ -17,7 +17,7 @@ export default class Configuration {
     this.database.host = process.env.DB_HOST || this.database.host;
     this.database.database = process.env.DB_DATABASE || this.database.database;
 
-    this.domainName = configuration.domainName;
+    this.domainName = process.env.DOMAIN_NAME || configuration.domainName;
 
     if ('DB_PORT' in process.env) {
       this.database.port = Number(process.env.DB_PORT);
