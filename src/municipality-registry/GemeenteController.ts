@@ -6,6 +6,7 @@ import GemeenteUtils from "./GemeenteUtils";
 
 const MUNICIPALITY_PAGE_BASE_URL = `${configuration.domainName}/gemeente`;
 const MUNICIPALITY_SHACL_BASE_URL = `${configuration.domainName}/gemeente/shape`;
+const MUNICIPALITY_CONTEXT_URL = `${configuration.domainName}/gemeente/context`;
 const PAGE_SIZE = 250;
 
 export async function getMunicipalityPage(req, res) {
@@ -24,8 +25,14 @@ export async function getMunicipalityShape(req, res){
   res.json(buildMunicipalityShaclResponse());
 }
 
+export async function getMunicipalityContext(req, res){
+  res.json(GemeenteUtils.getMunicipalityContext());
+}
+
 function buildMunicipalityPageResponse(items: any[], pageSize: number, page: number){
-  const response = GemeenteUtils.getMunicipalityContext();
+  //const response = GemeenteUtils.getMunicipalityContext();
+  const response = {};
+  response['@context'] = `${MUNICIPALITY_CONTEXT_URL}`;
   
   response['@id'] = `${MUNICIPALITY_PAGE_BASE_URL}?page=${page}`;
   response['viewOf'] = `${MUNICIPALITY_PAGE_BASE_URL}`;
@@ -41,7 +48,7 @@ function buildMunicipalityPageResponse(items: any[], pageSize: number, page: num
 
   response['shacl'] = {
     '@id' : MUNICIPALITY_PAGE_BASE_URL,
-    'tree:shape' : MUNICIPALITY_SHACL_BASE_URL
+    'shape' : MUNICIPALITY_SHACL_BASE_URL
   }
 
   response['items'] = items.map(item => createMunicipalityEvent(item));

@@ -6,6 +6,7 @@ import PostinfoUtils from './PostinfoUtils';
 
 const POSTAL_INFO_PAGE_BASE_URL = `${configuration.domainName}/postinfo`;
 const POSTAL_INFO_SHACL_BASE_URL = `${configuration.domainName}/postinfo/shape`;
+const POSTAL_INFO_CONTEXT_URL = `${configuration.domainName}/postinfo/context`
 const PAGE_SIZE = 250;
 
 export async function getPostalInfoPage(req, res) {
@@ -24,8 +25,14 @@ export async function getPostalInfoShape(req, res){
   res.json(buildPostalInfoShaclResponse());
 }
 
+export async function getPostalInfoContext(req, res){
+  res.json(PostinfoUtils.getPostalInfoContext());
+}
+
 function buildPostalInfoPageResponse(items: any[], pageSize: number, page: number) {
-  const response = PostinfoUtils.getPostalInfoContext();
+  //const response = PostinfoUtils.getPostalInfoContext();
+  const response = {};
+  response['@context'] = `${POSTAL_INFO_CONTEXT_URL}`;
   
   response['@id'] = `${POSTAL_INFO_PAGE_BASE_URL}?page=${page}`;
   response['viewOf'] = POSTAL_INFO_PAGE_BASE_URL;
@@ -41,7 +48,7 @@ function buildPostalInfoPageResponse(items: any[], pageSize: number, page: numbe
 
   response['shacl'] = {
     '@id' : POSTAL_INFO_PAGE_BASE_URL,
-    'tree:shape' : POSTAL_INFO_SHACL_BASE_URL
+    'shape' : POSTAL_INFO_SHACL_BASE_URL
   }
   response['items'] = items.map(item => createPostalInformationEvent(item));
 

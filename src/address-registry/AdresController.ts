@@ -6,6 +6,7 @@ import AdresUtils from './AdresUtils';
 
 const ADDRESS_PAGE_BASE_URL = `${configuration.domainName}/adres`;
 const ADDRESS_SHACL_BASE_URL = `${configuration.domainName}/adres/shape`;
+const ADDRESS_CONTEXT_URL = `${configuration.domainName}/adres/context`;
 const PAGE_SIZE = 250;
 
 
@@ -27,8 +28,14 @@ export function getAddressShape(req, res) {
   res.json(buildAddressShaclResponse());
 }
 
+export async function getAddressContext(req, res){
+  res.json(AdresUtils.getAddressContext());
+}
+
 function buildAddressPageResponse(items: any[], pageSize: number, page: number) {
-  const response = AdresUtils.getAddressContext();
+  //const response = AdresUtils.getAddressContext();
+  const response = {};
+  response['@context'] = `${ADDRESS_CONTEXT_URL}`;
 
   response['@id'] = `${ADDRESS_PAGE_BASE_URL}?page=${page}`;
   response['viewOf'] = `${ADDRESS_PAGE_BASE_URL}`;
@@ -44,7 +51,7 @@ function buildAddressPageResponse(items: any[], pageSize: number, page: number) 
 
   response['shacl'] = {
     '@id' : ADDRESS_PAGE_BASE_URL,
-    'tree:shape' : ADDRESS_SHACL_BASE_URL
+    'shape' : ADDRESS_SHACL_BASE_URL
   };
 
   response['items'] = items.map(item => createAddressEvent(item));
@@ -74,7 +81,7 @@ function createAddressEvent(data) {
   addressEvent['eventName'] = data.event_name;
   addressEvent['memberOf'] = ADDRESS_PAGE_BASE_URL;
 
-  addressEvent['@type'] = 'Adres';
+  addressEvent['@type'] = 'BelgischAdres';
 
   if (data.box_number) {
     addressEvent['busnummer'] = data.box_number

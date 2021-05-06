@@ -77,7 +77,7 @@ export default class StraatnaamUtils {
       },
       {
         "sh:path": "adres:Straatnaam.status",
-        "sh:datatype": "skos:Concept",
+        "sh:class": "skos:Concept",
         "sh:minCount": 1,
         "sh:maxCount": 1,
       },
@@ -93,15 +93,14 @@ export default class StraatnaamUtils {
   public static getStreetNameContext() {
     return {
       "@context": [
-        "https://data.vlaanderen.be/context/adresregister.jsonld",
+        "https://raw.githubusercontent.com/Informatievlaanderen/OSLO-Generated/test/doc/applicatieprofiel/adressenregister/ontwerpdocument/niet-bepaald/context/adressenregister.jsonld",
         {
           tree: "https://w3id.org/tree#",
-          skos: "http://www.w3.org/2004/02/skos/core#",
           xsd: "http://www.w3.org/2001/XMLSchema#",
           prov: "http://www.w3.org/ns/prov#",
           dct: "http://purl.org/dc/terms/",
           adms: "http://www.w3.org/ns/adms#",
-          adres: "https://data.vlaanderen.be/ns/adres#",
+          rdf : "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
           items: "@included",
           shacl: "@included",
           viewOf: {
@@ -117,6 +116,15 @@ export default class StraatnaamUtils {
             "@type": "xsd:dateTime",
           },
           eventName: "adms:versionNotes",
+          straatnaam : {
+            "@id" : "Straatnaam.straatnaam",
+            "@type" : "rdf:langString",
+            "@container" : "@set"
+          },
+          status : {
+            "@id" : "Straatnaam.status",
+            "@type" : "@id"
+          },
           isToegekendDoor: {
             "@id": "prov:wasAttributedTo",
             "@type": "@id",
@@ -125,6 +133,13 @@ export default class StraatnaamUtils {
             "@id": "dct:isVersionOf",
             "@type": "@id",
           },
+          shape : {
+            "@id" : "tree:shape",
+            "@type" : "@id"
+          },
+          "tree:node": {
+            "@type": "@id",
+          }
         },
       ],
     };
@@ -157,6 +172,9 @@ export default class StraatnaamUtils {
         "sh:datatype": {
           "@type": "@id",
         },
+        "sh:class" : {
+          "@type" : "@id"
+        }
       },
     };
   }

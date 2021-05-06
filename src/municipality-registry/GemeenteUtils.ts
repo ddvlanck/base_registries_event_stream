@@ -95,7 +95,7 @@ export default class GemeenteUtils {
       },
       {
         "sh:path": "br:Gemeente.status",
-        "sh:datatype": "skos:Concept",
+        "sh:class": "skos:Concept",
         "sh:minCount": 1,
         "sh:maxCount": 1,
       },
@@ -147,7 +147,7 @@ export default class GemeenteUtils {
         },
         status: {
           "@id": "br:Gemeente.status",
-          "@type": "skos:Concept",
+          "@type": "@id",
         },
         isVersionOf: {
           "@id": "dct:isVersionOf",
@@ -156,9 +156,10 @@ export default class GemeenteUtils {
         "tree:node": {
           "@type": "@id",
         },
-        "tree:shape": {
-          "@type": "@id",
-        },
+        shape : {
+          '@id' : 'tree:shape',
+          '@type' : '@id'
+        }
       },
     };
   }
@@ -190,6 +191,9 @@ export default class GemeenteUtils {
         "sh:datatype": {
           "@type": "@id",
         },
+        "sh:class" : {
+          "@type" : "@id"
+        }
       },
     };
   }

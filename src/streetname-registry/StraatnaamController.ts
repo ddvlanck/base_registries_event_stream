@@ -7,6 +7,7 @@ import StraatnaamUtils from './StraatnaamUtils';
 const STREETNAME_PAGE_BASE_URL = `${configuration.domainName}/straatnaam`;
 const STREETNAME_SHACL_BASE_URL = `${configuration.domainName}/straatnaam/shape`;
 const MUNICIPALITY_NAMESPACE = `https://data.vlaanderen.be/id/gemeente`;
+const STREETNAME_CONTEXT_URL = `${configuration.domainName}/straatnaam/context`;
 const PAGE_SIZE = 250;
 
 // Get all events for all street names
@@ -26,8 +27,14 @@ export async function getStreetNameShape(req, res){
   res.json(buildStreetNameShaclResponse());
 }
 
+export async function getStreetNameContext(req, res){
+  res.json(StraatnaamUtils.getStreetNameContext());
+}
+
 function buildStreetNamePageResponse(items: any[], pageSize: number, page: number) {
-  const response = StraatnaamUtils.getStreetNameContext();
+  //const response = StraatnaamUtils.getStreetNameContext();
+  const response = {};
+  response['@context'] = `${STREETNAME_CONTEXT_URL}`;
   
   response['@id'] = `${STREETNAME_PAGE_BASE_URL}?page=${page}`;
   response['viewOf'] = `${STREETNAME_PAGE_BASE_URL}`;
@@ -43,7 +50,7 @@ function buildStreetNamePageResponse(items: any[], pageSize: number, page: numbe
 
   response['shacl'] = {
     '@id' : STREETNAME_PAGE_BASE_URL,
-    'tree:shape' : STREETNAME_SHACL_BASE_URL
+    'shape' : STREETNAME_SHACL_BASE_URL
   }
 
   response['items'] = items.map((item) => createStreetNameEvent(item));

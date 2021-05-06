@@ -125,6 +125,9 @@ export default class AdresUtils {
                 "sh:datatype": {
                     "@type": "@id",
                 },
+                "sh:class" : {
+                    "@type" : "@id"
+                }
             },
         };
     }
@@ -133,59 +136,100 @@ export default class AdresUtils {
     public static getAddressContext() {
         return {
             '@context': [
-                'https://data.vlaanderen.be/context/adresregister.jsonld',
+                'https://raw.githubusercontent.com/Informatievlaanderen/OSLO-Generated/test/doc/applicatieprofiel/adressenregister/ontwerpdocument/niet-bepaald/context/adressenregister.jsonld',
                 'https://data.vlaanderen.be/doc/applicatieprofiel/generiek-basis/zonderstatus/2019-07-01/context/generiek-basis.jsonld',
                 {
                     xsd: "http://www.w3.org/2001/XMLSchema#",
                     prov: "http://www.w3.org/ns/prov#",
                     tree: "https://w3id.org/tree#",
                     dct: "http://purl.org/dc/terms/",
-                    skos: "http://www.w3.org/2004/02/skos/core#",
                     adms: "http://www.w3.org/ns/adms#",
+                    rdf : "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
                     items: "@included",
                     shacl: "@included",
-                    eventName: 'http://www.w3.org/ns/adms#versionNotes',
+                    isVersionOf: {
+                        '@id': 'dct:isVersionOf',
+                        '@type': '@id'
+                    },
                     generatedAtTime: {
                         '@id': 'prov:generatedAtTime',
                         '@type': 'xsd:dateTime'
                     },
-                    'isVersionOf': {
-                        '@id': 'dct:isVersionOf',
+                    eventName: 'http://www.w3.org/ns/adms#versionNotes',
+                    memberOf: {
+                        '@reverse': 'tree:member',
                         '@type': '@id'
+                    },
+                    huisnummer : {
+                        "@id" : 'BelgischAdres.huisnummer',
+                        '@type' : 'xsd:string'
+                    },
+                    heeftStraatnaam : {
+                        '@id' : 'BelgischAdres.heeftStraatnaam',
+                        '@type' : '@id'
+                    },
+                    heeftGemeentenaam : {
+                        '@id' : 'BelgischAdres.heeftGemeentenaam',
+                        '@type' : 'Gemeentenaam'
+                    },
+                    heeftPostinfo : {
+                        '@id' : 'BelgischAdres.heeftPostinfo',
+                        '@type' : 'Postinfo'
+                    },
+                    isToegekendDoor : {
+                        '@id' : 'BelgischAdres.isToegekendDoor',
+                        '@type' : '@id'
+                    },
+                    positie: {
+                        '@id' : 'BelgischAdres.positie',
+                        '@type' : 'GeografischePositie'
+                    },
+                    officieelToegekend : {
+                        '@id' : 'BelgischAdres.officieelToegekend',
+                        '@type' : 'xsd:boolean'
+                    },
+                    status : {
+                        '@id' : 'BelgischAdres.status',
+                        '@type' : '@id'
+                    },
+                    gemeentenaam : {
+                        '@id' : 'Gemeentenaam.gemeentenaam',
+                        '@type' : 'rdf:langString',
+                        '@container' : '@set'
+                    },
+                    isAfgeleidVan : {
+                        '@id' : 'Gemeentenaam.isAfgeleidVan',
+                        '@type' : '@id'
+                    },
+                    postcode : {
+                        '@id' : 'Postinfo.postcode',
+                        '@type' : 'xsd:string'
+                    },
+                    default : {
+                        '@id' : 'GeografischePositie.default',
+                        '@type' : 'xsd:boolean'
+                    }, 
+                    geometrie : {
+                        '@id' : 'GeografischePositie.geometrie',
+                        '@type' : 'Punt'
+                    },              
+                    gml : {
+                        "@id" : "Geometrie.gml",
+                        "@type" : "http://www.opengis.net/ont/geosparql#gmlLiteral"
                     },
                     viewOf: {
                         '@reverse': 'tree:view',
                         '@type': '@id'
                     },
-                    memberOf: {
-                        '@reverse': 'tree:member',
-                        '@type': '@id'
-                    },
+                    shape : {
+                        '@id' : 'tree:shape',
+                        '@type' : '@id'
+                    },                    
                     'tree:node': {
                         '@type': '@id'
                     },
                     'tree:path': {
                         '@type': '@id'
-                    },
-                    heeftStraatnaam : {
-                        '@id' : 'https://data.vlaanderen.be/ns/adres#heeftStraatnaam',
-                        '@type' : '@id'
-                    },
-                    huisnummer : {
-                        "@id" : 'https://data.vlaanderen.be/ns/adres#huisnummer',
-                        '@type' : 'xsd:string'
-                    },
-                    postcode : {
-                        "@id" : "Postinfo.postcode",
-                        "@type" : "xsd:string"
-                    },
-                    status : {
-                        '@id' : 'Adres.status',
-                        '@type' : 'skos:Concept'
-                    },
-                    gml : {
-                        "@id" : "Geometrie.gml",
-                        "@type" : "http://www.opengis.net/ont/geosparql#gmlLiteral"
                     }
                 }
             ]
@@ -283,13 +327,13 @@ export default class AdresUtils {
                         },
                         {
                             "sh:path": "generiek:methode",
-                            "sh:datatype": "skos:Concept",
+                            "sh:class": "skos:Concept",
                             "sh:minCount": 1,
                             "sh:maxCount": 1
                         },
                         {
                             "sh:path": "generiek:specificatie",
-                            "sh:datatype": "skos:Concept",
+                            "sh:class": "skos:Concept",
                             "sh:minCount": 1,
                             "sh:maxCount": 1
                         }
@@ -298,7 +342,7 @@ export default class AdresUtils {
             },
             {
                 "sh:path": "adres:Adres.status",
-                "sh:datatype": "skos:Concept",
+                "sh:class": "skos:Concept",
                 "sh:minCount": 1,
                 "sh:maxCount": 1
             },

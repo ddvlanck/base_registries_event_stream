@@ -63,6 +63,12 @@ export default class PostinfoUtils {
         "sh:path": "https://data.vlaanderen.be/ns/adres#postnaam",
         "sh:datatype": "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString",
       },
+      {
+        "sh:path" : "https://basisregisters.vlaanderen.be/ns/adres#Postinfo.status",
+        "sh:class" : "skos:Concept",
+        "sh:minCount" : 1,
+        "sh:maxCount" : 1
+      }
     ];
   }
 
@@ -76,6 +82,7 @@ export default class PostinfoUtils {
         dct: "http://purl.org/dc/terms/",
         adms: "http://www.w3.org/ns/adms#",
         adres: "https://data.vlaanderen.be/ns/adres#",
+        br: "https://basisregisters.vlaanderen.be/ns/adres#",
         items: "@included",
         shacl: "@included",
         viewOf: {
@@ -94,6 +101,10 @@ export default class PostinfoUtils {
         Postinfo: "adres:Postinfo",
         postcode: "adres:postcode",
         postnaam: "adres:postnaam",
+        status: {
+          '@id' : 'br:Postinfo.status',
+          '@type' : '@id'
+        },
         isVersionOf: {
           "@id": "dct:isVersionOf",
           "@type": "@id",
@@ -101,9 +112,10 @@ export default class PostinfoUtils {
         "tree:node": {
           "@type": "@id",
         },
-        "tree:shape": {
-          "@type": "@id",
-        },
+        shape : {
+          '@id' : 'tree:shape',
+          '@type' : '@id'
+        }
       },
     };
   }
@@ -116,10 +128,6 @@ export default class PostinfoUtils {
         xsd: "http://www.w3.org/2001/XMLSchema#",
         tree: "https://w3id.org/tree#",
         skos: "http://www.w3.org/2004/02/skos/core#",
-        prov: "http://www.w3.org/ns/prov#",
-        dct: "http://purl.org/dc/terms/",
-        adms: "http://www.w3.org/ns/adms#",
-        adres: "https://data.vlaanderen.be/ns/adres#",
         shapeOf: {
           "@reverse": "tree:shape",
           "@type": "@id",
@@ -134,6 +142,9 @@ export default class PostinfoUtils {
         "sh:datatype": {
           "@type": "@id",
         },
+        "sh:class" : {
+          "@type" : "@id"
+        }
       },
     };
   }
