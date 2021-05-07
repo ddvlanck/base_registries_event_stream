@@ -22,10 +22,18 @@ export async function getPostalInfoPage(req, res) {
 }
 
 export async function getPostalInfoShape(req, res){
+  res.set({
+    'Access-Control-Allow-Origin': '*',
+    'Content-Type': 'application/ld+json'
+  });
   res.json(buildPostalInfoShaclResponse());
 }
 
 export async function getPostalInfoContext(req, res){
+  res.set({
+    'Access-Control-Allow-Origin': '*',
+    'Content-Type': 'application/ld+json'
+  });
   res.json(PostinfoUtils.getPostalInfoContext());
 }
 

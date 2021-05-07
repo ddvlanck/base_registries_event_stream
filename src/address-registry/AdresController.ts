@@ -25,10 +25,18 @@ export async function getAddressPage(req, res) {
 
 // Get SHACL shape for address objects
 export function getAddressShape(req, res) {
+  res.set({
+    'Access-Control-Allow-Origin': '*',
+    'Content-Type': 'application/ld+json'
+});
   res.json(buildAddressShaclResponse());
 }
 
 export async function getAddressContext(req, res){
+  res.set({
+    'Access-Control-Allow-Origin': '*',
+    'Content-Type': 'application/ld+json'
+  });
   res.json(AdresUtils.getAddressContext());
 }
 

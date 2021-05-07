@@ -22,10 +22,18 @@ export async function getMunicipalityPage(req, res) {
 }
 
 export async function getMunicipalityShape(req, res){
+  res.set({
+    'Access-Control-Allow-Origin': '*',
+    'Content-Type': 'application/ld+json'
+  });
   res.json(buildMunicipalityShaclResponse());
 }
 
 export async function getMunicipalityContext(req, res){
+  res.set({
+    'Access-Control-Allow-Origin': '*',
+    'Content-Type': 'application/ld+json'
+  });
   res.json(GemeenteUtils.getMunicipalityContext());
 }
 

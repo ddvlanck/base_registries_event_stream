@@ -24,10 +24,18 @@ export async function getStreetNamePage(req, res) {
 }
 
 export async function getStreetNameShape(req, res){
+  res.set({
+    'Access-Control-Allow-Origin': '*',
+    'Content-Type': 'application/ld+json'
+  });
   res.json(buildStreetNameShaclResponse());
 }
 
 export async function getStreetNameContext(req, res){
+  res.set({
+    'Access-Control-Allow-Origin': '*',
+    'Content-Type': 'application/ld+json'
+  });
   res.json(StraatnaamUtils.getStreetNameContext());
 }
 
