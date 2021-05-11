@@ -1,3 +1,5 @@
+# DEPRECATED README
+
 # Base registries event stream
 
 This repository publishes event streams of base registries, such as addresses and street names as Linked Open Data and tries to be compliant with the data models of the Flemish Interoperability program ([OSLO](https://data.vlaanderen.be/) - Open Standards for Linked Organizations (only available in dutch)).
