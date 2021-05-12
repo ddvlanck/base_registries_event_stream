@@ -1,7 +1,7 @@
 import { configuration } from '../utils/Configuration';
 import { db } from '../utils/DatabaseQueries';
 import { addNext, addPrevious } from '../utils/HypermediaControls';
-import { addHeaders } from '../utils/Headers';
+import { addContentTypeHeader, addHeaders } from '../utils/Headers';
 import StraatnaamUtils from './StraatnaamUtils';
 
 const STREETNAME_PAGE_BASE_URL = `${configuration.domainName}/straatnaam`;
@@ -24,18 +24,12 @@ export async function getStreetNamePage(req, res) {
 }
 
 export async function getStreetNameShape(req, res){
-  res.set({
-    'Access-Control-Allow-Origin': '*',
-    'Content-Type': 'application/ld+json'
-  });
+  addContentTypeHeader(res);
   res.json(buildStreetNameShaclResponse());
 }
 
 export async function getStreetNameContext(req, res){
-  res.set({
-    'Access-Control-Allow-Origin': '*',
-    'Content-Type': 'application/ld+json'
-  });
+  addContentTypeHeader(res);
   res.json(StraatnaamUtils.getStreetNameContext());
 }
 

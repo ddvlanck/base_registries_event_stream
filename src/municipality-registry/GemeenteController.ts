@@ -1,6 +1,6 @@
 import {configuration} from "../utils/Configuration";
 import {db} from "../utils/DatabaseQueries";
-import {addHeaders} from "../utils/Headers";
+import {addContentTypeHeader, addHeaders} from "../utils/Headers";
 import {addNext, addPrevious} from "../utils/HypermediaControls";
 import GemeenteUtils from "./GemeenteUtils";
 
@@ -22,18 +22,12 @@ export async function getMunicipalityPage(req, res) {
 }
 
 export async function getMunicipalityShape(req, res){
-  res.set({
-    'Access-Control-Allow-Origin': '*',
-    'Content-Type': 'application/ld+json'
-  });
+  addContentTypeHeader(res);
   res.json(buildMunicipalityShaclResponse());
 }
 
 export async function getMunicipalityContext(req, res){
-  res.set({
-    'Access-Control-Allow-Origin': '*',
-    'Content-Type': 'application/ld+json'
-  });
+  addContentTypeHeader(res);
   res.json(GemeenteUtils.getMunicipalityContext());
 }
 

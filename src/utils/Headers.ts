@@ -2,7 +2,7 @@ import { Response } from 'express';
 
 export function addHeaders(response: Response, pageSize: number, numberOfObjects: number) {
   response.setHeader('Content-Type', 'application/ld+json');
-  response.setHeader('Access-Control-Allow-Origin', '*');
+  //response.setHeader('Access-Control-Allow-Origin', '*'); // This header is automatically set, so no need to do this again
 
   // When the number of objects returned is lower than the page size
   // We reached the last page
@@ -16,4 +16,8 @@ export function addHeaders(response: Response, pageSize: number, numberOfObjects
     // If not changed, then the local version is used, else the newest version is downloaded from the server
     response.setHeader('Cache-control', 'no-cache');  
   }
+}
+
+export function addContentTypeHeader(response: Response){
+  response.setHeader('Content-Type', 'application/ld+json');
 }

@@ -1,7 +1,7 @@
 import { configuration } from '../utils/Configuration';
 import { db } from '../utils/DatabaseQueries';
 import { addNext, addPrevious } from '../utils/HypermediaControls';
-import { addHeaders } from '../utils/Headers';
+import { addContentTypeHeader, addHeaders } from '../utils/Headers';
 import PostinfoUtils from './PostinfoUtils';
 
 const POSTAL_INFO_PAGE_BASE_URL = `${configuration.domainName}/postinfo`;
@@ -22,18 +22,12 @@ export async function getPostalInfoPage(req, res) {
 }
 
 export async function getPostalInfoShape(req, res){
-  res.set({
-    'Access-Control-Allow-Origin': '*',
-    'Content-Type': 'application/ld+json'
-  });
+  addContentTypeHeader(res);
   res.json(buildPostalInfoShaclResponse());
 }
 
 export async function getPostalInfoContext(req, res){
-  res.set({
-    'Access-Control-Allow-Origin': '*',
-    'Content-Type': 'application/ld+json'
-  });
+  addContentTypeHeader(res);
   res.json(PostinfoUtils.getPostalInfoContext());
 }
 
