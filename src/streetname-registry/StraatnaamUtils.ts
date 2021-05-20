@@ -86,7 +86,7 @@ export default class StraatnaamUtils {
         "sh:nodeKind": "sh:IRI",
         "sh:minCount": 1,
         "sh:maxCount": 1,
-      },
+      }
     ];
   }
 

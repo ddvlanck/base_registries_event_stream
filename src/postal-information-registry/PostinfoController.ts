@@ -1,7 +1,7 @@
 import { configuration } from '../utils/Configuration';
 import { db } from '../utils/DatabaseQueries';
 import { addNext, addPrevious } from '../utils/HypermediaControls';
-import { addContentTypeHeader, addHeaders } from '../utils/Headers';
+import { addContentTypeHeader, addHeaders, setCacheControl } from '../utils/Headers';
 import PostinfoUtils from './PostinfoUtils';
 
 const POSTAL_INFO_PAGE_BASE_URL = `${configuration.domainName}/postinfo`;
@@ -23,11 +23,13 @@ export async function getPostalInfoPage(req, res) {
 
 export async function getPostalInfoShape(req, res){
   addContentTypeHeader(res);
+  setCacheControl(res);
   res.json(buildPostalInfoShaclResponse());
 }
 
 export async function getPostalInfoContext(req, res){
   addContentTypeHeader(res);
+  setCacheControl(res);
   res.json(PostinfoUtils.getPostalInfoContext());
 }
 

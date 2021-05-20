@@ -1,12 +1,13 @@
 import { response } from "express";
 import { configuration } from "../utils/Configuration";
-import { addContentTypeHeader } from "../utils/Headers";
+import { addContentTypeHeader, setCacheControl } from "../utils/Headers";
 import DataCatalogUtils from "./DataCatalogUtils";
 
 const DATA_CATALOG_URL = `${configuration.domainName}`;
 
 export async function getDataCatalogPage(req, res){
     addContentTypeHeader(res);
+    setCacheControl(res);
     res.json(buildDataCatalogResponse());
 }
 

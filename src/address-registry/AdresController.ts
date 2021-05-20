@@ -1,7 +1,7 @@
 import { db } from '../utils/DatabaseQueries';
 import { configuration } from '../utils/Configuration';
 import { addNext, addPrevious } from '../utils/HypermediaControls';
-import { addHeaders, addContentTypeHeader } from '../utils/Headers';
+import { addHeaders, addContentTypeHeader, setCacheControl } from '../utils/Headers';
 import AdresUtils from './AdresUtils';
 
 const ADDRESS_PAGE_BASE_URL = `${configuration.domainName}/adres`;
@@ -26,11 +26,13 @@ export async function getAddressPage(req, res) {
 // Get SHACL shape for address objects
 export function getAddressShape(req, res) {
   addContentTypeHeader(res);
+  setCacheControl(res);
   res.json(buildAddressShaclResponse());
 }
 
 export async function getAddressContext(req, res){
   addContentTypeHeader(res);
+  setCacheControl(res);
   res.json(AdresUtils.getAddressContext());
 }
 

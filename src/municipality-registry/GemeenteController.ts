@@ -1,6 +1,6 @@
 import {configuration} from "../utils/Configuration";
 import {db} from "../utils/DatabaseQueries";
-import {addContentTypeHeader, addHeaders} from "../utils/Headers";
+import {addContentTypeHeader, addHeaders, setCacheControl} from "../utils/Headers";
 import {addNext, addPrevious} from "../utils/HypermediaControls";
 import GemeenteUtils from "./GemeenteUtils";
 
@@ -23,11 +23,13 @@ export async function getMunicipalityPage(req, res) {
 
 export async function getMunicipalityShape(req, res){
   addContentTypeHeader(res);
+  setCacheControl(res);
   res.json(buildMunicipalityShaclResponse());
 }
 
 export async function getMunicipalityContext(req, res){
   addContentTypeHeader(res);
+  setCacheControl(res);
   res.json(GemeenteUtils.getMunicipalityContext());
 }
 
