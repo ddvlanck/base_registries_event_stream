@@ -71,7 +71,7 @@ export default class StraatnaamUtils {
         "sh:maxCount": 1,
       },
       {
-        "sh:path": "adres:straatnaam",
+        "sh:path": "rdfs:label",
         "sh:datatype": "rdf:langString",
         "sh:minCount": 1,
       },
@@ -86,6 +86,11 @@ export default class StraatnaamUtils {
         "sh:nodeKind": "sh:IRI",
         "sh:minCount": 1,
         "sh:maxCount": 1,
+      },
+      {
+        "sh:path" : "adres:homoniemToevoeging",
+        "sh:datatype" : "xsd:string",
+        "sh:maxCount" : 1
       }
     ];
   }
@@ -101,6 +106,7 @@ export default class StraatnaamUtils {
           dct: "http://purl.org/dc/terms/",
           adms: "http://www.w3.org/ns/adms#",
           rdf : "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+          rdfs: "http://www.w3.org/2000/01/rdf-schema#",
           items: "@included",
           shacl: "@included",
           viewOf: {
@@ -128,6 +134,10 @@ export default class StraatnaamUtils {
           isToegekendDoor: {
             "@id": "prov:wasAttributedTo",
             "@type": "@id",
+          },
+          homoniemToevoeging: {
+            "@id" : "Straatnaam.homoniemToevoeging",
+            "@type" : "xsd:string"
           },
           isVersionOf: {
             "@id": "dct:isVersionOf",

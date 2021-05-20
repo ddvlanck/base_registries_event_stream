@@ -88,6 +88,8 @@ function createStreetNameEvent(data) {
   streetNameEvent['straatnaam'] = data.geographical_name;
 
   streetNameEvent['isToegekendDoor'] = `${MUNICIPALITY_NAMESPACE}/${data.nis_code}`;
+
+  if(data.homonym !== null) streetNameEvent['homoniemToevoeging'] = data.homonym;
   streetNameEvent['status'] = data.street_name_status;
 
   return streetNameEvent;

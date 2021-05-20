@@ -293,6 +293,7 @@ export default class DatabaseQueries {
     objectUri: string,
     geographicalNames: string,
     straatNameStatus: string,
+    homonym: string | null,
     nisCode: number) {
 
     const ADD_STREET_NAME = `
@@ -305,8 +306,9 @@ export default class DatabaseQueries {
         "object_uri",
         "geographical_name",
         "street_name_status",
+        "homonym",
         "nis_code")
-      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)`;
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`;
 
     return await client.query(
       ADD_STREET_NAME,
@@ -319,6 +321,7 @@ export default class DatabaseQueries {
         objectUri,
         geographicalNames,
         straatNameStatus,
+        homonym,
         nisCode
       ]);
   }

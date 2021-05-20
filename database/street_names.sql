@@ -12,6 +12,7 @@ CREATE TABLE brs."street_names"
     "geographical_name" jsonb,
 
     "street_name_status" character varying,
+    "homonym" character varying,
     "nis_code" character varying,
 
     PRIMARY KEY ("event_id")

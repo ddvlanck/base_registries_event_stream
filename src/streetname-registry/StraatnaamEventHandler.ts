@@ -74,6 +74,8 @@ export default class StraatnaamEventHandler {
     geographicalNames = StraatnaamUtils.mapGeographicalNames(objectBody.Straatnamen[0].GeografischeNaam);
     
     const streetNameStatus = StraatnaamUtils.mapStreetNameStatus(objectBody.StraatnaamStatus[0]);
+    const homonymAddition = objectBody.HomoniemToevoegingen[0] === '' ? null : objectBody.HomoniemToevoegingen[0].GeografischeNaam[0].Spelling[0];
+
     const nisCode = objectBody.NisCode[0];
 
     console.log(`[StreetNameEventHandler]: Adding object for ${streetNameId} at position ${position}.`);
@@ -87,6 +89,7 @@ export default class StraatnaamEventHandler {
       objectUri,
       JSON.stringify(geographicalNames),
       streetNameStatus,
+      homonymAddition,
       nisCode
       );
 
