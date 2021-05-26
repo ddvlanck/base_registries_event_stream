@@ -98,7 +98,6 @@ export default class StraatnaamUtils {
   public static getStreetNameContext() {
     return {
       "@context": [
-        "https://raw.githubusercontent.com/Informatievlaanderen/OSLO-Generated/test/doc/applicatieprofiel/adressenregister/ontwerpdocument/niet-bepaald/context/adressenregister.jsonld",
         {
           tree: "https://w3id.org/tree#",
           xsd: "http://www.w3.org/2001/XMLSchema#",
@@ -107,14 +106,11 @@ export default class StraatnaamUtils {
           adms: "http://www.w3.org/ns/adms#",
           rdf : "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
           rdfs: "http://www.w3.org/2000/01/rdf-schema#",
+          adres: "https://data.vlaanderen.be/ns/adres#",
           items: "@included",
           shacl: "@included",
-          viewOf: {
-            "@reverse": "tree:view",
-            "@type": "@id",
-          },
-          memberOf: {
-            "@reverse": "tree:member",
+          isVersionOf: {
+            "@id": "dct:isVersionOf",
             "@type": "@id",
           },
           generatedAtTime: {
@@ -122,13 +118,22 @@ export default class StraatnaamUtils {
             "@type": "xsd:dateTime",
           },
           eventName: "adms:versionNotes",
+          memberOf: {
+            "@reverse": "tree:member",
+            "@type": "@id",
+          },
+          viewOf: {
+            "@reverse": "tree:view",
+            "@type": "@id",
+          },
+          Straatnaam : 'adres:Straatnaam',
           straatnaam : {
-            "@id" : "Straatnaam.straatnaam",
+            "@id" : "rdfs:label",
             "@type" : "rdf:langString",
             "@container" : "@set"
           },
           status : {
-            "@id" : "Straatnaam.status",
+            "@id" : "adres:Straatnaam.status",
             "@type" : "@id"
           },
           isToegekendDoor: {
@@ -136,12 +141,8 @@ export default class StraatnaamUtils {
             "@type": "@id",
           },
           homoniemToevoeging: {
-            "@id" : "Straatnaam.homoniemToevoeging",
+            "@id" : "adres:Straatnaam.homoniemToevoeging",
             "@type" : "xsd:string"
-          },
-          isVersionOf: {
-            "@id": "dct:isVersionOf",
-            "@type": "@id",
           },
           shape : {
             "@id" : "tree:shape",

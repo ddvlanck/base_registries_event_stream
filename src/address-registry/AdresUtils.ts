@@ -136,7 +136,6 @@ export default class AdresUtils {
     public static getAddressContext() {
         return {
             '@context': [
-                'https://raw.githubusercontent.com/Informatievlaanderen/OSLO-Generated/test/doc/applicatieprofiel/adressenregister/ontwerpdocument/niet-bepaald/context/adressenregister.jsonld',
                 'https://data.vlaanderen.be/doc/applicatieprofiel/generiek-basis/zonderstatus/2019-07-01/context/generiek-basis.jsonld',
                 {
                     xsd: "http://www.w3.org/2001/XMLSchema#",
@@ -145,6 +144,7 @@ export default class AdresUtils {
                     dct: "http://purl.org/dc/terms/",
                     adms: "http://www.w3.org/ns/adms#",
                     rdf : "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                    adres: "https://data.vlaanderen.be/ns/adres#",
                     items: "@included",
                     shacl: "@included",
                     isVersionOf: {
@@ -160,62 +160,80 @@ export default class AdresUtils {
                         '@reverse': 'tree:member',
                         '@type': '@id'
                     },
+                    BelgischAdres : 'adres:Adres',
+                    Gemeentenaam : 'adres:Gemeentenaam',
+                    Postinfo : 'adres:Postinfo',
+                    busnummer: {
+                        '@id' : 'adres:busnummer',
+                        '@type' : 'xsd:string'
+                    },
                     huisnummer : {
-                        "@id" : 'BelgischAdres.huisnummer',
+                        "@id" : 'adres:huisnummer',
                         '@type' : 'xsd:string'
                     },
                     heeftStraatnaam : {
-                        '@id' : 'BelgischAdres.heeftStraatnaam',
+                        '@id' : 'adres:heeftStraatnaam',
                         '@type' : '@id'
                     },
                     heeftGemeentenaam : {
-                        '@id' : 'BelgischAdres.heeftGemeentenaam',
-                        '@type' : 'Gemeentenaam'
+                        '@id' : 'adres:heeftGemeentenaam',
+                        '@type' : 'adres:Gemeentenaam'
                     },
                     heeftPostinfo : {
-                        '@id' : 'BelgischAdres.heeftPostinfo',
-                        '@type' : 'Postinfo'
+                        '@id' : 'adres:heeftPostinfo',
+                        '@type' : 'adres:Postinfo'
                     },
                     isToegekendDoor : {
-                        '@id' : 'BelgischAdres.isToegekendDoor',
+                        '@id' : 'http://www.w3.org/ns/prov#wasAttributedTo',
                         '@type' : '@id'
                     },
                     positie: {
-                        '@id' : 'BelgischAdres.positie',
-                        '@type' : 'GeografischePositie'
+                        '@id' : 'adres:positie',
+                        '@type' : 'https://data.vlaanderen.be/ns/generiek#GeografischePositie'
                     },
+                    GeografischePositie : 'https://data.vlaanderen.be/ns/generiek#GeografischePositie',
                     officieelToegekend : {
-                        '@id' : 'BelgischAdres.officieelToegekend',
+                        '@id' : 'adres:officieelToegekend',
                         '@type' : 'xsd:boolean'
                     },
                     status : {
-                        '@id' : 'BelgischAdres.status',
+                        '@id' : 'adres:Adres.status',
                         '@type' : '@id'
                     },
                     gemeentenaam : {
-                        '@id' : 'Gemeentenaam.gemeentenaam',
+                        '@id' : 'http://www.w3.org/2000/01/rdf-schema#label',
                         '@type' : 'rdf:langString',
                         '@container' : '@set'
                     },
                     isAfgeleidVan : {
-                        '@id' : 'Gemeentenaam.isAfgeleidVan',
+                        '@id' : 'adres:isAfgeleidVan',
                         '@type' : '@id'
                     },
                     postcode : {
-                        '@id' : 'Postinfo.postcode',
+                        '@id' : 'adres:postcode',
                         '@type' : 'xsd:string'
                     },
                     default : {
-                        '@id' : 'GeografischePositie.default',
+                        '@id' : 'https://data.vlaanderen.be/ns/generiek#default',
                         '@type' : 'xsd:boolean'
                     }, 
+                    Punt : 'http://www.opengis.net/ont/sf#Point',
                     geometrie : {
-                        '@id' : 'GeografischePositie.geometrie',
-                        '@type' : 'Punt'
-                    },              
+                        '@id' : 'http://www.w3.org/ns/locn#geometry',
+                        '@type' : 'http://www.opengis.net/ont/sf#Point'
+                    },      
+
                     gml : {
-                        "@id" : "Geometrie.gml",
+                        "@id" : "http://www.opengis.net/ont/geosparql#asGML",
                         "@type" : "http://www.opengis.net/ont/geosparql#gmlLiteral"
+                    },
+                    methode : {
+                        '@id' : 'https://data.vlaanderen.be/ns/generiek#methode',
+                        '@type' : '@id'
+                    },
+                    specificatie : {
+                        '@id' : 'https://data.vlaanderen.be/ns/generiek#specificatie',
+                        '@type' : '@id'
                     },
                     viewOf: {
                         '@reverse': 'tree:view',
