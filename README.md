@@ -1,5 +1,7 @@
 # Base Registries Linked Data Event Streams
 
+![Build status](https://github.com/ddvlanck/base_registries_event_stream/actions/workflows/ci.yml/badge.svg)
+
 This repository publishes the various entities in the address registry as a Linked Data Event Stream. Every object in this Linked Data Event Stream complies with one of the official data model of the Flemish Interoperability program ([OSLO](https://data.vlaanderen.be/) - website in Dutch), short for Open Standards for Linked Organizations 
 
 The fetcher in this repository reads the original event streams (ATOM feeds) of the address registry and stores the objects which comply with the data model. The API exposes the objects within a Linked Data Event Stream.
