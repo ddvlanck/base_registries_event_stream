@@ -4,7 +4,7 @@ import { configuration } from './Configuration';
 
 const databaseConfig = configuration.database;
 
-export const clientPool = new Pool({
+export const pool = new Pool({
   user: databaseConfig.username,
   password: databaseConfig.password,
   host: databaseConfig.host,
@@ -12,6 +12,6 @@ export const clientPool = new Pool({
   database: databaseConfig.database,
 });
 
-clientPool.on('error', (err, client) => {
+pool.on('error', (err, client) => {
   console.error('Error: ', err);
 });

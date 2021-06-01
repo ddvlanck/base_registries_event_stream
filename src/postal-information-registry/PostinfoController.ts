@@ -15,9 +15,17 @@ export async function getPostalInfoPage(req, res) {
   if (!page) {
     res.redirect('?page=1');
   } else {
-    const queryResponse = await db.getPostalInformationPaged(page, PAGE_SIZE);
-    addHeaders(res, PAGE_SIZE, queryResponse.rows.length);
-    res.json(buildPostalInfoPageResponse(queryResponse.rows, PAGE_SIZE, page));
+    const items = [];
+    const stream = await db.getPostalInformationPaged(page, PAGE_SIZE);
+    stream.on('data', (data) => {
+      items.push(createPostalInformationEvent(data));
+    });
+
+    stream.on('end', () => {
+      console.log(`[PostinfoController]: Done transforming objects. Start creating page ${page}.`);
+      addHeaders(res, PAGE_SIZE, items.length);
+      res.json(buildPostalInfoPageResponse(items, PAGE_SIZE, page));
+    });
   }
 }
 

@@ -17,9 +17,17 @@ export async function getAddressPage(req, res) {
   if (!page) {
     res.redirect('?page=1');
   } else {
-    const queryResponse = await db.getAddressesPaged(page, PAGE_SIZE);
-    addHeaders(res, PAGE_SIZE, queryResponse.rows.length);
-    res.json(buildAddressPageResponse(queryResponse.rows, PAGE_SIZE, page));
+    const items = [];
+    const stream = await db.getAddressesPaged(page, PAGE_SIZE);
+    stream.on('data', (data) => {
+      items.push(createAddressEvent(data));
+    });
+
+    stream.on('end', () => {
+      console.log(`[AdresController]: Done transforming objects. Start creating page ${page}.`);
+      addHeaders(res, PAGE_SIZE, items.length);
+      res.json(buildAddressPageResponse(items, PAGE_SIZE, page));
+    });
   }
 }
 

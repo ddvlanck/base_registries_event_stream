@@ -17,9 +17,17 @@ export async function getStreetNamePage(req, res) {
   if (!page) {
     res.redirect('?page=1');
   } else {
-    const queryResponse = await db.getStreetNamesPaged(page, PAGE_SIZE);
-    addHeaders(res, PAGE_SIZE, queryResponse.rows.length);
-    res.json(buildStreetNamePageResponse(queryResponse.rows, PAGE_SIZE, page));
+    const items = [];
+    const stream = await db.getStreetNamesPaged(page, PAGE_SIZE);
+    stream.on('data', (data) => {
+      items.push(createStreetNameEvent(data));
+    });
+
+    stream.on('end', () => {
+      console.log(`[StraatnaamController]: Done transforming objects. Start creating page ${page}.`);
+      addHeaders(res, PAGE_SIZE, items.length);
+      res.json(buildStreetNamePageResponse(items, PAGE_SIZE, page));
+    });
   }
 }
 
@@ -36,7 +44,6 @@ export async function getStreetNameContext(req, res){
 }
 
 function buildStreetNamePageResponse(items: any[], pageSize: number, page: number) {
-  //const response = StraatnaamUtils.getStreetNameContext();
   const response = {};
   response['@context'] = `${STREETNAME_CONTEXT_URL}`;
   
@@ -56,8 +63,8 @@ function buildStreetNamePageResponse(items: any[], pageSize: number, page: numbe
     '@id' : STREETNAME_PAGE_BASE_URL,
     'shape' : STREETNAME_SHACL_BASE_URL
   }
-
-  response['items'] = items.map((item) => createStreetNameEvent(item));
+  
+  response['items'] = items;
 
   return response;
 }

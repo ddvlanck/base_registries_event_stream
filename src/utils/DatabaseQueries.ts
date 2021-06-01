@@ -1,12 +1,14 @@
 import {PoolClient} from 'pg';
-import {clientPool} from './DatabaseConfiguration';
+import {pool} from './DatabaseConfiguration';
+const QueryStream = require('pg-query-stream');
+const JSONStream = require('JSONStream');
 
 export default class DatabaseQueries {
 
   //#region "SELECT queries"
 
   async getAddressesPaged(page: number, pageSize: number) {
-    const client = await clientPool.connect();
+    const client = await pool.connect();
 
     const ADDRESSES_PAGED = `
       SELECT event_name,
@@ -31,14 +33,15 @@ export default class DatabaseQueries {
        LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
 
     try {
-      return await client.query(ADDRESSES_PAGED);
+      const query = new QueryStream(ADDRESSES_PAGED);
+      return client.query(query);
     } finally {
       client.release();
     }
   }
 
   async getStreetNamesPaged(page: number, pageSize: number) {
-    const client = await clientPool.connect();
+    const client = await pool.connect();
 
     const STREET_NAMES_PAGED = `
       SELECT *
@@ -47,14 +50,15 @@ export default class DatabaseQueries {
        LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
 
     try {
-      return await client.query(STREET_NAMES_PAGED);
+      const query = new QueryStream(STREET_NAMES_PAGED);
+      return client.query(query);
     } finally {
       client.release();
     }
   }
 
   async getPostalInformationPaged(page: number, pageSize: number) {
-    const client = await clientPool.connect();
+    const client = await pool.connect();
 
     const POSTAL_INFORMATION_PAGED = `
       SELECT *
@@ -63,14 +67,15 @@ export default class DatabaseQueries {
        LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
 
     try {
-      return await client.query(POSTAL_INFORMATION_PAGED);
+      const query = new QueryStream(POSTAL_INFORMATION_PAGED);
+      return client.query(query);
     } finally {
       client.release();
     }
   }
 
   async getMunicipalitiesPaged(page: number, pageSize: number) {
-    const client = await clientPool.connect();
+    const client = await pool.connect();
 
     const MUNICIPALITIES_PAGED = `
         SELECT *
@@ -79,14 +84,15 @@ export default class DatabaseQueries {
         LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
 
     try {
-      return await client.query(MUNICIPALITIES_PAGED);
+      const query = new QueryStream(MUNICIPALITIES_PAGED);
+      return client.query(query);
     } finally {
       client.release();
     }
   }
 
   async getParcelsPaged(page: number, pageSize: number){
-    const client = await clientPool.connect();
+    const client = await pool.connect();
     const PARCELS_PAGED = `
         SELECT *
         FROM brs.parcels
@@ -94,7 +100,8 @@ export default class DatabaseQueries {
         LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
 
     try {
-      return await client.query(PARCELS_PAGED);
+      const query = new QueryStream(PARCELS_PAGED);
+      return client.query(query);
     } finally {
       client.release();
     }
@@ -102,7 +109,7 @@ export default class DatabaseQueries {
   }
 
   async getBuildingsPaged(page: number, pageSize: number) {
-    const client = await clientPool.connect();
+    const client = await pool.connect();
 
     const BUILDINGS_PAGED = `
       SELECT *
@@ -111,14 +118,15 @@ export default class DatabaseQueries {
        LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
 
     try {
-      return await client.query(BUILDINGS_PAGED);
+      const query = new QueryStream(BUILDINGS_PAGED);
+      return client.query(query);
     } finally {
       client.release();
     }
   }
 
   async getBuildingUnitForBuildingVersion(unitId: string, eventId: number) {
-    const client = await clientPool.connect();
+    const client = await pool.connect();
 
     const BUILDING_UNITS = `
       SELECT *
@@ -127,7 +135,8 @@ export default class DatabaseQueries {
        ORDER BY event_id ASC`;
 
     try {
-      return await client.query(BUILDING_UNITS, [eventId, unitId]);
+      const query = new QueryStream(BUILDING_UNITS, [eventId, unitId]);
+      return client.query(query);
     } finally {
       client.release();
     }
@@ -138,7 +147,7 @@ export default class DatabaseQueries {
   //#region "Database utils"
 
   async transaction(f: (client: PoolClient) => any) {
-    const client = await clientPool.connect();
+    const client = await pool.connect();
 
     try {
       await client.query('BEGIN');
@@ -155,7 +164,7 @@ export default class DatabaseQueries {
   }
 
   async getProjectionStatus(feed: string) {
-    const client = await clientPool.connect();
+    const client = await pool.connect();
 
     const PROJECTION_STATUS = `
       SELECT position
@@ -170,7 +179,7 @@ export default class DatabaseQueries {
   }
 
   async initProjectionStatus(feed: string) {
-    const client = await clientPool.connect();
+    const client = await pool.connect();
 
     const PROJECTION_INIT = `
       INSERT INTO brs.projection_status(feed, position)

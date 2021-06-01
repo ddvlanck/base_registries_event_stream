@@ -4,6 +4,7 @@ import routes from './routes/index';
 import waitForPostgres from './../dependencies/wait-for-postgres/lib';
 
 import { configuration } from './utils/Configuration';
+import { pool } from './utils/DatabaseConfiguration';
 
 const app = express();
 app.use('/', routes);
@@ -22,7 +23,7 @@ if (app.get('env') === 'development') {
   });
 }
 
-// production error handler
+// Production error handler
 // no stacktraces leaked to user
 app.use((err: any, req, res, next) => {
   res.status(err.status || 500);
@@ -34,16 +35,15 @@ app.use((err: any, req, res, next) => {
 
 app.set('port', process.env.PORT || 3000);
 
-(async () => {
-  const connected = await waitForPostgres.wait(configuration.database);
-
-  if (connected == 0) {
-    const server = app.listen(app.get('port'), () => {
-      console.log('Express server listening on port ' + app.get('port'));
-    });
+pool.connect((err, client, release) => {
+  if(err){
+    return console.error(`[Server]: Error trying to connect to database. Printing error:`, err.stack);
   }
 
-  console.log('Done')
-})().catch(e => console.error(e.stack));
+  console.log(`[Server]: Connected to database. Starting API.`)
+  app.listen(app.get('port'), () => {
+    console.log(`[Server]: Listening on port ${app.get('port')}`)
+  })
+});
 
 

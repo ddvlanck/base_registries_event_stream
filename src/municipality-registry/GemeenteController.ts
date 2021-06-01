@@ -15,9 +15,17 @@ export async function getMunicipalityPage(req, res) {
   if (!page) {
     res.redirect('?page=1');
   } else {
-    const queryResponse = await db.getMunicipalitiesPaged(page, PAGE_SIZE);
-    addHeaders(res, PAGE_SIZE, queryResponse.rows.length);
-    res.json(buildMunicipalityPageResponse(queryResponse.rows, PAGE_SIZE, page));
+    const items = [];
+    const stream = await db.getMunicipalitiesPaged(page, PAGE_SIZE);
+    stream.on('data', (data) => {
+      items.push(createMunicipalityEvent(data));
+    });
+
+    stream.on('end', () => {
+      console.log(`[GemeenteController]: Done transforming objects. Start creating page ${page}.`);
+      addHeaders(res, PAGE_SIZE, items.length);
+      res.json(buildMunicipalityPageResponse(items, PAGE_SIZE, page));
+    });
   }
 }
 
