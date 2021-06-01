@@ -1,4 +1,4 @@
-name: Base Registries Linked Data Event Stream CI
+name: Build status
 
 on:
   push:
