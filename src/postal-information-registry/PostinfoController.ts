@@ -62,7 +62,7 @@ function buildPostalInfoPageResponse(items: any[], pageSize: number, page: numbe
     '@id' : POSTAL_INFO_PAGE_BASE_URL,
     'shape' : POSTAL_INFO_SHACL_BASE_URL
   }
-  response['items'] = items.map(item => createPostalInformationEvent(item));
+  response['items'] = items;
 
   return response;
 }

@@ -66,7 +66,7 @@ function buildAddressPageResponse(items: any[], pageSize: number, page: number) 
     'shape' : ADDRESS_SHACL_BASE_URL
   };
 
-  response['items'] = items.map(item => createAddressEvent(item));
+  response['items'] = items;
 
   return response;
 }

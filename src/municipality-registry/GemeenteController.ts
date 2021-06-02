@@ -63,7 +63,7 @@ function buildMunicipalityPageResponse(items: any[], pageSize: number, page: num
     'shape' : MUNICIPALITY_SHACL_BASE_URL
   }
 
-  response['items'] = items.map(item => createMunicipalityEvent(item));
+  response['items'] = items;
 
   return response;
 }

@@ -1,7 +1,6 @@
 import {PoolClient} from 'pg';
 import {pool} from './DatabaseConfiguration';
 const QueryStream = require('pg-query-stream');
-const JSONStream = require('JSONStream');
 
 export default class DatabaseQueries {
 
