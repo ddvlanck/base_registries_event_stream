@@ -10,26 +10,17 @@ export default class DatabaseQueries {
     const client = await pool.connect();
 
     const ADDRESSES_PAGED = `
-      SELECT event_name,
-        brs.addresses.timestamp AS timestamp,
-        object_uri,
-        postal_code,
-        house_number,
-        box_number,
-        address_status,
-        address_geometry,
-        position_geometry_method,
-        position_specification,
-        officially_assigned,
+      SELECT *, 
         brs.address_streetname.persistent_identifier AS streetname_puri,
         brs.address_municipality.persistent_identifier AS municipality_puri,
         brs.address_municipality.municipality_name AS municipality_name
-       FROM brs.addresses
-       INNER JOIN brs.address_streetname ON brs.addresses.streetname_id = brs.address_streetname.streetname_id
-       INNER JOIN brs.address_municipality ON brs.address_streetname.nis_code = brs.address_municipality.nis_code
-       WHERE event_can_be_published = 'true'
-       ORDER BY brs.addresses.event_id ASC
-       LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
+      FROM (
+        SELECT * FROM brs.addresses
+	      WHERE event_can_be_published = 'true'
+	      ORDER BY event_id ASC
+        LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}) AS T1
+      INNER JOIN brs.address_streetname ON T1.streetname_id = brs.address_streetname.streetname_id
+      INNER JOIN brs.address_municipality ON brs.address_streetname.nis_code = brs.address_municipality.nis_code`;
 
     try {
       const query = new QueryStream(ADDRESSES_PAGED);
