@@ -1,9 +1,5 @@
 import express from 'express';
 import routes from './routes/index';
-
-import waitForPostgres from './../dependencies/wait-for-postgres/lib';
-
-import { configuration } from './utils/Configuration';
 import { pool } from './utils/DatabaseConfiguration';
 
 const app = express();

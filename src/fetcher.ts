@@ -1,7 +1,6 @@
 const { Command } = require('commander');
 const program = new Command();
-import waitForPostgres from './../dependencies/wait-for-postgres/lib';
-import { configuration } from './utils/Configuration';
+import { pool } from './utils/DatabaseConfiguration';
 import FeedFetcher from './utils/FeedFetcher';
 
 program
@@ -20,12 +19,10 @@ if(!apikey){
 console.log(`[Fetcher]: Received api key. Starting Fetcher...`);
 const fetcher = new FeedFetcher(apikey);
 
-(async () => {
-  const connected = await waitForPostgres.wait(configuration.database);
-
-  if (connected == 0) {
-    await fetcher.fetchFeeds()
+pool.connect(async (err, client, release) => {
+  if(err){
+    return console.error(`[Server]: Error trying to connect to database. Printing error:`, err.stack);
   }
 
-  console.log('Done')
-})().catch(e => console.error(e.stack));
+  await fetcher.fetchFeeds();
+});
