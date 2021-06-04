@@ -8,6 +8,7 @@ export default class DatabaseQueries {
 
   async getAddressesPaged(page: number, pageSize: number) {
     const client = await pool.connect();
+    const [low, high] = this.getIndexRange(page, pageSize);
 
     const ADDRESSES_PAGED = `
       SELECT *, 
@@ -16,9 +17,8 @@ export default class DatabaseQueries {
         brs.address_municipality.municipality_name AS municipality_name
       FROM (
         SELECT * FROM brs.addresses
-	      WHERE event_can_be_published = 'true'
-	      ORDER BY event_id ASC
-        LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}) AS T1
+	      WHERE index_number BETWEEN ${low} AND ${high}
+	      ORDER BY index_number ASC) AS T1
       INNER JOIN brs.address_streetname ON T1.streetname_id = brs.address_streetname.streetname_id
       INNER JOIN brs.address_municipality ON brs.address_streetname.nis_code = brs.address_municipality.nis_code`;
 
@@ -32,12 +32,13 @@ export default class DatabaseQueries {
 
   async getStreetNamesPaged(page: number, pageSize: number) {
     const client = await pool.connect();
+    const [low, high] = this.getIndexRange(page, pageSize);
 
     const STREET_NAMES_PAGED = `
       SELECT *
-        FROM brs.street_names
-       ORDER BY event_id ASC
-       LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
+      FROM brs.street_names
+      WHERE index_number BETWEEN ${low} AND ${high}
+      ORDER BY index_number ASC`;
 
     try {
       const query = new QueryStream(STREET_NAMES_PAGED);
@@ -49,12 +50,13 @@ export default class DatabaseQueries {
 
   async getPostalInformationPaged(page: number, pageSize: number) {
     const client = await pool.connect();
+    const [low, high] = this.getIndexRange(page, pageSize);
 
     const POSTAL_INFORMATION_PAGED = `
       SELECT *
-        FROM brs.postal_information
-       ORDER BY event_id ASC
-       LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
+      FROM brs.postal_information
+      WHERE index_number BETWEEN ${low} AND ${high}
+      ORDER BY index_number ASC`;
 
     try {
       const query = new QueryStream(POSTAL_INFORMATION_PAGED);
@@ -66,66 +68,16 @@ export default class DatabaseQueries {
 
   async getMunicipalitiesPaged(page: number, pageSize: number) {
     const client = await pool.connect();
+    const [low, high] = this.getIndexRange(page, pageSize);
 
     const MUNICIPALITIES_PAGED = `
-        SELECT *
-        FROM brs.municipalities
-        ORDER BY event_id ASC
-        LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
+      SELECT *
+      FROM brs.municipalities
+      WHERE index_number BETWEEN ${low} AND ${high}
+      ORDER BY index_number ASC`;
 
     try {
       const query = new QueryStream(MUNICIPALITIES_PAGED);
-      return client.query(query);
-    } finally {
-      client.release();
-    }
-  }
-
-  async getParcelsPaged(page: number, pageSize: number){
-    const client = await pool.connect();
-    const PARCELS_PAGED = `
-        SELECT *
-        FROM brs.parcels
-        ORDER BY timestamp ASC, event_id ASC
-        LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
-
-    try {
-      const query = new QueryStream(PARCELS_PAGED);
-      return client.query(query);
-    } finally {
-      client.release();
-    }
-
-  }
-
-  async getBuildingsPaged(page: number, pageSize: number) {
-    const client = await pool.connect();
-
-    const BUILDINGS_PAGED = `
-      SELECT *
-        FROM brs.buildings
-       ORDER BY timestamp asc, event_id ASC
-       LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
-
-    try {
-      const query = new QueryStream(BUILDINGS_PAGED);
-      return client.query(query);
-    } finally {
-      client.release();
-    }
-  }
-
-  async getBuildingUnitForBuildingVersion(unitId: string, eventId: number) {
-    const client = await pool.connect();
-
-    const BUILDING_UNITS = `
-      SELECT *
-        FROM brs.building_units
-       WHERE event_id = $1 AND building_unit_id = $2
-       ORDER BY event_id ASC`;
-
-    try {
-      const query = new QueryStream(BUILDING_UNITS, [eventId, unitId]);
       return client.query(query);
     } finally {
       client.release();
@@ -189,6 +141,20 @@ export default class DatabaseQueries {
       WHERE feed = $2;`;
 
     return await client.query(PROJECTION_UPDATE, [position, feed]);
+  }
+
+  getIndexRange(page: number, pageSize: number): Array<number> {
+    let low = 0;
+    let high = 0;
+
+    if(page === 1){
+      low = page;
+    } else {
+      low = ((page - 1) * pageSize) + 1;
+    }
+
+    high = page * pageSize;
+    return [low, high];
   }
 
   //#endregion "Database utils"

@@ -9,7 +9,6 @@ import { db } from './DatabaseQueries';
 import AdresEventHandler from '../address-registry/AdresEventHandler';
 import StraatnaamEventHandler from '../streetname-registry/StraatnaamEventHandler';
 import GemeenteEventHandler from '../municipality-registry/GemeenteEventHandler';
-import GebouwEventHandler from '../building-registry/GebouwEventHandler';
 import PostinfoEventHandler from '../postal-information-registry/PostinfoEventHandler';
 
 import { URL } from 'url';
@@ -104,9 +103,6 @@ export default class FeedFetcher {
 
       case 'address':
         return new AdresEventHandler();
-
-      case 'building':
-        return new GebouwEventHandler();
 
       case 'postal_info':
         return new PostinfoEventHandler();
