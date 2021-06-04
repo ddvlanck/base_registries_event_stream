@@ -14,6 +14,7 @@ CREATE TABLE brs."street_names"
     "street_name_status" character varying,
     "homonym" character varying,
     "nis_code" character varying,
+    "index_number" bigint,
 
     PRIMARY KEY ("event_id")
 )
@@ -30,3 +31,8 @@ CREATE INDEX str_name_index
     ON brs.street_names
     (object_id ASC NULLS LAST)
     TABLESPACE pg_default;
+
+CREATE INDEX str_name_index_index_number
+    ON brs.street_names
+    (index_number ASC NULLS LAST)
+    TABLESPACE pg_default;    

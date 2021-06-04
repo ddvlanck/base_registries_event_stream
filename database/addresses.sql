@@ -19,6 +19,7 @@ CREATE TABLE brs."addresses"
     "position_specification" character varying,
     "officially_assigned" boolean,
     "event_can_be_published" boolean,
+    "index_number" bigint,
 
     PRIMARY KEY ("event_id")
 )
@@ -36,3 +37,8 @@ CREATE INDEX address_index
     ON brs.addresses
     (object_id ASC NULLS LAST, event_can_be_published)
     TABLESPACE pg_default;
+
+CREATE INDEX address_index_index_number
+    ON brs.addresses
+    (index_number ASC NULLS LAST)
+    TABLESPACE pg_default;    

@@ -9,11 +9,11 @@ CREATE TABLE brs."postal_information"
     "object_uri" character varying(500),
     "postal_names" jsonb,
     "status" character varying,
+    "index_numer" bigint,
 
     PRIMARY KEY ("event_id")
 )
 
--- TODO: Add index on object_id, complete
 
 TABLESPACE pg_default;
 
@@ -27,3 +27,8 @@ CREATE INDEX post_info_index
     ON brs.postal_information
     (object_id ASC NULLS LAST)
     TABLESPACE pg_default;
+
+CREATE INDEX post_info_index_index_number
+    ON brs.postal_information
+    (index_number ASC NULLS LAST)
+    TABLESPACE pg_default;    

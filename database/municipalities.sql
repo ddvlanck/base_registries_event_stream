@@ -17,6 +17,7 @@ CREATE TABLE brs."municipalities"
     "facility_language" character varying(50)[],
     "municipality_name" jsonb,
     "status" character varying,
+    "index_number" bigint,
 
     PRIMARY KEY ("event_id")
 )
@@ -34,3 +35,7 @@ CREATE INDEX municipality_index
     (object_id ASC NULLS LAST)
     TABLESPACE pg_default;
 
+CREATE INDEX municipality_index_index_number
+    ON brs.municipalities
+    (index_number ASC NULLS LAST)
+    TABLESPACE pg_default;
