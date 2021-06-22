@@ -1,0 +1,6 @@
+{
+    "extends" : [
+        "github>informatievlaanderen/renovate-presets:presets"
+    ],
+    "requiredStatusChecks" : null
+}
