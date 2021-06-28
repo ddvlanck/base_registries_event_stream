@@ -32,7 +32,7 @@ CREATE INDEX str_name_index
     (object_id ASC NULLS LAST)
     TABLESPACE pg_default;
 
-CREATE INDEX str_name_index_index_number
+CREATE INDEX street_name_index_index_number
     ON brs.street_names
     (index_number ASC NULLS LAST)
     TABLESPACE pg_default;    
