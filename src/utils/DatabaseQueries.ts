@@ -178,7 +178,8 @@ export default class DatabaseQueries {
     positionGeometryMethod: string,
     positionSpecification: string,
     officiallyAssigned: boolean,
-    versionCanBePublished: boolean) {
+    versionCanBePublished: boolean,
+    index: number) {
 
     const ADD_ADDRESS = `
       INSERT INTO brs.addresses(
@@ -197,8 +198,9 @@ export default class DatabaseQueries {
         "position_geometry_method",
         "position_specification",
         "officially_assigned",
-        "event_can_be_published")
-      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`;
+        "event_can_be_published",
+        "index_number")
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`;
 
     return await client.query(
       ADD_ADDRESS,
@@ -218,7 +220,8 @@ export default class DatabaseQueries {
         positionGeometryMethod,
         positionSpecification,
         officiallyAssigned,
-        versionCanBePublished
+        versionCanBePublished,
+        index
       ]);
   }
 

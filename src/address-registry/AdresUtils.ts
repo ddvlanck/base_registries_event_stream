@@ -9,7 +9,8 @@ export default class AdresUtils {
         geometry: string,
         geometryMethod: string,
         geometrySpecification: string,
-        addressStatus: string
+        addressStatus: string,
+        objectId: string
     ) {
         let versionCanBePublished = true;
 
@@ -20,7 +21,8 @@ export default class AdresUtils {
             geometry === null ||
             geometryMethod === null ||
             geometrySpecification === null ||
-            addressStatus === null) {
+            addressStatus === null ||
+            typeof objectId === 'object') {
             versionCanBePublished = false;
         }
 

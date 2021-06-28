@@ -10,6 +10,8 @@ const eventsToIgnore = [
 ]
 
 export default class AddressEventHandler {
+  private indexCounter = 1;
+
   async processPage(client: PoolClient, entries: Array<any>) {
     await this.processEvents(client, entries);
   }
@@ -76,11 +78,12 @@ export default class AddressEventHandler {
       addressPosition,
       positionGeometryMethod,
       positionSpecification,
-      addressStatus
+      addressStatus,
+      objectId
     );
 
     if(!versionCanBePublished){
-      console.log(`[AdresEventHandler]: Object verification have shown that object for ${addressId} at position ${position} is not complete and can therefore not be published.`);
+      console.log(`[AdresEventHandler]: Object verification have shown that object for ${addressId} at position ${position} is not complete or does not have a persistent URI yet and can therefore not be published.`);
       return;
     }
 
@@ -106,14 +109,14 @@ export default class AddressEventHandler {
       mappedPositionGeometryMethod,
       mappedGeometrySpecification,
       officiallyAssigned,
-      versionCanBePublished);
+      versionCanBePublished,
+      this.indexCounter);
 
-    if (eventName === 'AddressPersistentLocalIdentifierWasAssigned') {
-      console.log(`[AdresEventHandler]: Assigning ${objectUri} for ${addressId} at position ${position}.`);
+    this.indexCounter++;
 
-      db.setAddressPersistentId(client, addressId, objectId, objectUri);
-    }
-
+    /*
+      That event will always happen immediately after the original initialization. This is because, for example, a mistake was made and then corrected.
+    */
     if(eventName === 'AddressWasRemoved'){
       console.log(`[AdresEventHandler]: Records for ${addressId} (position = ${position}) will not be published anymore because it was removed.`);
       db.addressWasRemoved(client, addressId);
