@@ -18,7 +18,7 @@
     "@types/node-fetch": "2.5.10",
     "@types/xml2js": "0.4.8",
     "@types/pg": "7.14.11",
-    "typescript": "3.9.5"
+    "typescript": "3.9.10"
   },
   "dependencies": {
     "commander": "^7.0.0",
