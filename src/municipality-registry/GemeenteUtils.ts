@@ -135,13 +135,13 @@ export default class GemeenteUtils {
           "@type": "rdfs:langString",
           "@container": "@set",
         },
-        officieleTalen: {
-          "@id": "br:Gemeente.officieleTalen",
+        officieleTaal: {
+          "@id": "br:Gemeente.officieleTaal",
           "@type": "xsd:string",
           "@container": "@set",
         },
-        faciliteitenTalen: {
-          "@id": "br:Gemeente.faciliteitenTalen",
+        faciliteitenTaal: {
+          "@id": "br:Gemeente.faciliteitenTaal",
           "@type": "xsd:string",
           "@container": "@set",
         },
