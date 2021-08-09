@@ -92,10 +92,10 @@ function createMunicipalityEvent(data) {
 
   municipalityEvent['@type'] = 'Gemeente';
   municipalityEvent['gemeentenaam'] = data.municipality_name;
-  municipalityEvent['officieleTalen'] = data.official_language
+  municipalityEvent['officieleTaal'] = data.official_language
 
   if(data.facility_language !== null){
-    municipalityEvent['faciliteitenTalen'] = data.facility_language
+    municipalityEvent['faciliteitenTaal'] = data.facility_language
   }
   municipalityEvent['status'] = data.status;
 
