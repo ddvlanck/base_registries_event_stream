@@ -8,14 +8,11 @@ export function addHeaders(response: Response, pageSize: number, numberOfObjects
   // We reached the last page
   if (numberOfObjects === pageSize) {
       setCacheControl(response);
-  } else {
-
-    // We can't cache the last page, because it can still change, but we don't know when.
-    // So we provide the 'no-cache' header, which means that each time the page is requested,
-    // the browser will check on the server if the page was changed (with ETag).
-    // If not changed, then the local version is used, else the newest version is downloaded from the server
-    setNoCache(response);  
   }
+  
+  // We can't cache the last page, because it can still change, but we don't know when.
+  // With the ETag header present by the NGINX cache, the browser will check on the server if the page was changed.
+  // If not changed, then the local version is used, else the newest version is downloaded from the server
 }
 
 export function addContentTypeHeader(response: Response){
