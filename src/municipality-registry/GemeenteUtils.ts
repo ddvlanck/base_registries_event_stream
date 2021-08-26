@@ -131,7 +131,7 @@ export default class GemeenteUtils {
         },
         Gemeente: "https://data.vlaanderen.be/ns/generiek#Gemeente",
         gemeentenaam: {
-          "@id": "rdf:label",
+          "@id": "rdfs:label",
           "@type": "rdfs:langString",
           "@container": "@set",
         },
