@@ -1,7 +1,7 @@
-import {configuration} from "../utils/Configuration";
-import {db} from "../utils/DatabaseQueries";
-import {addContentTypeHeader, addHeaders, setCacheControl} from "../utils/Headers";
-import {addNext, addPrevious} from "../utils/HypermediaControls";
+import { configuration } from "../utils/Configuration";
+import { db } from "../utils/DatabaseQueries";
+import { addContentTypeHeader, addHeaders, setCacheControl } from "../utils/Headers";
+import { addNext, addPrevious } from "../utils/HypermediaControls";
 import GemeenteUtils from "./GemeenteUtils";
 
 const MUNICIPALITY_PAGE_BASE_URL = `${configuration.domainName}/gemeente`;
@@ -29,38 +29,38 @@ export async function getMunicipalityPage(req, res) {
   }
 }
 
-export async function getMunicipalityShape(req, res){
+export async function getMunicipalityShape(req, res) {
   addContentTypeHeader(res);
   setCacheControl(res);
   res.json(buildMunicipalityShaclResponse());
 }
 
-export async function getMunicipalityContext(req, res){
+export async function getMunicipalityContext(req, res) {
   addContentTypeHeader(res);
   setCacheControl(res);
   res.json(GemeenteUtils.getMunicipalityContext());
 }
 
-function buildMunicipalityPageResponse(items: any[], pageSize: number, page: number){
+function buildMunicipalityPageResponse(items: any[], pageSize: number, page: number) {
   //const response = GemeenteUtils.getMunicipalityContext();
   const response = {};
   response['@context'] = `${MUNICIPALITY_CONTEXT_URL}`;
-  
+
   response['@id'] = `${MUNICIPALITY_PAGE_BASE_URL}?page=${page}`;
   response['viewOf'] = `${MUNICIPALITY_PAGE_BASE_URL}`;
 
   const tree = [];
 
-  addNext( tree, items.length, pageSize, page, MUNICIPALITY_PAGE_BASE_URL);
-  addPrevious( tree, items.length, page, MUNICIPALITY_PAGE_BASE_URL);
+  addNext(tree, items.length, pageSize, page, MUNICIPALITY_PAGE_BASE_URL);
+  addPrevious(tree, items.length, page, MUNICIPALITY_PAGE_BASE_URL);
 
   if (tree.length) {
     response['tree:relation'] = tree;
   }
 
   response['shacl'] = {
-    '@id' : MUNICIPALITY_PAGE_BASE_URL,
-    'shape' : MUNICIPALITY_SHACL_BASE_URL
+    '@id': MUNICIPALITY_PAGE_BASE_URL,
+    'shape': MUNICIPALITY_SHACL_BASE_URL
   }
 
   response['items'] = items;
@@ -68,7 +68,7 @@ function buildMunicipalityPageResponse(items: any[], pageSize: number, page: num
   return response;
 }
 
-function buildMunicipalityShaclResponse(){
+function buildMunicipalityShaclResponse() {
   const response = GemeenteUtils.getMunicipalityShaclContext();
 
   response['@id'] = MUNICIPALITY_SHACL_BASE_URL;
@@ -94,7 +94,7 @@ function createMunicipalityEvent(data) {
   municipalityEvent['gemeentenaam'] = data.municipality_name;
   municipalityEvent['officieleTaal'] = data.official_language
 
-  if(data.facility_language !== null){
+  if (data.facility_language !== null) {
     municipalityEvent['faciliteitenTaal'] = data.facility_language
   }
   municipalityEvent['status'] = data.status;
