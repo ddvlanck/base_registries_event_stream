@@ -74,6 +74,12 @@ export default class GemeenteUtils {
         "sh:maxCount": 1,
       },
       {
+        "sh:path": "dct:created",
+        "sh:datatype": "xsd:dateTime",
+        "sh:minCount": 1,
+        "sh:maxCount": 1
+      },
+      {
         "sh:path": "adms:versionNotes",
         "sh:datatype": "xsd:string",
         "sh:minCount": 1,
@@ -156,9 +162,13 @@ export default class GemeenteUtils {
         "tree:node": {
           "@type": "@id",
         },
-        shape : {
-          '@id' : 'tree:shape',
-          '@type' : '@id'
+        shape: {
+          '@id': 'tree:shape',
+          '@type': '@id'
+        },
+        created: {
+          '@id': 'dct:created',
+          '@type': "xsd:dateTime"
         }
       },
     };
@@ -191,8 +201,8 @@ export default class GemeenteUtils {
         "sh:datatype": {
           "@type": "@id",
         },
-        "sh:class" : {
-          "@type" : "@id"
+        "sh:class": {
+          "@type": "@id"
         }
       },
     };

@@ -6,11 +6,16 @@ import GemeenteUtils from './GemeenteUtils';
 const parser = new xml2js.Parser();
 
 export default class GemeenteEventHandler {
+  private indexNumber: number;
+
+  constructor() {
+    this.indexNumber = 1;
+  }
+
   async processPage(client: PoolClient, entries: Array<any>) {
     await this.processEvents(client, entries);
   }
 
-  //TODO: check whether it is better to update existing record when event is 'MunicipalityWasNamed'
   async processEvents(client: PoolClient, entries: Array<any>) {
     const self = this;
 
@@ -46,7 +51,6 @@ export default class GemeenteEventHandler {
 
     const status = typeof objectBody.GemeenteStatus[0] === 'object' ? null : objectBody.GemeenteStatus[0];
 
-
     // Thanks to status we always know if an object can be processed or not
     if (!status) {
       console.log(`[GemeenteEventHandler]: Skipping ${eventName} at position ${position} due to not having a status (and thus not complete).`);
@@ -58,9 +62,9 @@ export default class GemeenteEventHandler {
     const versieId = objectBody.Identificator[0].VersieId[0];
     const objectId = objectBody.Identificator[0].ObjectId[0];
     const objectUri = objectBody.Identificator[0].Id[0];
-    const officialLangues = typeof objectBody.OfficieleTalen[0] === 'object' ? GemeenteUtils.extractLanguages(objectBody.OfficieleTalen): null;
-    const facilityLanguages = typeof objectBody.FaciliteitenTalen[0] === 'object' ? GemeenteUtils.extractLanguages(objectBody.FaciliteitenTalen): null;
-    const municipalityNames = typeof objectBody.Gemeentenamen[0] === 'object' ? GemeenteUtils.mapGeographicalNames(objectBody.Gemeentenamen): null;
+    const officialLangues = typeof objectBody.OfficieleTalen[0] === 'object' ? GemeenteUtils.extractLanguages(objectBody.OfficieleTalen) : null;
+    const facilityLanguages = typeof objectBody.FaciliteitenTalen[0] === 'object' ? GemeenteUtils.extractLanguages(objectBody.FaciliteitenTalen) : null;
+    const municipalityNames = typeof objectBody.Gemeentenamen[0] === 'object' ? GemeenteUtils.mapGeographicalNames(objectBody.Gemeentenamen) : null;
     const mappedStatus = GemeenteUtils.mapStatus(status);
 
     // Extra check to verify whether the object is actually complete and can therefore be saved
@@ -70,12 +74,14 @@ export default class GemeenteEventHandler {
       status
     );
 
-    if(!complete){
+    if (!complete) {
       console.log(`[GemeenteEventHandler]: Skipping ${eventName} at position ${position} because other checks have shown that this event does not contain a complete object.`);
       return;
     }
-    
+
     console.log(`[GemeenteEventHandler]: Adding object for ${municipalityId} at position ${position}.`);
+
+    const recordTimestamp = new Date(Date.now()).toISOString();
     await db.addMunicipality(
       client,
       position,
@@ -87,8 +93,12 @@ export default class GemeenteEventHandler {
       officialLangues,
       facilityLanguages,
       JSON.stringify(municipalityNames),
-      mappedStatus
+      mappedStatus,
+      this.indexNumber,
+      recordTimestamp
     );
+
+    this.indexNumber++;
 
     console.log(`[GemeenteEventHandler]: Adding object for ${municipalityId} at position ${position} in address-municipality table`);
     await db.updateAddressMunicipalityTable(

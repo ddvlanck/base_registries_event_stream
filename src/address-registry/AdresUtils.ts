@@ -29,73 +29,73 @@ export default class AdresUtils {
         return versionCanBePublished;
     }
 
-    public static createObjectHash(addressObject: any){
+    public static createObjectHash(addressObject: any) {
         return hash(addressObject);
     }
 
-    public static mapAddressStatus(status: string){
-        switch(status){
+    public static mapAddressStatus(status: string) {
+        switch (status) {
 
             case "InGebruik":
                 return "https://data.vlaanderen.be/id/concept/adresstatus/inGebruik";
-            
+
             case "Gehistoreerd":
                 return "https://data.vlaanderen.be/id/concept/adresstatus/gehistoreerd";
-                
+
             case "Voorgesteld":
                 return "https://data.vlaanderen.be/id/concept/adresstatus/voorgesteld";
-                
+
             default:
-                throw new Error(`[AdresUtils]: address should have a status.`);    
+                throw new Error(`[AdresUtils]: address should have a status.`);
         }
     }
 
-    public static mapGeometryPositionMethod(method: string){
-        switch(method){
+    public static mapGeometryPositionMethod(method: string) {
+        switch (method) {
 
             case "Geïnterpoleerd":
                 return "https://data.vlaanderen.be/id/conceptscheme/geometriemethode/geinterpoleerd";
 
             case "AangeduidDoorBeheerder":
                 return "https://data.vlaanderen.be/id/conceptscheme/geometriemethode/aangeduidDoorBeheerder";
-                
+
             case "AfgeleidVanObject":
                 return "https://data.vlaanderen.be/id/conceptscheme/geometriemethode/afgeleidVanObject";
-                
+
             default:
-                throw new Error(`[AdresUtils]: address should have a geometry position method.`);    
+                throw new Error(`[AdresUtils]: address should have a geometry position method.`);
         }
     }
 
-    public static mapGeometrySpecification(specification: string){
-        switch(specification){
+    public static mapGeometrySpecification(specification: string) {
+        switch (specification) {
 
             case "Ligplaats":
                 return "https://data.vlaanderen.be/id/conceptscheme/geometriespecificatie/ligplaats";
 
             case "Gebouweenheid":
                 return "https://data.vlaanderen.be/id/conceptscheme/geometriespecificatie/gebouweenheid";
-                
+
             case "Ingang":
                 return "https://data.vlaanderen.be/id/conceptscheme/geometriespecificatie/ingang";
-                
+
             case "Lot":
                 return "https://data.vlaanderen.be/id/conceptscheme/geometriespecificatie/lot";
-                
+
             case "Gemeente":
                 return "https://data.vlaanderen.be/id/conceptscheme/geometriespecificatie/gemeente";
-                
+
             case "Perceel":
                 return "https://data.vlaanderen.be/id/conceptscheme/geometriespecificatie/perceel";
-                
+
             case "Wegsegment":
                 return "https://data.vlaanderen.be/id/conceptscheme/geometriespecificatie/wegsegment";
-                
+
             case "Standplaats":
                 return "https://data.vlaanderen.be/id/conceptscheme/geometriespecificatie/standplaats";
-                
+
             default:
-                throw new Error(`[AdresUtils]: address should have a geometry specification.`);    
+                throw new Error(`[AdresUtils]: address should have a geometry specification.`);
         }
     }
 
@@ -127,13 +127,13 @@ export default class AdresUtils {
                 "sh:datatype": {
                     "@type": "@id",
                 },
-                "sh:class" : {
-                    "@type" : "@id"
+                "sh:class": {
+                    "@type": "@id"
                 }
             },
         };
     }
-    
+
 
     public static getAddressContext() {
         return {
@@ -145,7 +145,7 @@ export default class AdresUtils {
                     tree: "https://w3id.org/tree#",
                     dct: "http://purl.org/dc/terms/",
                     adms: "http://www.w3.org/ns/adms#",
-                    rdf : "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                    rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
                     adres: "https://data.vlaanderen.be/ns/adres#",
                     items: "@included",
                     shacl: "@included",
@@ -162,94 +162,98 @@ export default class AdresUtils {
                         '@reverse': 'tree:member',
                         '@type': '@id'
                     },
-                    BelgischAdres : 'adres:Adres',
-                    Gemeentenaam : 'adres:Gemeentenaam',
-                    Postinfo : 'adres:Postinfo',
+                    BelgischAdres: 'adres:Adres',
+                    Gemeentenaam: 'adres:Gemeentenaam',
+                    Postinfo: 'adres:Postinfo',
                     busnummer: {
-                        '@id' : 'adres:busnummer',
-                        '@type' : 'xsd:string'
+                        '@id': 'adres:busnummer',
+                        '@type': 'xsd:string'
                     },
-                    huisnummer : {
-                        "@id" : 'adres:huisnummer',
-                        '@type' : 'xsd:string'
+                    huisnummer: {
+                        "@id": 'adres:huisnummer',
+                        '@type': 'xsd:string'
                     },
-                    heeftStraatnaam : {
-                        '@id' : 'adres:heeftStraatnaam',
-                        '@type' : '@id'
+                    heeftStraatnaam: {
+                        '@id': 'adres:heeftStraatnaam',
+                        '@type': '@id'
                     },
-                    heeftGemeentenaam : {
-                        '@id' : 'adres:heeftGemeentenaam',
-                        '@type' : 'adres:Gemeentenaam'
+                    heeftGemeentenaam: {
+                        '@id': 'adres:heeftGemeentenaam',
+                        '@type': 'adres:Gemeentenaam'
                     },
-                    heeftPostinfo : {
-                        '@id' : 'adres:heeftPostinfo',
-                        '@type' : 'adres:Postinfo'
+                    heeftPostinfo: {
+                        '@id': 'adres:heeftPostinfo',
+                        '@type': 'adres:Postinfo'
                     },
-                    isToegekendDoor : {
-                        '@id' : 'http://www.w3.org/ns/prov#wasAttributedTo',
-                        '@type' : '@id'
+                    isToegekendDoor: {
+                        '@id': 'http://www.w3.org/ns/prov#wasAttributedTo',
+                        '@type': '@id'
                     },
                     positie: {
-                        '@id' : 'adres:positie',
-                        '@type' : 'https://data.vlaanderen.be/ns/generiek#GeografischePositie'
+                        '@id': 'adres:positie',
+                        '@type': 'https://data.vlaanderen.be/ns/generiek#GeografischePositie'
                     },
-                    GeografischePositie : 'https://data.vlaanderen.be/ns/generiek#GeografischePositie',
-                    officieelToegekend : {
-                        '@id' : 'adres:officieelToegekend',
-                        '@type' : 'xsd:boolean'
+                    GeografischePositie: 'https://data.vlaanderen.be/ns/generiek#GeografischePositie',
+                    officieelToegekend: {
+                        '@id': 'adres:officieelToegekend',
+                        '@type': 'xsd:boolean'
                     },
-                    status : {
-                        '@id' : 'adres:Adres.status',
-                        '@type' : '@id'
+                    status: {
+                        '@id': 'adres:Adres.status',
+                        '@type': '@id'
                     },
-                    gemeentenaam : {
-                        '@id' : 'http://www.w3.org/2000/01/rdf-schema#label',
-                        '@type' : 'rdf:langString',
-                        '@container' : '@set'
+                    gemeentenaam: {
+                        '@id': 'http://www.w3.org/2000/01/rdf-schema#label',
+                        '@type': 'rdf:langString',
+                        '@container': '@set'
                     },
-                    isAfgeleidVan : {
-                        '@id' : 'adres:isAfgeleidVan',
-                        '@type' : '@id'
+                    isAfgeleidVan: {
+                        '@id': 'adres:isAfgeleidVan',
+                        '@type': '@id'
                     },
-                    postcode : {
-                        '@id' : 'adres:postcode',
-                        '@type' : 'xsd:string'
+                    postcode: {
+                        '@id': 'adres:postcode',
+                        '@type': 'xsd:string'
                     },
-                    default : {
-                        '@id' : 'https://data.vlaanderen.be/ns/generiek#default',
-                        '@type' : 'xsd:boolean'
-                    }, 
-                    Punt : 'http://www.opengis.net/ont/sf#Point',
-                    geometrie : {
-                        '@id' : 'http://www.w3.org/ns/locn#geometry',
-                        '@type' : 'http://www.opengis.net/ont/sf#Point'
-                    },      
+                    default: {
+                        '@id': 'https://data.vlaanderen.be/ns/generiek#default',
+                        '@type': 'xsd:boolean'
+                    },
+                    Punt: 'http://www.opengis.net/ont/sf#Point',
+                    geometrie: {
+                        '@id': 'http://www.w3.org/ns/locn#geometry',
+                        '@type': 'http://www.opengis.net/ont/sf#Point'
+                    },
 
-                    gml : {
-                        "@id" : "http://www.opengis.net/ont/geosparql#asGML",
-                        "@type" : "http://www.opengis.net/ont/geosparql#gmlLiteral"
+                    gml: {
+                        "@id": "http://www.opengis.net/ont/geosparql#asGML",
+                        "@type": "http://www.opengis.net/ont/geosparql#gmlLiteral"
                     },
-                    methode : {
-                        '@id' : 'https://data.vlaanderen.be/ns/generiek#methode',
-                        '@type' : '@id'
+                    methode: {
+                        '@id': 'https://data.vlaanderen.be/ns/generiek#methode',
+                        '@type': '@id'
                     },
-                    specificatie : {
-                        '@id' : 'https://data.vlaanderen.be/ns/generiek#specificatie',
-                        '@type' : '@id'
+                    specificatie: {
+                        '@id': 'https://data.vlaanderen.be/ns/generiek#specificatie',
+                        '@type': '@id'
                     },
                     viewOf: {
                         '@reverse': 'tree:view',
                         '@type': '@id'
                     },
-                    shape : {
-                        '@id' : 'tree:shape',
-                        '@type' : '@id'
-                    },                    
+                    shape: {
+                        '@id': 'tree:shape',
+                        '@type': '@id'
+                    },
                     'tree:node': {
                         '@type': '@id'
                     },
                     'tree:path': {
                         '@type': '@id'
+                    },
+                    created: {
+                        '@id': 'dct:created',
+                        '@type': 'xsd:dateTime'
                     }
                 }
             ]
@@ -266,6 +270,12 @@ export default class AdresUtils {
             },
             {
                 "sh:path": "prov:generatedAtTime",
+                "sh:datatype": "xsd:dateTime",
+                "sh:minCount": 1,
+                "sh:maxCount": 1,
+            },
+            {
+                "sh:path": "dct:created",
                 "sh:datatype": "xsd:dateTime",
                 "sh:minCount": 1,
                 "sh:maxCount": 1,

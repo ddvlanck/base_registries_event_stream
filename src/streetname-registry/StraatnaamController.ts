@@ -87,7 +87,8 @@ function createStreetNameEvent(data) {
 
   streetNameEvent['@id'] = `${STREETNAME_PAGE_BASE_URL}#${hash}`;
   streetNameEvent['isVersionOf'] = data.object_uri;
-  streetNameEvent['generatedAtTime'] = data.timestamp;
+  streetNameEvent['generatedAtTime'] = data.record_generated_time;
+  streetNameEvent['created'] = data.timestamp
   streetNameEvent['eventName'] = data.event_name;
   streetNameEvent['memberOf'] = STREETNAME_PAGE_BASE_URL;
   

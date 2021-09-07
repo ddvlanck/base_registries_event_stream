@@ -1,5 +1,5 @@
-import {PoolClient} from 'pg';
-import {pool} from './DatabaseConfiguration';
+import { PoolClient } from 'pg';
+import { pool } from './DatabaseConfiguration';
 const QueryStream = require('pg-query-stream');
 
 export default class DatabaseQueries {
@@ -147,7 +147,7 @@ export default class DatabaseQueries {
     let low = 0;
     let high = 0;
 
-    if(page === 1){
+    if (page === 1) {
       low = page;
     } else {
       low = ((page - 1) * pageSize) + 1;
@@ -179,7 +179,8 @@ export default class DatabaseQueries {
     positionSpecification: string,
     officiallyAssigned: boolean,
     versionCanBePublished: boolean,
-    index: number) {
+    indexNumber: number,
+    recordTimestamp: string) {
 
     const ADD_ADDRESS = `
       INSERT INTO brs.addresses(
@@ -199,8 +200,9 @@ export default class DatabaseQueries {
         "position_specification",
         "officially_assigned",
         "event_can_be_published",
-        "index_number")
-      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`;
+        "index_number",
+        "record_generated_time")
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)`;
 
     return await client.query(
       ADD_ADDRESS,
@@ -221,7 +223,8 @@ export default class DatabaseQueries {
         positionSpecification,
         officiallyAssigned,
         versionCanBePublished,
-        index
+        indexNumber,
+        recordTimestamp
       ]);
   }
 
@@ -243,13 +246,13 @@ export default class DatabaseQueries {
     client: PoolClient,
     addressId: string) {
 
-      const ADDRESS_WAS_REMOVED = `
+    const ADDRESS_WAS_REMOVED = `
         UPDATE brs.addresses
           SET event_can_be_published = 'false'
         WHERE address_id = $1`;
 
-      return await client.query(ADDRESS_WAS_REMOVED, [addressId]);  
-    }
+    return await client.query(ADDRESS_WAS_REMOVED, [addressId]);
+  }
 
   async addStreetName(
     client: PoolClient,
@@ -262,7 +265,9 @@ export default class DatabaseQueries {
     geographicalNames: string,
     straatNameStatus: string,
     homonym: string | null,
-    nisCode: number) {
+    nisCode: number,
+    indexNumber: number,
+    recordTimestamp: string) {
 
     const ADD_STREET_NAME = `
       INSERT INTO brs.street_names(
@@ -275,8 +280,10 @@ export default class DatabaseQueries {
         "geographical_name",
         "street_name_status",
         "homonym",
-        "nis_code")
-      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`;
+        "nis_code",
+        "index_number",
+        "record_generated_time")
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`;
 
     return await client.query(
       ADD_STREET_NAME,
@@ -290,7 +297,9 @@ export default class DatabaseQueries {
         geographicalNames,
         straatNameStatus,
         homonym,
-        nisCode
+        nisCode,
+        indexNumber,
+        recordTimestamp
       ]);
   }
 
@@ -319,7 +328,9 @@ export default class DatabaseQueries {
     officialLanguages: Array<string>,
     facilityLanguages: Array<string>,
     municipalityNames: string,
-    status: string) {
+    status: string,
+    indexNumber: number,
+    recordTimestamp: string) {
 
     const ADD_MUNICIPALITY = `
       INSERT INTO brs.municipalities(
@@ -332,8 +343,10 @@ export default class DatabaseQueries {
         "official_language",
         "facility_language",
         "municipality_name",
-        "status")
-      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`;
+        "status",
+        "index_number",
+        "record_generated_time")
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`;
 
     return await client.query(
       ADD_MUNICIPALITY,
@@ -347,7 +360,9 @@ export default class DatabaseQueries {
         officialLanguages,
         facilityLanguages,
         municipalityNames,
-        status
+        status,
+        indexNumber,
+        recordTimestamp
       ]
     )
   }
@@ -361,7 +376,9 @@ export default class DatabaseQueries {
     objectId: number | null,
     objectUri: string,
     postalNames: any,
-    status: string) {
+    status: string,
+    indexNumber: number,
+    recordTimestamp: string) {
 
     const ADD_POSTAL_INFO = `
       INSERT INTO brs.postal_information(
@@ -372,8 +389,10 @@ export default class DatabaseQueries {
         "object_id",
         "object_uri",
         "postal_names",
-        "status")
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`;
+        "status",
+        "index_number",
+        "record_generated_time")
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`;
 
     return await client.query(
       ADD_POSTAL_INFO,
@@ -385,7 +404,9 @@ export default class DatabaseQueries {
         objectId,
         objectUri,
         postalNames,
-        status
+        status,
+        indexNumber,
+        recordTimestamp
       ]
     );
   }
@@ -435,7 +456,7 @@ export default class DatabaseQueries {
     nisCode: string,
     eventId: number,
     timestamp: string
-  ){
+  ) {
     const UPDATE_ADDRESS_STREETNAME = `
       INSERT INTO brs.address_streetname(
         "streetname_id",
@@ -459,7 +480,7 @@ export default class DatabaseQueries {
         eventId,
         timestamp
       ]
-    )      
+    )
 
   }
 }

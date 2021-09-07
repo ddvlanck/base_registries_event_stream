@@ -7,6 +7,12 @@ import PostinfoUtils from './PostinfoUtils';
 const parser = new xml2js.Parser();
 
 export default class PostinfoEventHandler {
+  private indexNumber: number;
+
+  constructor() {
+    this.indexNumber = 1;
+  }
+
   async processPage(client: PoolClient, entries: Array<any>) {
     await this.processEvents(client, entries);
   }
@@ -67,6 +73,7 @@ export default class PostinfoEventHandler {
 
     console.log(`[PostinfoEventHandler]: Adding object for ${postalCode} at position ${position}.`);
 
+    const recordTimestamp = new Date(Date.now()).toISOString();
     await db.addPostalInformation(
       client,
       position,
@@ -76,7 +83,11 @@ export default class PostinfoEventHandler {
       objectId,
       objectUri,
       JSON.stringify(postalNames),
-      statusUri
+      statusUri,
+      this.indexNumber,
+      recordTimestamp
     );
+
+    this.indexNumber++;
   }
 }

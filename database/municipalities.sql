@@ -8,6 +8,7 @@ CREATE TABLE brs."municipalities"
     "event_name" character varying(200) NOT NULL,
 
     "timestamp" character varying(30) NOT NULL,
+    "record_generated_time" character varying NOT NULL,
     "municipality_id" character varying(40) NOT NULL,
 
     "object_id" bigint,
@@ -19,7 +20,8 @@ CREATE TABLE brs."municipalities"
     "status" character varying,
     "index_number" bigint,
 
-    PRIMARY KEY ("event_id")
+    PRIMARY KEY ("event_id"),
+    UNIQUE("record_generated_time", "municipality_id")
 )
 
 TABLESPACE pg_default;

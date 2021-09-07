@@ -65,6 +65,12 @@ export default class StraatnaamUtils {
         "sh:maxCount": 1,
       },
       {
+        "sh:path": "dct:created",
+        "sh:datatype": "xsd:dateTime",
+        "sh:minCount": 1,
+        "sh:maxCount": 1,
+      },
+      {
         "sh:path": "adms:versionNotes",
         "sh:datatype": "xsd:string",
         "sh:minCount": 1,
@@ -150,6 +156,10 @@ export default class StraatnaamUtils {
           },
           "tree:node": {
             "@type": "@id",
+          },
+          created: {
+            '@id' : 'dct:created',
+            '@type' : 'xsd:dateTime'
           }
         },
       ],

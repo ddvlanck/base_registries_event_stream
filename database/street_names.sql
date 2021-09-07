@@ -4,6 +4,7 @@ CREATE TABLE brs."street_names"
     "event_name" character varying NOT NULL,
 
     "timestamp" character varying NOT NULL,
+    "record_generated_time" character varying NOT NULL,
     "street_name_id" character varying NOT NULL,
 
     "object_id" bigint,
@@ -16,7 +17,8 @@ CREATE TABLE brs."street_names"
     "nis_code" character varying,
     "index_number" bigint,
 
-    PRIMARY KEY ("event_id")
+    PRIMARY KEY ("event_id"),
+    UNIQUE ("record_generated_time", "street_name_id")
 )
 
 TABLESPACE pg_default;

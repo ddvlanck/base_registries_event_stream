@@ -5,6 +5,7 @@ CREATE TABLE brs."addresses"
 
     "address_id" character varying(40) NOT NULL,
     "timestamp" character varying(50) NOT NULL,
+    "record_generated_time" character varying NOT NULL,
 
     "object_id" bigint,
     "object_uri" character varying(500),
@@ -21,7 +22,8 @@ CREATE TABLE brs."addresses"
     "event_can_be_published" boolean,
     "index_number" bigint,
 
-    PRIMARY KEY ("event_id")
+    PRIMARY KEY ("event_id"),
+    UNIQUE ("record_generated_time", "address_id")
 )
 
 

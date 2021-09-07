@@ -48,6 +48,12 @@ export default class PostinfoUtils {
         "sh:maxCount": 1,
       },
       {
+        "sh:path": "http://purl.org/dc/terms/created",
+        "sh:datatype": "xsd:dateTime",
+        "sh:minCount": 1,
+        "sh:maxCount": 1
+      },
+      {
         "sh:path": "http://www.w3.org/ns/adms#versionNotes",
         "sh:datatype": "xsd:string",
         "sh:minCount": 1,
@@ -64,10 +70,10 @@ export default class PostinfoUtils {
         "sh:datatype": "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString",
       },
       {
-        "sh:path" : "https://basisregisters.vlaanderen.be/ns/adres#Postinfo.status",
-        "sh:class" : "skos:Concept",
-        "sh:minCount" : 1,
-        "sh:maxCount" : 1
+        "sh:path": "https://basisregisters.vlaanderen.be/ns/adres#Postinfo.status",
+        "sh:class": "skos:Concept",
+        "sh:minCount": 1,
+        "sh:maxCount": 1
       }
     ];
   }
@@ -102,8 +108,8 @@ export default class PostinfoUtils {
         postcode: "adres:postcode",
         postnaam: "adres:postnaam",
         status: {
-          '@id' : 'br:Postinfo.status',
-          '@type' : '@id'
+          '@id': 'br:Postinfo.status',
+          '@type': '@id'
         },
         isVersionOf: {
           "@id": "dct:isVersionOf",
@@ -112,9 +118,13 @@ export default class PostinfoUtils {
         "tree:node": {
           "@type": "@id",
         },
-        shape : {
-          '@id' : 'tree:shape',
-          '@type' : '@id'
+        shape: {
+          '@id': 'tree:shape',
+          '@type': '@id'
+        },
+        created: {
+          '@id': 'dct:created',
+          '@type': 'xsd:dateTime'
         }
       },
     };
@@ -142,8 +152,8 @@ export default class PostinfoUtils {
         "sh:datatype": {
           "@type": "@id",
         },
-        "sh:class" : {
-          "@type" : "@id"
+        "sh:class": {
+          "@type": "@id"
         }
       },
     };

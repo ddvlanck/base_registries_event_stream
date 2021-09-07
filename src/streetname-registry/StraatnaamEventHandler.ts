@@ -11,6 +11,12 @@ const eventsToIgnore = [
 ]
 
 export default class StraatnaamEventHandler {
+  private indexNumber: number;
+
+  constructor() {
+    this.indexNumber = 1;
+  }
+
   async processPage(client: PoolClient, entries: Array<any>) {
     await this.processEvents(client, entries);
   }
@@ -27,7 +33,7 @@ export default class StraatnaamEventHandler {
         continue;
       }
 
-      if(eventsToIgnore.includes(eventName)){
+      if (eventsToIgnore.includes(eventName)) {
         console.log(`[StreetNameEventHandler]: Skipping ${eventName} at position ${position} because these events have to be ignored.`);
         continue;
       }
@@ -59,7 +65,7 @@ export default class StraatnaamEventHandler {
       objectBody.NisCode[0]
     );
 
-    if(!addToDatabase){
+    if (!addToDatabase) {
       console.log(`[StreetNameEventHandler]: Skipping ${eventName} at position ${position} due to not having a complete object`);
       return;
     }
@@ -72,13 +78,15 @@ export default class StraatnaamEventHandler {
 
     let geographicalNames = []
     geographicalNames = StraatnaamUtils.mapGeographicalNames(objectBody.Straatnamen[0].GeografischeNaam);
-    
+
     const streetNameStatus = StraatnaamUtils.mapStreetNameStatus(objectBody.StraatnaamStatus[0]);
     const homonymAddition = objectBody.HomoniemToevoegingen[0] === '' ? null : objectBody.HomoniemToevoegingen[0].GeografischeNaam[0].Spelling[0];
 
     const nisCode = objectBody.NisCode[0];
 
     console.log(`[StreetNameEventHandler]: Adding object for ${streetNameId} at position ${position}.`);
+    
+    const recordTimestamp = new Date(Date.now()).toISOString();
     await db.addStreetName(
       client,
       position,
@@ -90,8 +98,12 @@ export default class StraatnaamEventHandler {
       JSON.stringify(geographicalNames),
       streetNameStatus,
       homonymAddition,
-      nisCode
-      );
+      nisCode,
+      this.indexNumber,
+      recordTimestamp
+    );
+
+    this.indexNumber++;
 
     if (eventName === 'StreetNamePersistentLocalIdentifierWasAssigned') {
       console.log(`[StreetNameEventHandler]: Assigning ${objectUri} for ${streetNameId} at position ${position}.`);

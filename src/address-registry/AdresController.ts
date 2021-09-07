@@ -38,7 +38,7 @@ export function getAddressShape(req, res) {
   res.json(buildAddressShaclResponse());
 }
 
-export async function getAddressContext(req, res){
+export async function getAddressContext(req, res) {
   addContentTypeHeader(res);
   setCacheControl(res);
   res.json(AdresUtils.getAddressContext());
@@ -54,16 +54,16 @@ function buildAddressPageResponse(items: any[], pageSize: number, page: number) 
 
   const tree = [];
 
-  addNext( tree, items.length, pageSize, page, ADDRESS_PAGE_BASE_URL);
-  addPrevious( tree, items.length, page, ADDRESS_PAGE_BASE_URL);
+  addNext(tree, items.length, pageSize, page, ADDRESS_PAGE_BASE_URL);
+  addPrevious(tree, items.length, page, ADDRESS_PAGE_BASE_URL);
 
   if (tree.length) {
     response['tree:relation'] = tree;
   }
 
   response['shacl'] = {
-    '@id' : ADDRESS_PAGE_BASE_URL,
-    'shape' : ADDRESS_SHACL_BASE_URL
+    '@id': ADDRESS_PAGE_BASE_URL,
+    'shape': ADDRESS_SHACL_BASE_URL
   };
 
   response['items'] = items;
@@ -71,7 +71,7 @@ function buildAddressPageResponse(items: any[], pageSize: number, page: number) 
   return response;
 }
 
-function buildAddressShaclResponse(){
+function buildAddressShaclResponse() {
   const response = AdresUtils.getAddressShaclContext();
 
   response['@id'] = ADDRESS_SHACL_BASE_URL;
@@ -89,7 +89,8 @@ function createAddressEvent(data) {
 
   addressEvent['@id'] = `${ADDRESS_PAGE_BASE_URL}#${hash}`;
   addressEvent['isVersionOf'] = data.object_uri;
-  addressEvent['generatedAtTime'] = data.timestamp;
+  addressEvent['generatedAtTime'] = data.record_generated_time;
+  addressEvent['created'] = data.timestamp;
   addressEvent['eventName'] = data.event_name;
   addressEvent['memberOf'] = ADDRESS_PAGE_BASE_URL;
 
@@ -105,14 +106,14 @@ function createAddressEvent(data) {
 
   addressEvent['heeftStreetnaam'] = data.streetname_puri;
   addressEvent['heeftGemeentenaam'] = {
-    "@type" : "Gemeentenaam",
-    "gemeentenaam" : JSON.parse(data.municipality_name),
-    "isAfgeleidVan" : data.municipality_puri
+    "@type": "Gemeentenaam",
+    "gemeentenaam": JSON.parse(data.municipality_name),
+    "isAfgeleidVan": data.municipality_puri
   }
 
   if (data.postal_code) {
     addressEvent['heeftPostinfo'] = {
-      "@type" : "Postinfo",
+      "@type": "Postinfo",
       'postcode': data.postal_code
     }
   }
@@ -121,13 +122,13 @@ function createAddressEvent(data) {
 
   addressEvent['positie'] = {
     '@type': 'GeografischePositie',
-    'default' : true,
+    'default': true,
     'geometrie': {
       '@type': 'Punt',
-      'gml' : data.address_geometry
+      'gml': data.address_geometry
     },
-    'methode' : data.position_geometry_method,
-    'specificatie' : data.position_specification
+    'methode': data.position_geometry_method,
+    'specificatie': data.position_specification
   }
 
   addressEvent['officieelToegekend'] = data.officially_assigned;

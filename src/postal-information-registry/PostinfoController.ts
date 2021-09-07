@@ -85,7 +85,8 @@ function createPostalInformationEvent(data) {
   
   postInfoEvent['@id'] = `${POSTAL_INFO_PAGE_BASE_URL}#${hash}`;
   postInfoEvent['isVersionOf'] = data.object_uri;
-  postInfoEvent['generatedAtTime'] = data.timestamp;
+  postInfoEvent['generatedAtTime'] = data.record_generated_time;
+  postInfoEvent['created'] = data.timestamp;
   postInfoEvent['eventName'] = data.event_name;
   postInfoEvent['memberOf'] = POSTAL_INFO_PAGE_BASE_URL;
 

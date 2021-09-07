@@ -42,7 +42,6 @@ export async function getMunicipalityContext(req, res) {
 }
 
 function buildMunicipalityPageResponse(items: any[], pageSize: number, page: number) {
-  //const response = GemeenteUtils.getMunicipalityContext();
   const response = {};
   response['@context'] = `${MUNICIPALITY_CONTEXT_URL}`;
 
@@ -86,7 +85,8 @@ function createMunicipalityEvent(data) {
 
   municipalityEvent['@id'] = `${MUNICIPALITY_PAGE_BASE_URL}#${hash}`;
   municipalityEvent['isVersionOf'] = data.object_uri;
-  municipalityEvent['generatedAtTime'] = data.timestamp;
+  municipalityEvent['generatedAtTime'] = data.record_generated_time;
+  municipalityEvent['created'] = data.timestamp;
   municipalityEvent['eventName'] = data.event_name;
   municipalityEvent['memberOf'] = MUNICIPALITY_PAGE_BASE_URL;
 

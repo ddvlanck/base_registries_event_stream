@@ -3,15 +3,17 @@ CREATE TABLE brs."postal_information"
     "event_id" bigint NOT NULL,
     "event_name" character varying(200) NOT NULL,
     "timestamp" character varying(30) NOT NULL,
+    "record_generated_time" character varying NOT NULL,
     "postal_code" bigint NOT NULL,
 
     "object_id" bigint,
     "object_uri" character varying(500),
     "postal_names" jsonb,
     "status" character varying,
-    "index_numer" bigint,
+    "index_number" bigint,
 
-    PRIMARY KEY ("event_id")
+    PRIMARY KEY ("event_id"),
+    UNIQUE("record_generated_time", "object_id")
 )
 
 

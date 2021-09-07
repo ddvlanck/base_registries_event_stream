@@ -10,7 +10,11 @@ const eventsToIgnore = [
 ]
 
 export default class AddressEventHandler {
-  private indexCounter = 1;
+  private indexNumber: number;
+
+  constructor() {
+    this.indexNumber = 1;
+  }
 
   async processPage(client: PoolClient, entries: Array<any>) {
     await this.processEvents(client, entries);
@@ -28,7 +32,7 @@ export default class AddressEventHandler {
         continue;
       }
 
-      if(eventsToIgnore.includes(eventName)){
+      if (eventsToIgnore.includes(eventName)) {
         console.log(`[AdresEventHandler]: Skipping ${eventName} at position ${position}, because it is included in the list of events which should be skipped.`);
         continue;
       }
@@ -64,7 +68,7 @@ export default class AddressEventHandler {
     const postalCode = typeof objectBody.PostCode[0] === 'object' ? null : objectBody.PostCode[0];
     const houseNumber = typeof objectBody.Huisnummer[0] === 'object' ? null : objectBody.Huisnummer[0];
     const boxNumber = typeof objectBody.Busnummer[0] === 'object' ? null : objectBody.Busnummer[0];
-    const addressStatus = typeof objectBody.AdresStatus[0] === 'object' ? null: objectBody.AdresStatus[0];
+    const addressStatus = typeof objectBody.AdresStatus[0] === 'object' ? null : objectBody.AdresStatus[0];
     const addressPosition = objectBody.AdresPositie[0].hasOwnProperty('point') === false ? null : this.createGmlString(objectBody.AdresPositie[0]);
     const positionGeometryMethod = typeof objectBody.PositieGeometrieMethode[0] === 'object' ? null : objectBody.PositieGeometrieMethode[0];
     const positionSpecification = typeof objectBody.PositieSpecificatie[0] === 'object' ? null : objectBody.PositieSpecificatie[0];
@@ -82,7 +86,7 @@ export default class AddressEventHandler {
       objectId
     );
 
-    if(!versionCanBePublished){
+    if (!versionCanBePublished) {
       console.log(`[AdresEventHandler]: Object verification have shown that object for ${addressId} at position ${position} is not complete or does not have a persistent URI yet and can therefore not be published.`);
       return;
     }
@@ -92,6 +96,8 @@ export default class AddressEventHandler {
     const mappedGeometrySpecification = AdresUtils.mapGeometrySpecification(positionSpecification);
 
     console.log(`[AdresEventHandler]: Adding object for ${addressId} at position ${position}.`);
+
+    const recordTimestamp = new Date(Date.now()).toISOString();
     await db.addAddress(
       client,
       position,
@@ -110,14 +116,16 @@ export default class AddressEventHandler {
       mappedGeometrySpecification,
       officiallyAssigned,
       versionCanBePublished,
-      this.indexCounter);
+      this.indexNumber,
+      recordTimestamp
+    );
 
-    this.indexCounter++;
+    this.indexNumber++;
 
     /*
       That event will always happen immediately after the original initialization. This is because, for example, a mistake was made and then corrected.
     */
-    if(eventName === 'AddressWasRemoved'){
+    if (eventName === 'AddressWasRemoved') {
       console.log(`[AdresEventHandler]: Records for ${addressId} (position = ${position}) will not be published anymore because it was removed.`);
       db.addressWasRemoved(client, addressId);
     }
