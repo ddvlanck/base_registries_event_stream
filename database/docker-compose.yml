@@ -23,7 +23,7 @@ services:
       - ./address_streetname.sql:/docker-entrypoint-initdb.d/08-address_streetname.sql
 
   dba:
-    image: dpage/pgadmin4:5.6
+    image: dpage/pgadmin4:5.7
     container_name: base_registries_dba
     hostname: base_registries_dba
     environment:
