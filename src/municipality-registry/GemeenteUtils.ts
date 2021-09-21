@@ -120,8 +120,9 @@ export default class GemeenteUtils {
         br: "https://basisregisters.vlaanderen.be/ns/adres#",
         rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
         rdfs: "http://www.w3.org/2000/01/rdf-schema#",
+        ldes: "https://w3id.org/ldes#",
         items: "@included",
-        shacl: "@included",
+        collectionInfo: "@included",
         eventName: "adms:versionNotes",
         viewOf: {
           "@reverse": "tree:view",
@@ -169,6 +170,14 @@ export default class GemeenteUtils {
         created: {
           '@id': 'dct:created',
           '@type': "xsd:dateTime"
+        },
+        timestampPath: {
+          '@id' : 'ldes:timestampPath',
+          '@type' : '@id'
+        },
+        versionOfPath: {
+          '@id': 'ldes:versionOfPath',
+          '@type': '@id'
         }
       },
     };

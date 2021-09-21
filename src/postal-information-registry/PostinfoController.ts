@@ -29,13 +29,13 @@ export async function getPostalInfoPage(req, res) {
   }
 }
 
-export async function getPostalInfoShape(req, res){
+export async function getPostalInfoShape(req, res) {
   addContentTypeHeader(res);
   setCacheControl(res);
   res.json(buildPostalInfoShaclResponse());
 }
 
-export async function getPostalInfoContext(req, res){
+export async function getPostalInfoContext(req, res) {
   addContentTypeHeader(res);
   setCacheControl(res);
   res.json(PostinfoUtils.getPostalInfoContext());
@@ -45,7 +45,7 @@ function buildPostalInfoPageResponse(items: any[], pageSize: number, page: numbe
   //const response = PostinfoUtils.getPostalInfoContext();
   const response = {};
   response['@context'] = `${POSTAL_INFO_CONTEXT_URL}`;
-  
+
   response['@id'] = `${POSTAL_INFO_PAGE_BASE_URL}?page=${page}`;
   response['viewOf'] = POSTAL_INFO_PAGE_BASE_URL;
 
@@ -58,16 +58,18 @@ function buildPostalInfoPageResponse(items: any[], pageSize: number, page: numbe
     response['tree:relation'] = tree;
   }
 
-  response['shacl'] = {
-    '@id' : POSTAL_INFO_PAGE_BASE_URL,
-    'shape' : POSTAL_INFO_SHACL_BASE_URL
+  response['collectionInfo'] = {
+    '@id': POSTAL_INFO_PAGE_BASE_URL,
+    'shape': POSTAL_INFO_SHACL_BASE_URL,
+    'timestampPath': 'prov:generatedAtTime',
+    'versionOfPath': 'dct:isVersionOf'
   }
   response['items'] = items;
 
   return response;
 }
 
-function buildPostalInfoShaclResponse(){
+function buildPostalInfoShaclResponse() {
   const response = PostinfoUtils.getPostalInfoShaclContext();
 
   response['@id'] = POSTAL_INFO_SHACL_BASE_URL;
@@ -82,7 +84,7 @@ function createPostalInformationEvent(data) {
   const postInfoEvent = {}
 
   const hash = PostinfoUtils.createObjectHash(data);
-  
+
   postInfoEvent['@id'] = `${POSTAL_INFO_PAGE_BASE_URL}#${hash}`;
   postInfoEvent['isVersionOf'] = data.object_uri;
   postInfoEvent['generatedAtTime'] = data.record_generated_time;
@@ -93,7 +95,7 @@ function createPostalInformationEvent(data) {
   postInfoEvent['@type'] = 'Postinfo';
   postInfoEvent['postcode'] = parseInt(data.postal_code);
 
-  if (data.postal_names.length ) {
+  if (data.postal_names.length) {
     postInfoEvent['postnaam'] = data.postal_names;
   }
 

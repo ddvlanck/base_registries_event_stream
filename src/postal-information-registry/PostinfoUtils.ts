@@ -89,8 +89,9 @@ export default class PostinfoUtils {
         adms: "http://www.w3.org/ns/adms#",
         adres: "https://data.vlaanderen.be/ns/adres#",
         br: "https://basisregisters.vlaanderen.be/ns/adres#",
+        ldes: "https://w3id.org/ldes#",
         items: "@included",
-        shacl: "@included",
+        collectionInfo: "@included",
         viewOf: {
           "@reverse": "tree:view",
           "@type": "@id",
@@ -125,6 +126,14 @@ export default class PostinfoUtils {
         created: {
           '@id': 'dct:created',
           '@type': 'xsd:dateTime'
+        },
+        timestampPath: {
+          '@id': 'ldes:timestampPath',
+          '@type': '@id'
+        },
+        versionOfPath: {
+          '@id': 'ldes:versionOfPath',
+          '@type': '@id'
         }
       },
     };

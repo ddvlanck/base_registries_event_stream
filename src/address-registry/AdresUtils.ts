@@ -147,8 +147,9 @@ export default class AdresUtils {
                     adms: "http://www.w3.org/ns/adms#",
                     rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
                     adres: "https://data.vlaanderen.be/ns/adres#",
+                    ldes: "https://w3id.org/ldes#",
                     items: "@included",
-                    shacl: "@included",
+                    collectionInfo: "@included",
                     isVersionOf: {
                         '@id': 'dct:isVersionOf',
                         '@type': '@id'
@@ -254,6 +255,14 @@ export default class AdresUtils {
                     created: {
                         '@id': 'dct:created',
                         '@type': 'xsd:dateTime'
+                    },
+                    timestampPath : {
+                        '@id' : "ldes:timestampPath",
+                        '@type' : '@id'
+                    },
+                    versionOfPath : {
+                        '@id' : 'ldes:versionOfPath',
+                        '@type' : '@id'
                     }
                 }
             ]

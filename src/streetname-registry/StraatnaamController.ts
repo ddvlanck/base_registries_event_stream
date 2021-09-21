@@ -59,9 +59,11 @@ function buildStreetNamePageResponse(items: any[], pageSize: number, page: numbe
     response['tree:relation'] = tree;
   }
 
-  response['shacl'] = {
+  response['collectionInfo'] = {
     '@id' : STREETNAME_PAGE_BASE_URL,
-    'shape' : STREETNAME_SHACL_BASE_URL
+    'shape' : STREETNAME_SHACL_BASE_URL,
+    'timestampPath' : 'prov:generatedAtTime',
+    'versionOfPath' : 'dct:isVersionOf'
   }
   
   response['items'] = items;

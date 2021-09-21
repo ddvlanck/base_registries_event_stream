@@ -57,9 +57,11 @@ function buildMunicipalityPageResponse(items: any[], pageSize: number, page: num
     response['tree:relation'] = tree;
   }
 
-  response['shacl'] = {
+  response['collectionInfo'] = {
     '@id': MUNICIPALITY_PAGE_BASE_URL,
-    'shape': MUNICIPALITY_SHACL_BASE_URL
+    'shape': MUNICIPALITY_SHACL_BASE_URL,
+    'timestampPath' : 'prov:generatedAtTime',
+    'versionOfPath' : 'dct:isVersionOf'
   }
 
   response['items'] = items;

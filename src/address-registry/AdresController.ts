@@ -61,9 +61,11 @@ function buildAddressPageResponse(items: any[], pageSize: number, page: number) 
     response['tree:relation'] = tree;
   }
 
-  response['shacl'] = {
+  response['collectionInfo'] = {
     '@id': ADDRESS_PAGE_BASE_URL,
-    'shape': ADDRESS_SHACL_BASE_URL
+    'shape': ADDRESS_SHACL_BASE_URL,
+    'timestampPath' : 'prov:generatedAtTime',
+    'versionOfPath': 'dct:isVersionOf'
   };
 
   response['items'] = items;

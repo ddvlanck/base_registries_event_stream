@@ -94,9 +94,9 @@ export default class StraatnaamUtils {
         "sh:maxCount": 1,
       },
       {
-        "sh:path" : "adres:homoniemToevoeging",
-        "sh:datatype" : "xsd:string",
-        "sh:maxCount" : 1
+        "sh:path": "adres:homoniemToevoeging",
+        "sh:datatype": "xsd:string",
+        "sh:maxCount": 1
       }
     ];
   }
@@ -110,11 +110,12 @@ export default class StraatnaamUtils {
           prov: "http://www.w3.org/ns/prov#",
           dct: "http://purl.org/dc/terms/",
           adms: "http://www.w3.org/ns/adms#",
-          rdf : "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+          rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
           rdfs: "http://www.w3.org/2000/01/rdf-schema#",
           adres: "https://data.vlaanderen.be/ns/adres#",
+          ldes: "https://w3id.org/ldes#",
           items: "@included",
-          shacl: "@included",
+          collectionInfo: "@included",
           isVersionOf: {
             "@id": "dct:isVersionOf",
             "@type": "@id",
@@ -132,34 +133,42 @@ export default class StraatnaamUtils {
             "@reverse": "tree:view",
             "@type": "@id",
           },
-          Straatnaam : 'adres:Straatnaam',
-          straatnaam : {
-            "@id" : "rdfs:label",
-            "@type" : "rdf:langString",
-            "@container" : "@set"
+          Straatnaam: 'adres:Straatnaam',
+          straatnaam: {
+            "@id": "rdfs:label",
+            "@type": "rdf:langString",
+            "@container": "@set"
           },
-          status : {
-            "@id" : "adres:Straatnaam.status",
-            "@type" : "@id"
+          status: {
+            "@id": "adres:Straatnaam.status",
+            "@type": "@id"
           },
           isToegekendDoor: {
             "@id": "prov:wasAttributedTo",
             "@type": "@id",
           },
           homoniemToevoeging: {
-            "@id" : "adres:Straatnaam.homoniemToevoeging",
-            "@type" : "xsd:string"
+            "@id": "adres:Straatnaam.homoniemToevoeging",
+            "@type": "xsd:string"
           },
-          shape : {
-            "@id" : "tree:shape",
-            "@type" : "@id"
+          shape: {
+            "@id": "tree:shape",
+            "@type": "@id"
           },
           "tree:node": {
             "@type": "@id",
           },
           created: {
-            '@id' : 'dct:created',
-            '@type' : 'xsd:dateTime'
+            '@id': 'dct:created',
+            '@type': 'xsd:dateTime'
+          },
+          timestampPath: {
+            '@id': 'ldes:timestampPath',
+            '@type': '@id'
+          },
+          versionOfPath: {
+            '@id': 'ldes:versionOfPath',
+            '@type': '@id'
           }
         },
       ],
@@ -193,8 +202,8 @@ export default class StraatnaamUtils {
         "sh:datatype": {
           "@type": "@id",
         },
-        "sh:class" : {
-          "@type" : "@id"
+        "sh:class": {
+          "@type": "@id"
         }
       },
     };
