@@ -21,9 +21,15 @@ export default class StraatnaamUtils {
     let mappedGeographicalNames = [];
 
     for (let geographicalName of geographicalNames) {
+      let name: string = geographicalName.Spelling[0];
+
+      if (name.includes('"')) {
+        name = name.replace(/"/g, '');
+      }
+
       mappedGeographicalNames.push({
         "@language": geographicalName.Taal[0],
-        "@value": geographicalName.Spelling[0],
+        "@value": name,
       });
     }
 
