@@ -20,7 +20,7 @@ export function addContentTypeHeader(response: Response){
 }
 
 export function setCacheControl(response: Response){
-  response.setHeader('Cache-control', 'public, max-age=31557600');  // Cache it for one year
+  response.setHeader('Cache-control', 'public, max-age=31557600, immutable');  // Cache it for one year
 }
 
 export function setNoCache(response: Response){
