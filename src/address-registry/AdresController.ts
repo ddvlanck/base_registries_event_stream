@@ -50,6 +50,7 @@ function buildAddressPageResponse(items: any[], pageSize: number, page: number) 
   response['@context'] = `${ADDRESS_CONTEXT_URL}`;
 
   response['@id'] = `${ADDRESS_PAGE_BASE_URL}?page=${page}`;
+  response['@type'] = 'Node'
   response['viewOf'] = `${ADDRESS_PAGE_BASE_URL}`;
 
   const tree = [];
@@ -63,6 +64,7 @@ function buildAddressPageResponse(items: any[], pageSize: number, page: number) 
 
   response['collectionInfo'] = {
     '@id': ADDRESS_PAGE_BASE_URL,
+    '@type': 'EventStream',
     'shape': ADDRESS_SHACL_BASE_URL,
     'timestampPath' : 'prov:generatedAtTime',
     'versionOfPath': 'dct:isVersionOf'

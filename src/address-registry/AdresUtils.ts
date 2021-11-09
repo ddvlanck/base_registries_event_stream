@@ -263,7 +263,9 @@ export default class AdresUtils {
                     versionOfPath : {
                         '@id' : 'ldes:versionOfPath',
                         '@type' : '@id'
-                    }
+                    },
+                    EventStream: 'ldes:EventStream',
+                    Node: 'tree:Node',
                 }
             ]
         }

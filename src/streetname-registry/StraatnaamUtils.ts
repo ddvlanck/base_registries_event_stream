@@ -175,7 +175,9 @@ export default class StraatnaamUtils {
           versionOfPath: {
             '@id': 'ldes:versionOfPath',
             '@type': '@id'
-          }
+          },
+          EventStream: 'ldes:EventStream',
+          Node: 'tree:Node',
         },
       ],
     };

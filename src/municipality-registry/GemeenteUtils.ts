@@ -172,13 +172,15 @@ export default class GemeenteUtils {
           '@type': "xsd:dateTime"
         },
         timestampPath: {
-          '@id' : 'ldes:timestampPath',
-          '@type' : '@id'
+          '@id': 'ldes:timestampPath',
+          '@type': '@id'
         },
         versionOfPath: {
           '@id': 'ldes:versionOfPath',
           '@type': '@id'
-        }
+        },
+        EventStream: 'ldes:EventStream',
+        Node: 'tree:Node',
       },
     };
   }

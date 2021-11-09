@@ -46,6 +46,7 @@ function buildMunicipalityPageResponse(items: any[], pageSize: number, page: num
   response['@context'] = `${MUNICIPALITY_CONTEXT_URL}`;
 
   response['@id'] = `${MUNICIPALITY_PAGE_BASE_URL}?page=${page}`;
+  response['@type'] = 'Node';
   response['viewOf'] = `${MUNICIPALITY_PAGE_BASE_URL}`;
 
   const tree = [];
@@ -59,9 +60,10 @@ function buildMunicipalityPageResponse(items: any[], pageSize: number, page: num
 
   response['collectionInfo'] = {
     '@id': MUNICIPALITY_PAGE_BASE_URL,
+    '@type': 'EventStream',
     'shape': MUNICIPALITY_SHACL_BASE_URL,
-    'timestampPath' : 'prov:generatedAtTime',
-    'versionOfPath' : 'dct:isVersionOf'
+    'timestampPath': 'prov:generatedAtTime',
+    'versionOfPath': 'dct:isVersionOf'
   }
 
   response['items'] = items;

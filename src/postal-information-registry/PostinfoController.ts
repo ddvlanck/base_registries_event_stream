@@ -47,6 +47,7 @@ function buildPostalInfoPageResponse(items: any[], pageSize: number, page: numbe
   response['@context'] = `${POSTAL_INFO_CONTEXT_URL}`;
 
   response['@id'] = `${POSTAL_INFO_PAGE_BASE_URL}?page=${page}`;
+  response['@type'] = 'Node';
   response['viewOf'] = POSTAL_INFO_PAGE_BASE_URL;
 
   const tree = [];
@@ -60,6 +61,7 @@ function buildPostalInfoPageResponse(items: any[], pageSize: number, page: numbe
 
   response['collectionInfo'] = {
     '@id': POSTAL_INFO_PAGE_BASE_URL,
+    '@type': 'EventStream',
     'shape': POSTAL_INFO_SHACL_BASE_URL,
     'timestampPath': 'prov:generatedAtTime',
     'versionOfPath': 'dct:isVersionOf'

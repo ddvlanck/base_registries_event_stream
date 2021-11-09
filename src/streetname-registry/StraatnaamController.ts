@@ -31,13 +31,13 @@ export async function getStreetNamePage(req, res) {
   }
 }
 
-export async function getStreetNameShape(req, res){
+export async function getStreetNameShape(req, res) {
   addContentTypeHeader(res);
   setCacheControl(res);
   res.json(buildStreetNameShaclResponse());
 }
 
-export async function getStreetNameContext(req, res){
+export async function getStreetNameContext(req, res) {
   addContentTypeHeader(res);
   setCacheControl(res);
   res.json(StraatnaamUtils.getStreetNameContext());
@@ -46,32 +46,34 @@ export async function getStreetNameContext(req, res){
 function buildStreetNamePageResponse(items: any[], pageSize: number, page: number) {
   const response = {};
   response['@context'] = `${STREETNAME_CONTEXT_URL}`;
-  
+
   response['@id'] = `${STREETNAME_PAGE_BASE_URL}?page=${page}`;
+  response['@type'] = 'Node';
   response['viewOf'] = `${STREETNAME_PAGE_BASE_URL}`;
 
   const tree = [];
 
-  addNext( tree, items.length, pageSize, page, STREETNAME_PAGE_BASE_URL);
-  addPrevious( tree, items.length, page, STREETNAME_PAGE_BASE_URL);
+  addNext(tree, items.length, pageSize, page, STREETNAME_PAGE_BASE_URL);
+  addPrevious(tree, items.length, page, STREETNAME_PAGE_BASE_URL);
 
   if (tree.length) {
     response['tree:relation'] = tree;
   }
 
   response['collectionInfo'] = {
-    '@id' : STREETNAME_PAGE_BASE_URL,
-    'shape' : STREETNAME_SHACL_BASE_URL,
-    'timestampPath' : 'prov:generatedAtTime',
-    'versionOfPath' : 'dct:isVersionOf'
+    '@id': STREETNAME_PAGE_BASE_URL,
+    'shape': STREETNAME_SHACL_BASE_URL,
+    '@type': 'EventStream',
+    'timestampPath': 'prov:generatedAtTime',
+    'versionOfPath': 'dct:isVersionOf'
   }
-  
+
   response['items'] = items;
 
   return response;
 }
 
-function buildStreetNameShaclResponse(){
+function buildStreetNameShaclResponse() {
   const response = StraatnaamUtils.getStreetNameShaclContext();
 
   response['@id'] = STREETNAME_SHACL_BASE_URL;
@@ -93,13 +95,13 @@ function createStreetNameEvent(data) {
   streetNameEvent['created'] = data.timestamp
   streetNameEvent['eventName'] = data.event_name;
   streetNameEvent['memberOf'] = STREETNAME_PAGE_BASE_URL;
-  
+
   streetNameEvent['@type'] = 'Straatnaam';
   streetNameEvent['straatnaam'] = data.geographical_name;
 
   streetNameEvent['isToegekendDoor'] = `${MUNICIPALITY_NAMESPACE}/${data.nis_code}`;
 
-  if(data.homonym !== null) streetNameEvent['homoniemToevoeging'] = data.homonym;
+  if (data.homonym !== null) streetNameEvent['homoniemToevoeging'] = data.homonym;
   streetNameEvent['status'] = data.street_name_status;
 
   return streetNameEvent;
