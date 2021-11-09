@@ -1,29 +1,27 @@
-import xml2js from 'xml2js';
-import { PoolClient } from 'pg';
+import type { PoolClient } from 'pg';
+import { Parser } from 'xml2js';
 import { db } from '../utils/DatabaseQueries';
-import AdresUtils from './AdresUtils';
+import { AdresUtils } from './AdresUtils';
 
-const parser = new xml2js.Parser();
+const parser = new Parser();
 
-const eventsToIgnore = [
-  'AddressBecameComplete'
-]
+const eventsToIgnore = new Set([
+  'AddressBecameComplete',
+]);
 
 export default class AddressEventHandler {
   private indexNumber: number;
 
-  constructor() {
+  public constructor() {
     this.indexNumber = 1;
   }
 
-  async processPage(client: PoolClient, entries: Array<any>) {
+  public async processPage(client: PoolClient, entries: any[]): Promise<void> {
     await this.processEvents(client, entries);
   }
 
-  async processEvents(client: PoolClient, entries: Array<any>) {
-    const self = this;
-
-    for (let event of entries) {
+  private async processEvents(client: PoolClient, entries: any[]): Promise<void> {
+    for (const event of entries) {
       const position = Number(event.id[0]);
       const eventName = event.title[0].replace(`-${position}`, '');
 
@@ -32,27 +30,23 @@ export default class AddressEventHandler {
         continue;
       }
 
-      if (eventsToIgnore.includes(eventName)) {
+      if (eventsToIgnore.has(eventName)) {
         console.log(`[AdresEventHandler]: Skipping ${eventName} at position ${position}, because it is included in the list of events which should be skipped.`);
         continue;
       }
 
       await parser
         .parseStringPromise(event.content[0])
-        .then(async function (ev) {
-          try {
-            await self.processEvent(client, position, eventName, ev.Content);
-          } catch {
-            return;
-          }
+        .then(async ev => {
+          await this.processEvent(client, position, eventName, ev.Content);
         })
-        .catch(function (err) {
-          console.error('[AdresEventHandler]: Failed to parse event.', event.content[0], err);
+        .catch(error => {
+          console.error('[AdresEventHandler]: Failed to parse event.', event.content[0], error);
         });
     }
   }
 
-  async processEvent(client: PoolClient, position: number, eventName: string, ev: any) {
+  private async processEvent(client: PoolClient, position: number, eventName: string, ev: any): Promise<void> {
     console.log(`[AdresEventHandler]: Processing ${eventName} at position ${position}.`);
 
     const eventBody = ev.Event[0][Object.keys(ev.Event[0])[0]][0];
@@ -69,12 +63,19 @@ export default class AddressEventHandler {
     const houseNumber = typeof objectBody.Huisnummer[0] === 'object' ? null : objectBody.Huisnummer[0];
     const boxNumber = typeof objectBody.Busnummer[0] === 'object' ? null : objectBody.Busnummer[0];
     const addressStatus = typeof objectBody.AdresStatus[0] === 'object' ? null : objectBody.AdresStatus[0];
-    const addressPosition = objectBody.AdresPositie[0].hasOwnProperty('point') === false ? null : this.createGmlString(objectBody.AdresPositie[0]);
-    const positionGeometryMethod = typeof objectBody.PositieGeometrieMethode[0] === 'object' ? null : objectBody.PositieGeometrieMethode[0];
-    const positionSpecification = typeof objectBody.PositieSpecificatie[0] === 'object' ? null : objectBody.PositieSpecificatie[0];
+    // eslint-disable-next-line unicorn/prefer-object-has-own
+    const addressPosition = Object.prototype.hasOwnProperty.call(objectBody.AdresPositie[0], 'point') === false ?
+      null :
+      this.createGmlString(objectBody.AdresPositie[0]);
+    const positionGeometryMethod = typeof objectBody.PositieGeometrieMethode[0] === 'object' ?
+      null :
+      objectBody.PositieGeometrieMethode[0];
+    const positionSpecification = typeof objectBody.PositieSpecificatie[0] === 'object' ?
+      null :
+      objectBody.PositieSpecificatie[0];
     const officiallyAssigned = objectBody.OfficieelToegekend[0] === 'true';
 
-    let versionCanBePublished = AdresUtils.checkIfVersionCanBePublished(
+    const versionCanBePublished = AdresUtils.checkIfVersionCanBePublished(
       streetnameId,
       postalCode,
       houseNumber,
@@ -83,7 +84,7 @@ export default class AddressEventHandler {
       positionGeometryMethod,
       positionSpecification,
       addressStatus,
-      objectId
+      objectId,
     );
 
     if (!versionCanBePublished) {
@@ -117,22 +118,23 @@ export default class AddressEventHandler {
       officiallyAssigned,
       versionCanBePublished,
       this.indexNumber,
-      recordTimestamp
+      recordTimestamp,
     );
 
     this.indexNumber++;
 
-    /*
-      That event will always happen immediately after the original initialization. This is because, for example, a mistake was made and then corrected.
-    */
+    //
+    // That event will always happen immediately after the original initialization.
+    // This is because, for example, a mistake was made and then corrected.
+    //
     if (eventName === 'AddressWasRemoved') {
       console.log(`[AdresEventHandler]: Records for ${addressId} (position = ${position}) will not be published anymore because it was removed.`);
-      db.addressWasRemoved(client, addressId);
+      await db.addressWasRemoved(client, addressId);
     }
   }
 
-  private createGmlString(position) {
+  private createGmlString(position): string {
     const coords = position.point[0].pos[0];
-    return `<gml:Point><gml:pos srsDimension='2'>${coords}</gml:pos></gml:Point>`
+    return `<gml:Point><gml:pos srsDimension='2'>${coords}</gml:pos></gml:Point>`;
   }
 }

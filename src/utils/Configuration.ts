@@ -1,11 +1,11 @@
 import fs from 'fs';
 
 export default class Configuration {
-  database: { username: string, password: string, host: string, port: number, database: string };
-  feeds: { name: string, feedLocation: string, enabled: boolean }[];
-  domainName: string;
+  public database: { username: string; password: string; host: string; port: number; database: string };
+  public feeds: { name: string; feedLocation: string; enabled: boolean }[];
+  public domainName: string;
 
-  constructor() {
+  public constructor() {
     const rawdata = fs.readFileSync('config.json', 'utf8');
     const configuration = JSON.parse(rawdata.trim());
 

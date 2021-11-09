@@ -1,26 +1,24 @@
-import xml2js from 'xml2js';
-import { PoolClient } from 'pg';
+import type { PoolClient } from 'pg';
+import { Parser } from 'xml2js';
 
 import { db } from '../utils/DatabaseQueries';
-import PostinfoUtils from './PostinfoUtils';
+import { PostinfoUtils } from './PostinfoUtils';
 
-const parser = new xml2js.Parser();
+const parser = new Parser();
 
 export default class PostinfoEventHandler {
   private indexNumber: number;
 
-  constructor() {
+  public constructor() {
     this.indexNumber = 1;
   }
 
-  async processPage(client: PoolClient, entries: Array<any>) {
+  public async processPage(client: PoolClient, entries: any[]): Promise<void> {
     await this.processEvents(client, entries);
   }
 
-  async processEvents(client: PoolClient, entries: Array<any>) {
-    const self = this;
-
-    for (let event of entries) {
+  private async processEvents(client: PoolClient, entries: any[]): Promise<void> {
+    for (const event of entries) {
       const position = Number(event.id[0]);
       const eventName = event.title[0].replace(`-${position}`, '');
 
@@ -31,20 +29,16 @@ export default class PostinfoEventHandler {
 
       await parser
         .parseStringPromise(event.content[0])
-        .then(async function (ev) {
-          try {
-            await self.processEvent(client, position, eventName, ev.Content);
-          } catch {
-            return;
-          }
+        .then(async ev => {
+          await this.processEvent(client, position, eventName, ev.Content);
         })
-        .catch(function (err) {
-          console.error('[PostinfoEventHandler]: Failed to parse event.', event.content[0], err);
+        .catch(error => {
+          console.error('[PostinfoEventHandler]: Failed to parse event.', event.content[0], error);
         });
     }
   }
 
-  async processEvent(client: PoolClient, position: number, eventName: string, ev: any) {
+  private async processEvent(client: PoolClient, position: number, eventName: string, ev: any): Promise<void> {
     console.log(`[PostinfoEventHandler]: Processing ${eventName} at position ${position}.`);
 
     const eventBody = ev.Event[0][Object.keys(ev.Event[0])[0]][0];
@@ -68,8 +62,9 @@ export default class PostinfoEventHandler {
 
     let postalNames = [];
 
-    if (typeof objectBody.Postnamen[0] === 'object')
+    if (typeof objectBody.Postnamen[0] === 'object') {
       postalNames = PostinfoUtils.mapPostnamen(objectBody.Postnamen[0].Postnaam);
+    }
 
     console.log(`[PostinfoEventHandler]: Adding object for ${postalCode} at position ${position}.`);
 
@@ -85,7 +80,7 @@ export default class PostinfoEventHandler {
       JSON.stringify(postalNames),
       statusUri,
       this.indexNumber,
-      recordTimestamp
+      recordTimestamp,
     );
 
     this.indexNumber++;

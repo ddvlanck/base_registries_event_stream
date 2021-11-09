@@ -1,25 +1,23 @@
-import xml2js from 'xml2js';
-import { PoolClient } from 'pg';
+import type { PoolClient } from 'pg';
+import { Parser } from 'xml2js';
 import { db } from '../utils/DatabaseQueries';
-import GemeenteUtils from './GemeenteUtils';
+import { GemeenteUtils } from './GemeenteUtils';
 
-const parser = new xml2js.Parser();
+const parser = new Parser();
 
 export default class GemeenteEventHandler {
   private indexNumber: number;
 
-  constructor() {
+  public constructor() {
     this.indexNumber = 1;
   }
 
-  async processPage(client: PoolClient, entries: Array<any>) {
+  public async processPage(client: PoolClient, entries: any[]): Promise<void> {
     await this.processEvents(client, entries);
   }
 
-  async processEvents(client: PoolClient, entries: Array<any>) {
-    const self = this;
-
-    for (let event of entries) {
+  private async processEvents(client: PoolClient, entries: any[]): Promise<void> {
+    for (const event of entries) {
       const position = Number(event.id[0]);
       const eventName = event.title[0].replace(`-${position}`, '');
 
@@ -30,20 +28,16 @@ export default class GemeenteEventHandler {
 
       await parser
         .parseStringPromise(event.content[0])
-        .then(async function (ev) {
-          try {
-            await self.processEvent(client, position, eventName, ev.Content);
-          } catch {
-            return;
-          }
+        .then(async ev => {
+          await this.processEvent(client, position, eventName, ev.Content);
         })
-        .catch(function (err) {
-          console.error('[GemeenteEventHandler]: Failed to parse event.', event.content[0], err);
+        .catch(error => {
+          console.error('[GemeenteEventHandler]: Failed to parse event.', event.content[0], error);
         });
     }
   }
 
-  async processEvent(client: PoolClient, position: number, eventName: string, ev: any) {
+  private async processEvent(client: PoolClient, position: number, eventName: string, ev: any): Promise<void> {
     console.log(`[GemeenteEventHandler]: Processing ${eventName} at position ${position}.`);
 
     const eventBody = ev.Event[0][Object.keys(ev.Event[0])[0]][0];
@@ -62,16 +56,22 @@ export default class GemeenteEventHandler {
     const versieId = objectBody.Identificator[0].VersieId[0];
     const objectId = objectBody.Identificator[0].ObjectId[0];
     const objectUri = objectBody.Identificator[0].Id[0];
-    const officialLangues = typeof objectBody.OfficieleTalen[0] === 'object' ? GemeenteUtils.extractLanguages(objectBody.OfficieleTalen) : null;
-    const facilityLanguages = typeof objectBody.FaciliteitenTalen[0] === 'object' ? GemeenteUtils.extractLanguages(objectBody.FaciliteitenTalen) : null;
-    const municipalityNames = typeof objectBody.Gemeentenamen[0] === 'object' ? GemeenteUtils.mapGeographicalNames(objectBody.Gemeentenamen) : null;
+    const officialLangues = typeof objectBody.OfficieleTalen[0] === 'object' ?
+      GemeenteUtils.extractLanguages(objectBody.OfficieleTalen) :
+      null;
+    const facilityLanguages = typeof objectBody.FaciliteitenTalen[0] === 'object' ?
+      GemeenteUtils.extractLanguages(objectBody.FaciliteitenTalen) :
+      null;
+    const municipalityNames = typeof objectBody.Gemeentenamen[0] === 'object' ?
+      GemeenteUtils.mapGeographicalNames(objectBody.Gemeentenamen) :
+      null;
     const mappedStatus = GemeenteUtils.mapStatus(status);
 
     // Extra check to verify whether the object is actually complete and can therefore be saved
     const complete = GemeenteUtils.checkIfVersionCanBeAddedToDatabase(
       officialLangues,
       municipalityNames,
-      status
+      status,
     );
 
     if (!complete) {
@@ -95,7 +95,7 @@ export default class GemeenteEventHandler {
       JSON.stringify(municipalityNames),
       mappedStatus,
       this.indexNumber,
-      recordTimestamp
+      recordTimestamp,
     );
 
     this.indexNumber++;
@@ -108,7 +108,7 @@ export default class GemeenteEventHandler {
       objectId,
       JSON.stringify(municipalityNames),
       position,
-      versieId
-    )
+      versieId,
+    );
   }
 }

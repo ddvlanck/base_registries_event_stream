@@ -1,5 +1,5 @@
 import express from 'express';
-import routes from './routes/index';
+import routes from './routes';
 import { pool } from './utils/DatabaseConfiguration';
 
 const app = express();
@@ -29,17 +29,16 @@ app.use((err: any, req, res, next) => {
   });
 });
 
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 3_000);
 
 pool.connect((err, client, release) => {
-  if(err){
+  if (err) {
     return console.error(`[Server]: Error trying to connect to database. Printing error:`, err.stack);
   }
 
-  console.log(`[Server]: Connected to database. Starting API.`)
+  console.log(`[Server]: Connected to database. Starting API.`);
   app.listen(app.get('port'), () => {
-    console.log(`[Server]: Listening on port ${app.get('port')}`)
-  })
+    console.log(`[Server]: Listening on port ${app.get('port')}`);
+  });
 });
-
 

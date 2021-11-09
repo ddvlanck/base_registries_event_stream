@@ -1,12 +1,11 @@
-import { PoolClient } from 'pg';
+import type { PoolClient } from 'pg';
 import { pool } from './DatabaseConfiguration';
 const QueryStream = require('pg-query-stream');
 
 export default class DatabaseQueries {
+  // #region "SELECT queries"
 
-  //#region "SELECT queries"
-
-  async getAddressesPaged(page: number, pageSize: number) {
+  public async getAddressesPaged(page: number, pageSize: number): Promise<any> {
     const client = await pool.connect();
     const [low, high] = this.getIndexRange(page, pageSize);
 
@@ -17,8 +16,8 @@ export default class DatabaseQueries {
         brs.address_municipality.municipality_name AS municipality_name
       FROM (
         SELECT * FROM brs.addresses
-	      WHERE index_number BETWEEN ${low} AND ${high}
-	      ORDER BY index_number ASC) AS T1
+        WHERE index_number BETWEEN ${low} AND ${high}
+        ORDER BY index_number ASC) AS T1
       INNER JOIN brs.address_streetname ON T1.streetname_id = brs.address_streetname.streetname_id
       INNER JOIN brs.address_municipality ON brs.address_streetname.nis_code = brs.address_municipality.nis_code`;
 
@@ -30,7 +29,7 @@ export default class DatabaseQueries {
     }
   }
 
-  async getStreetNamesPaged(page: number, pageSize: number) {
+  public async getStreetNamesPaged(page: number, pageSize: number): Promise<any> {
     const client = await pool.connect();
     const [low, high] = this.getIndexRange(page, pageSize);
 
@@ -48,7 +47,7 @@ export default class DatabaseQueries {
     }
   }
 
-  async getPostalInformationPaged(page: number, pageSize: number) {
+  public async getPostalInformationPaged(page: number, pageSize: number): Promise<any> {
     const client = await pool.connect();
     const [low, high] = this.getIndexRange(page, pageSize);
 
@@ -66,7 +65,7 @@ export default class DatabaseQueries {
     }
   }
 
-  async getMunicipalitiesPaged(page: number, pageSize: number) {
+  public async getMunicipalitiesPaged(page: number, pageSize: number): Promise<any> {
     const client = await pool.connect();
     const [low, high] = this.getIndexRange(page, pageSize);
 
@@ -84,28 +83,28 @@ export default class DatabaseQueries {
     }
   }
 
-  //#endregion "Select queries"
+  // #endregion "Select queries"
 
-  //#region "Database utils"
+  // #region "Database utils"
 
-  async transaction(f: (client: PoolClient) => any) {
+  public async transaction(func: (client: PoolClient) => any): Promise<any> {
     const client = await pool.connect();
 
     try {
       await client.query('BEGIN');
 
-      await f(client);
+      await func(client);
 
       await client.query('COMMIT');
-    } catch (e) {
+    } catch (error: unknown) {
       await client.query('ROLLBACK');
-      throw e;
+      throw error;
     } finally {
       client.release();
     }
   }
 
-  async getProjectionStatus(feed: string) {
+  public async getProjectionStatus(feed: string): Promise<any> {
     const client = await pool.connect();
 
     const PROJECTION_STATUS = `
@@ -120,7 +119,7 @@ export default class DatabaseQueries {
     }
   }
 
-  async initProjectionStatus(feed: string) {
+  public async initProjectionStatus(feed: string): Promise<any> {
     const client = await pool.connect();
 
     const PROJECTION_INIT = `
@@ -134,7 +133,7 @@ export default class DatabaseQueries {
     }
   }
 
-  async setProjectionStatus(client: PoolClient, feed: string, position: number) {
+  public async setProjectionStatus(client: PoolClient, feed: string, position: number): Promise<any> {
     const PROJECTION_UPDATE = `
       UPDATE brs.projection_status
         SET position = $1
@@ -143,7 +142,7 @@ export default class DatabaseQueries {
     return await client.query(PROJECTION_UPDATE, [position, feed]);
   }
 
-  getIndexRange(page: number, pageSize: number): Array<number> {
+  public getIndexRange(page: number, pageSize: number): number[] {
     let low = 0;
     let high = 0;
 
@@ -157,11 +156,11 @@ export default class DatabaseQueries {
     return [low, high];
   }
 
-  //#endregion "Database utils"
+  // #endregion "Database utils"
 
-  //#region "Insert queries"
+  // #region "Insert queries"
 
-  async addAddress(
+  public async addAddress(
     client: PoolClient,
     eventId: number,
     eventName: string,
@@ -180,8 +179,8 @@ export default class DatabaseQueries {
     officiallyAssigned: boolean,
     versionCanBePublished: boolean,
     indexNumber: number,
-    recordTimestamp: string) {
-
+    recordTimestamp: string,
+  ): Promise<any> {
     const ADD_ADDRESS = `
       INSERT INTO brs.addresses(
         "event_id",
@@ -224,16 +223,17 @@ export default class DatabaseQueries {
         officiallyAssigned,
         versionCanBePublished,
         indexNumber,
-        recordTimestamp
-      ]);
+        recordTimestamp,
+      ],
+    );
   }
 
-  async setAddressPersistentId(
+  public async setAddressPersistentId(
     client: PoolClient,
     addressId: string,
     objectId: number,
-    objectUri: string) {
-
+    objectUri: string,
+  ): Promise<any> {
     const SET_OBJECTID = `
       UPDATE brs.addresses
          SET object_id = $1, object_uri = $2
@@ -242,10 +242,10 @@ export default class DatabaseQueries {
     return await client.query(SET_OBJECTID, [objectId, objectUri, addressId]);
   }
 
-  async addressWasRemoved(
+  public async addressWasRemoved(
     client: PoolClient,
-    addressId: string) {
-
+    addressId: string,
+  ): Promise<any> {
     const ADDRESS_WAS_REMOVED = `
         UPDATE brs.addresses
           SET event_can_be_published = 'false'
@@ -254,7 +254,7 @@ export default class DatabaseQueries {
     return await client.query(ADDRESS_WAS_REMOVED, [addressId]);
   }
 
-  async addStreetName(
+  public async addStreetName(
     client: PoolClient,
     eventId: number,
     eventName: string,
@@ -267,8 +267,8 @@ export default class DatabaseQueries {
     homonym: string | null,
     nisCode: number,
     indexNumber: number,
-    recordTimestamp: string) {
-
+    recordTimestamp: string,
+  ): Promise<any> {
     const ADD_STREET_NAME = `
       INSERT INTO brs.street_names(
         "event_id",
@@ -299,16 +299,17 @@ export default class DatabaseQueries {
         homonym,
         nisCode,
         indexNumber,
-        recordTimestamp
-      ]);
+        recordTimestamp,
+      ],
+    );
   }
 
-  async setStreetNamePersistentId(
+  public async setStreetNamePersistentId(
     client: PoolClient,
     streetNameId: string,
     objectId: number,
-    objectUri: string) {
-
+    objectUri: string,
+  ): Promise<any> {
     const SET_OBJECTID = `
       UPDATE brs.street_names
          SET object_id = $1, object_uri = $2
@@ -317,7 +318,7 @@ export default class DatabaseQueries {
     return await client.query(SET_OBJECTID, [objectId, objectUri, streetNameId]);
   }
 
-  async addMunicipality(
+  public async addMunicipality(
     client: PoolClient,
     eventId: number,
     eventName: string,
@@ -325,13 +326,13 @@ export default class DatabaseQueries {
     municipalityId: string,
     objectId: number | null,
     objectUri: string,
-    officialLanguages: Array<string>,
-    facilityLanguages: Array<string>,
+    officialLanguages: string[],
+    facilityLanguages: string[],
     municipalityNames: string,
     status: string,
     indexNumber: number,
-    recordTimestamp: string) {
-
+    recordTimestamp: string,
+  ): Promise<any> {
     const ADD_MUNICIPALITY = `
       INSERT INTO brs.municipalities(
         "event_id",
@@ -362,12 +363,12 @@ export default class DatabaseQueries {
         municipalityNames,
         status,
         indexNumber,
-        recordTimestamp
-      ]
-    )
+        recordTimestamp,
+      ],
+    );
   }
 
-  async addPostalInformation(
+  public async addPostalInformation(
     client: PoolClient,
     eventId: number,
     eventName: string,
@@ -378,8 +379,8 @@ export default class DatabaseQueries {
     postalNames: any,
     status: string,
     indexNumber: number,
-    recordTimestamp: string) {
-
+    recordTimestamp: string,
+  ): Promise<any> {
     const ADD_POSTAL_INFO = `
       INSERT INTO brs.postal_information(
         "event_id",
@@ -406,20 +407,20 @@ export default class DatabaseQueries {
         postalNames,
         status,
         indexNumber,
-        recordTimestamp
-      ]
+        recordTimestamp,
+      ],
     );
   }
 
-  async updateAddressMunicipalityTable(
+  public async updateAddressMunicipalityTable(
     client: PoolClient,
     municipalityId: string,
     objectUri: string,
     objectId: string,
     municipalityName: string | null,
     eventId: number,
-    timestamp: string
-  ) {
+    timestamp: string,
+  ): Promise<any> {
     const UPDATE_ADDRESS_MUNICIPALITY = `
       INSERT INTO brs.address_municipality(
         "municipality_id",
@@ -444,19 +445,19 @@ export default class DatabaseQueries {
         objectId,
         eventId,
         timestamp,
-        municipalityName
-      ]
-    )
+        municipalityName,
+      ],
+    );
   }
 
-  async updateAddressStreetnameTable(
+  public async updateAddressStreetnameTable(
     client: PoolClient,
     streetNameId: string,
     objectUri: string,
     nisCode: string,
     eventId: number,
-    timestamp: string
-  ) {
+    timestamp: string,
+  ): Promise<any> {
     const UPDATE_ADDRESS_STREETNAME = `
       INSERT INTO brs.address_streetname(
         "streetname_id",
@@ -478,13 +479,12 @@ export default class DatabaseQueries {
         objectUri,
         nisCode,
         eventId,
-        timestamp
-      ]
-    )
-
+        timestamp,
+      ],
+    );
   }
 }
 
-//#endregion "Insert queries"
+// #endregion "Insert queries"
 
 export const db = new DatabaseQueries();

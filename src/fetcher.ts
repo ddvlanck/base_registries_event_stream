@@ -1,4 +1,4 @@
-const { Command } = require('commander');
+import { Command } from 'commander';
 const program = new Command();
 import { pool } from './utils/DatabaseConfiguration';
 import FeedFetcher from './utils/FeedFetcher';
@@ -11,16 +11,15 @@ program.parse(process.argv);
 const options = program.opts();
 const apikey = process.env.API_KEY || options.apikey;
 
-if(!apikey){
-  console.log(`[Fetcher]: Did not receive an api key. Unable to fetch event streams. Quiting...`)
-  process.exit(1);
+if (!apikey) {
+  throw new Error(`[Fetcher]: Did not receive an api key. Unable to fetch event streams. Quiting...`);
 }
 
 console.log(`[Fetcher]: Received api key. Starting Fetcher...`);
 const fetcher = new FeedFetcher(apikey);
 
 pool.connect(async (err, client, release) => {
-  if(err){
+  if (err) {
     return console.error(`[Server]: Error trying to connect to database. Printing error:`, err.stack);
   }
 

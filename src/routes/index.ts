@@ -1,12 +1,15 @@
-﻿﻿import express from 'express';
+import { Router } from 'express';
 
-import {getMunicipalityContext, getMunicipalityPage, getMunicipalityShape} from "../municipality-registry/GemeenteController";
-import {getAddressContext, getAddressPage, getAddressShape} from '../address-registry/AdresController';
-import { getStreetNameContext, getStreetNamePage, getStreetNameShape } from '../streetname-registry/StraatnaamController';
-import { getPostalInfoContext, getPostalInfoPage, getPostalInfoShape } from '../postal-information-registry/PostinfoController';
+import { getAddressContext, getAddressPage, getAddressShape } from '../address-registry/AdresController';
 import { getDataCatalogPage } from '../data-catalog/DataCatalogController';
+import { getMunicipalityContext, getMunicipalityPage, getMunicipalityShape } from
+  '../municipality-registry/GemeenteController';
+import { getPostalInfoContext, getPostalInfoPage, getPostalInfoShape } from
+  '../postal-information-registry/PostinfoController';
+import { getStreetNameContext, getStreetNamePage, getStreetNameShape } from
+  '../streetname-registry/StraatnaamController';
 
-const router = express.Router();
+const router = Router();
 
 router.get('/', getDataCatalogPage);
 
