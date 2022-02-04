@@ -9,7 +9,6 @@ const STREETNAME_PAGE_BASE_URL = `${configuration.domainName}/straatnaam`;
 const STREETNAME_SHACL_BASE_URL = `${configuration.domainName}/straatnaam/shape`;
 const MUNICIPALITY_NAMESPACE = `https://data.vlaanderen.be/id/gemeente`;
 const STREETNAME_CONTEXT_URL = `${configuration.domainName}/straatnaam/context`;
-const PAGE_SIZE = 250;
 
 export async function getStreetNameFragment(req: Request, res: Response): Promise<void> {
   const fragmentMetadata = await handleRequestAndGetFragmentMetadata(req, res, DbTable.StreetName);

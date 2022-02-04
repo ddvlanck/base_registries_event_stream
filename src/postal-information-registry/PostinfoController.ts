@@ -28,13 +28,13 @@ export async function getPostalInfoFragment(req: Request, res: Response): Promis
   }
 }
 
-export async function getPostalInfoShape(req, res): Promise<void> {
+export async function getPostalInfoShape(req: Request, res: Response): Promise<void> {
   addContentTypeHeader(res);
   setCacheControl(res);
   res.json(buildPostalInfoShaclResponse());
 }
 
-export async function getPostalInfoContext(req, res): Promise<void> {
+export async function getPostalInfoContext(req: Request, res: Response): Promise<void> {
   addContentTypeHeader(res);
   setCacheControl(res);
   res.json(PostinfoUtils.getPostalInfoContext());

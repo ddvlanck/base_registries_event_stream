@@ -29,13 +29,13 @@ export async function getAddressFragment(req: Request, res: Response): Promise<v
 }
 
 // Get SHACL shape for address objects
-export async function getAddressShape(req, res): Promise<void> {
+export async function getAddressShape(req: Request, res: Response): Promise<void> {
   addContentTypeHeader(res);
   setCacheControl(res);
   res.json(buildAddressShaclResponse());
 }
 
-export async function getAddressContext(req, res): Promise<void> {
+export async function getAddressContext(req: Request, res: Response): Promise<void> {
   addContentTypeHeader(res);
   setCacheControl(res);
   res.json(AdresUtils.getAddressContext());
