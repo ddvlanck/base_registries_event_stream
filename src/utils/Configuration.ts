@@ -4,6 +4,7 @@ export default class Configuration {
   public database: { username: string; password: string; host: string; port: number; database: string };
   public feeds: { name: string; feedLocation: string; enabled: boolean }[];
   public domainName: string;
+  public pageSize: number;
 
   public constructor() {
     const rawdata = fs.readFileSync('config.json', 'utf8');
@@ -22,6 +23,8 @@ export default class Configuration {
     if ('DB_PORT' in process.env) {
       this.database.port = Number(process.env.DB_PORT);
     }
+
+    this.pageSize = 250;
   }
 }
 

@@ -1,31 +1,30 @@
+import type { Request, Response } from 'express';
 import { configuration } from '../utils/Configuration';
-import { db } from '../utils/DatabaseQueries';
-import { addContentTypeHeader, addHeaders, setCacheControl } from '../utils/Headers';
-import { addNext, addPrevious } from '../utils/HypermediaControls';
+import { db, DbTable } from '../utils/DatabaseQueries';
+import { addContentTypeHeader, addResponseHeaders, setCacheControl } from '../utils/Headers';
+import { buildFragment, handleRequestAndGetFragmentMetadata } from '../utils/Utils';
 import { PostinfoUtils } from './PostinfoUtils';
 
 const POSTAL_INFO_PAGE_BASE_URL = `${configuration.domainName}/postinfo`;
 const POSTAL_INFO_SHACL_BASE_URL = `${configuration.domainName}/postinfo/shape`;
 const POSTAL_INFO_CONTEXT_URL = `${configuration.domainName}/postinfo/context`;
-const PAGE_SIZE = 250;
 
-export async function getPostalInfoPage(req, res): Promise<void> {
-  const page = Number.parseInt(req.query.page, 10);
+export async function getPostalInfoFragment(req: Request, res: Response): Promise<void> {
+  const fragmentMetadata = await handleRequestAndGetFragmentMetadata(req, res, DbTable.PostalInformation);
 
-  if (!page) {
-    res.redirect('?page=1');
-  } else {
-    const items = [];
-    const stream = await db.getPostalInformationPaged(page, PAGE_SIZE);
-    stream.on('data', data => {
-      items.push(createPostalInformationEvent(data));
-    });
+  // Redirects will have no metadata, so will not pass this check
+  if (fragmentMetadata) {
+    const items = (await db.getPostalInfoItems(fragmentMetadata.index, configuration.pageSize)).rows;
+    addResponseHeaders(res, fragmentMetadata);
 
-    stream.on('end', () => {
-      console.log(`[PostinfoController]: Done transforming objects. Start creating page ${page}.`);
-      addHeaders(res, PAGE_SIZE, items.length);
-      res.json(buildPostalInfoPageResponse(items, PAGE_SIZE, page));
-    });
+    res.json(buildFragment(
+      items,
+      fragmentMetadata,
+      POSTAL_INFO_PAGE_BASE_URL,
+      POSTAL_INFO_CONTEXT_URL,
+      POSTAL_INFO_SHACL_BASE_URL,
+      createPostalInformationEvent,
+    ));
   }
 }
 
@@ -41,36 +40,6 @@ export async function getPostalInfoContext(req, res): Promise<void> {
   res.json(PostinfoUtils.getPostalInfoContext());
 }
 
-function buildPostalInfoPageResponse(items: any[], pageSize: number, page: number): any {
-  // Const response = PostinfoUtils.getPostalInfoContext();
-  const response: any = {};
-  response['@context'] = `${POSTAL_INFO_CONTEXT_URL}`;
-
-  response['@id'] = `${POSTAL_INFO_PAGE_BASE_URL}?page=${page}`;
-  response['@type'] = 'Node';
-  response.viewOf = POSTAL_INFO_PAGE_BASE_URL;
-
-  const tree = [];
-
-  addNext(tree, items.length, pageSize, page, POSTAL_INFO_PAGE_BASE_URL);
-  addPrevious(tree, items.length, page, POSTAL_INFO_PAGE_BASE_URL);
-
-  if (tree.length > 0) {
-    response['tree:relation'] = tree;
-  }
-
-  response.collectionInfo = {
-    '@id': POSTAL_INFO_PAGE_BASE_URL,
-    '@type': 'EventStream',
-    shape: POSTAL_INFO_SHACL_BASE_URL,
-    timestampPath: 'prov:generatedAtTime',
-    versionOfPath: 'dct:isVersionOf',
-  };
-  response.items = items;
-
-  return response;
-}
-
 function buildPostalInfoShaclResponse(): any {
   const response: any = PostinfoUtils.getPostalInfoShaclContext();
 
@@ -82,7 +51,7 @@ function buildPostalInfoShaclResponse(): any {
   return response;
 }
 
-function createPostalInformationEvent(data): any {
+function createPostalInformationEvent(data: any): any {
   const postInfoEvent: any = {};
 
   const hash = PostinfoUtils.createObjectHash(data);

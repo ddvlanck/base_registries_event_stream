@@ -1,32 +1,30 @@
+import type { Request, Response } from 'express';
 import { configuration } from '../utils/Configuration';
-import { db } from '../utils/DatabaseQueries';
-import { addHeaders, addContentTypeHeader, setCacheControl } from '../utils/Headers';
-import { addNext, addPrevious } from '../utils/HypermediaControls';
+import { db, DbTable } from '../utils/DatabaseQueries';
+import { addContentTypeHeader, setCacheControl, addResponseHeaders } from '../utils/Headers';
+import { buildFragment, handleRequestAndGetFragmentMetadata } from '../utils/Utils';
 import { AdresUtils } from './AdresUtils';
 
 const ADDRESS_PAGE_BASE_URL = `${configuration.domainName}/adres`;
 const ADDRESS_SHACL_BASE_URL = `${configuration.domainName}/adres/shape`;
 const ADDRESS_CONTEXT_URL = `${configuration.domainName}/adres/context`;
-const PAGE_SIZE = 250;
 
-// Get all events for all addresses
-export async function getAddressPage(req, res): Promise<void> {
-  const page = Number.parseInt(req.query.page, 10);
+export async function getAddressFragment(req: Request, res: Response): Promise<void> {
+  const fragmentMetadata = await handleRequestAndGetFragmentMetadata(req, res, DbTable.Address);
 
-  if (!page) {
-    res.redirect('?page=1');
-  } else {
-    const items = [];
-    const stream = await db.getAddressesPaged(page, PAGE_SIZE);
-    stream.on('data', data => {
-      items.push(createAddressEvent(data));
-    });
+  // Redirects will have no metadata, so will not pass this check
+  if (fragmentMetadata) {
+    const items = (await db.getAddressItems(fragmentMetadata.index, configuration.pageSize)).rows;
+    addResponseHeaders(res, fragmentMetadata);
 
-    stream.on('end', () => {
-      console.log(`[AdresController]: Done transforming objects. Start creating page ${page}.`);
-      addHeaders(res, PAGE_SIZE, items.length);
-      res.json(buildAddressPageResponse(items, PAGE_SIZE, page));
-    });
+    res.json(buildFragment(
+      items,
+      fragmentMetadata,
+      ADDRESS_PAGE_BASE_URL,
+      ADDRESS_CONTEXT_URL,
+      ADDRESS_SHACL_BASE_URL,
+      createAddressEvent,
+    ));
   }
 }
 
@@ -41,36 +39,6 @@ export async function getAddressContext(req, res): Promise<void> {
   addContentTypeHeader(res);
   setCacheControl(res);
   res.json(AdresUtils.getAddressContext());
-}
-
-function buildAddressPageResponse(items: any[], pageSize: number, page: number): any {
-  const response: any = {};
-  response['@context'] = `${ADDRESS_CONTEXT_URL}`;
-
-  response['@id'] = `${ADDRESS_PAGE_BASE_URL}?page=${page}`;
-  response['@type'] = 'Node';
-  response.viewOf = `${ADDRESS_PAGE_BASE_URL}`;
-
-  const tree = [];
-
-  addNext(tree, items.length, pageSize, page, ADDRESS_PAGE_BASE_URL);
-  addPrevious(tree, items.length, page, ADDRESS_PAGE_BASE_URL);
-
-  if (tree.length > 0) {
-    response['tree:relation'] = tree;
-  }
-
-  response.collectionInfo = {
-    '@id': ADDRESS_PAGE_BASE_URL,
-    '@type': 'EventStream',
-    shape: ADDRESS_SHACL_BASE_URL,
-    timestampPath: 'prov:generatedAtTime',
-    versionOfPath: 'dct:isVersionOf',
-  };
-
-  response.items = items;
-
-  return response;
 }
 
 function buildAddressShaclResponse(): any {
