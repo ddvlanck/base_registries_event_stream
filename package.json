@@ -1,6 +1,6 @@
 {
   "name": "base-registries-event-stream",
-  "version": "1.0.0",
+  "version": "3.3.0",
   "description": "Base registries event stream",
   "main": "index.js",
   "scripts": {
@@ -40,6 +40,7 @@
     "pg": "^8.6.0",
     "pg-query-stream": "^4.1.0",
     "sleep-promise": "^9.0.0",
+    "winston": "^3.5.1",
     "xml2js": "^0.4.23"
   }
 }

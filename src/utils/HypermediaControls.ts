@@ -1,27 +1,30 @@
-export function addNext(tree: object[], itemsLength: number, pageSize: number, page: number, baseUrl: string): void {
-  if (itemsLength > 0 && itemsLength !== pageSize) {
-    return;
-  }
+import type { IFragmentMetadata } from './FragmentMetadata';
 
-  const nextURL = `${baseUrl}?page=${page + 1}`;
+export function addTreeRelations(
+  fragmentMetadata: IFragmentMetadata,
+  baseUrl: string,
+): object[] {
+  const relations: object[] = [];
 
-  tree.push({
-    '@type': 'tree:Relation',
-    'tree:node': nextURL,
-  });
-}
-
-export function addPrevious(tree: object[], itemsLength: number, page: number, baseUrl: string): void {
-  if (page <= 1) {
-    return;
-  }
-
-  const previousURL = `${baseUrl}?page=${page - 1}`;
-
-  if (itemsLength > 0) {
-    tree.push({
-      '@type': 'tree:Relation',
-      'tree:node': previousURL,
+  if (fragmentMetadata.previousFragment.present) {
+    const previousFragmentTime = fragmentMetadata.previousFragment.value;
+    relations.push({
+      '@type': 'tree:LessThanRelation',
+      'tree:node': `${baseUrl}?generatedAtTime=${previousFragmentTime}`,
+      'tree:path': 'prov:generatedAtTime',
+      'tree:value': previousFragmentTime,
     });
   }
+
+  if (fragmentMetadata.nextFragment.present) {
+    const nextFragmentTime = fragmentMetadata.nextFragment.value;
+    relations.push({
+      '@type': 'tree:GreaterThanRelation',
+      'tree:node': `${baseUrl}?generatedAtTime=${nextFragmentTime}`,
+      'tree:path': 'prov:generatedAtTime',
+      'tree:value': nextFragmentTime,
+    });
+  }
+
+  return relations;
 }

@@ -1,74 +1,43 @@
+import type { Request, Response } from 'express';
 import { configuration } from '../utils/Configuration';
-import { db } from '../utils/DatabaseQueries';
-import { addContentTypeHeader, addHeaders, setCacheControl } from '../utils/Headers';
-import { addNext, addPrevious } from '../utils/HypermediaControls';
+import { db, DbTable } from '../utils/DatabaseQueries';
+import { addContentTypeHeader, addResponseHeaders, setCacheControl } from '../utils/Headers';
+import { buildFragment, handleRequestAndGetFragmentMetadata } from '../utils/Utils';
 import { GemeenteUtils } from './GemeenteUtils';
 
 const MUNICIPALITY_PAGE_BASE_URL = `${configuration.domainName}/gemeente`;
 const MUNICIPALITY_SHACL_BASE_URL = `${configuration.domainName}/gemeente/shape`;
 const MUNICIPALITY_CONTEXT_URL = `${configuration.domainName}/gemeente/context`;
-const PAGE_SIZE = 250;
 
-export async function getMunicipalityPage(req, res): Promise<void> {
-  const page = Number.parseInt(req.query.page, 10);
+export async function getMunicipalityFragment(req: Request, res: Response): Promise<void> {
+  const fragmentMetadata = await handleRequestAndGetFragmentMetadata(req, res, DbTable.Municipality);
 
-  if (!page) {
-    res.redirect('?page=1');
-  } else {
-    const items = [];
-    const stream = await db.getMunicipalitiesPaged(page, PAGE_SIZE);
-    stream.on('data', data => {
-      items.push(createMunicipalityEvent(data));
-    });
+  // Redirects will have no metadata, so will not pass this check
+  if (fragmentMetadata) {
+    const items = (await db.getMunicipalityItems(fragmentMetadata.index, configuration.pageSize)).rows;
+    addResponseHeaders(res, fragmentMetadata);
 
-    stream.on('end', () => {
-      console.log(`[GemeenteController]: Done transforming objects. Start creating page ${page}.`);
-      addHeaders(res, PAGE_SIZE, items.length);
-      res.json(buildMunicipalityPageResponse(items, PAGE_SIZE, page));
-    });
+    res.json(buildFragment(
+      items,
+      fragmentMetadata,
+      MUNICIPALITY_PAGE_BASE_URL,
+      MUNICIPALITY_CONTEXT_URL,
+      MUNICIPALITY_SHACL_BASE_URL,
+      createMunicipalityEvent,
+    ));
   }
 }
 
-export async function getMunicipalityShape(req, res): Promise<void> {
+export async function getMunicipalityShape(req: Request, res: Response): Promise<void> {
   addContentTypeHeader(res);
   setCacheControl(res);
   res.json(buildMunicipalityShaclResponse());
 }
 
-export async function getMunicipalityContext(req, res): Promise<void> {
+export async function getMunicipalityContext(req: Request, res: Response): Promise<void> {
   addContentTypeHeader(res);
   setCacheControl(res);
   res.json(GemeenteUtils.getMunicipalityContext());
-}
-
-function buildMunicipalityPageResponse(items: any[], pageSize: number, page: number): any {
-  const response: any = {};
-  response['@context'] = `${MUNICIPALITY_CONTEXT_URL}`;
-
-  response['@id'] = `${MUNICIPALITY_PAGE_BASE_URL}?page=${page}`;
-  response['@type'] = 'Node';
-  response.viewOf = `${MUNICIPALITY_PAGE_BASE_URL}`;
-
-  const tree = [];
-
-  addNext(tree, items.length, pageSize, page, MUNICIPALITY_PAGE_BASE_URL);
-  addPrevious(tree, items.length, page, MUNICIPALITY_PAGE_BASE_URL);
-
-  if (tree.length > 0) {
-    response['tree:relation'] = tree;
-  }
-
-  response.collectionInfo = {
-    '@id': MUNICIPALITY_PAGE_BASE_URL,
-    '@type': 'EventStream',
-    shape: MUNICIPALITY_SHACL_BASE_URL,
-    timestampPath: 'prov:generatedAtTime',
-    versionOfPath: 'dct:isVersionOf',
-  };
-
-  response.items = items;
-
-  return response;
 }
 
 function buildMunicipalityShaclResponse(): any {
@@ -82,7 +51,7 @@ function buildMunicipalityShaclResponse(): any {
   return response;
 }
 
-function createMunicipalityEvent(data): any {
+function createMunicipalityEvent(data: any): any {
   const municipalityEvent: any = {};
 
   const hash = GemeenteUtils.createObjectHash(data);

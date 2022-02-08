@@ -2,82 +2,122 @@ import type { PoolClient } from 'pg';
 import { pool } from './DatabaseConfiguration';
 const QueryStream = require('pg-query-stream');
 
+export const enum DbTable {
+  Municipality = 'brs.municipalities',
+  PostalInformation = 'brs.postal_information',
+  StreetName = 'brs.street_names',
+  Address = 'brs.addresses'
+}
+
 export default class DatabaseQueries {
   // #region "SELECT queries"
 
-  public async getAddressesPaged(page: number, pageSize: number): Promise<any> {
+  public async getDistinctGeneratedAtTimesWithIndexNumber(table: DbTable, size: number): Promise<any> {
     const client = await pool.connect();
-    const [low, high] = this.getIndexRange(page, pageSize);
 
-    const ADDRESSES_PAGED = `
+    const DISTINCT_GENERATED_AT_TIME_QUERY = `
+      SELECT record_generated_time, index_number
+      FROM (
+        SELECT record_generated_time, index_number, row_number() OVER (ORDER BY record_generated_time ASC) - 1 rownr
+        FROM ${table}
+        GROUP BY record_generated_time, index_number
+      ) AS distinctGeneratedAtTimes
+      WHERE rownr % ${size} = 0
+      ORDER BY index_number ASC`;
+
+    try {
+      return client.query(DISTINCT_GENERATED_AT_TIME_QUERY);
+    } finally {
+      client.release();
+    }
+  }
+
+  public async getClosestFragment(
+    table: DbTable,
+    generatedAtTime: string,
+    distinctGeneratedAtTimes: string[],
+  ): Promise<any> {
+    const client = await pool.connect();
+
+    const CLOSEST_FRAGMENT_QUERY = `
+      SELECT MAX(record_generated_time) AS time
+      FROM ${table}
+      WHERE record_generated_time <= $1
+      AND record_generated_time = ANY ($2)`;
+
+    try {
+      return client.query(CLOSEST_FRAGMENT_QUERY, [generatedAtTime, distinctGeneratedAtTimes]);
+    } finally {
+      client.release();
+    }
+  }
+
+  public async getAddressItems(startIndex: number, pageSize: number): Promise<any> {
+    const client = await pool.connect();
+
+    const ADDRESS_QUERY = `
       SELECT *, 
         brs.address_streetname.persistent_identifier AS streetname_puri,
         brs.address_municipality.persistent_identifier AS municipality_puri,
         brs.address_municipality.municipality_name AS municipality_name
       FROM (
         SELECT * FROM brs.addresses
-        WHERE index_number BETWEEN ${low} AND ${high}
+        WHERE index_number BETWEEN ${startIndex} AND ${startIndex + pageSize - 1}
         ORDER BY index_number ASC) AS T1
       INNER JOIN brs.address_streetname ON T1.streetname_id = brs.address_streetname.streetname_id
-      INNER JOIN brs.address_municipality ON brs.address_streetname.nis_code = brs.address_municipality.nis_code`;
-
-    try {
-      const query = new QueryStream(ADDRESSES_PAGED);
-      return client.query(query);
-    } finally {
-      client.release();
-    }
-  }
-
-  public async getStreetNamesPaged(page: number, pageSize: number): Promise<any> {
-    const client = await pool.connect();
-    const [low, high] = this.getIndexRange(page, pageSize);
-
-    const STREET_NAMES_PAGED = `
-      SELECT *
-      FROM brs.street_names
-      WHERE index_number BETWEEN ${low} AND ${high}
+      INNER JOIN brs.address_municipality ON brs.address_streetname.nis_code = brs.address_municipality.nis_code
       ORDER BY index_number ASC`;
 
     try {
-      const query = new QueryStream(STREET_NAMES_PAGED);
-      return client.query(query);
+      return client.query(ADDRESS_QUERY);
     } finally {
       client.release();
     }
   }
 
-  public async getPostalInformationPaged(page: number, pageSize: number): Promise<any> {
+  public async getMunicipalityItems(startIndex: number, pageSize: number): Promise<any> {
     const client = await pool.connect();
-    const [low, high] = this.getIndexRange(page, pageSize);
 
-    const POSTAL_INFORMATION_PAGED = `
-      SELECT *
-      FROM brs.postal_information
-      WHERE index_number BETWEEN ${low} AND ${high}
-      ORDER BY index_number ASC`;
-
-    try {
-      const query = new QueryStream(POSTAL_INFORMATION_PAGED);
-      return client.query(query);
-    } finally {
-      client.release();
-    }
-  }
-
-  public async getMunicipalitiesPaged(page: number, pageSize: number): Promise<any> {
-    const client = await pool.connect();
-    const [low, high] = this.getIndexRange(page, pageSize);
-
-    const MUNICIPALITIES_PAGED = `
+    const MUNICIPALITY_QUERY = `
       SELECT *
       FROM brs.municipalities
-      WHERE index_number BETWEEN ${low} AND ${high}
+      WHERE index_number BETWEEN ${startIndex} AND ${startIndex + pageSize - 1}
       ORDER BY index_number ASC`;
 
     try {
-      const query = new QueryStream(MUNICIPALITIES_PAGED);
-      return client.query(query);
+      return client.query(MUNICIPALITY_QUERY);
+    } finally {
+      client.release();
+    }
+  }
+
+  public async getPostalInfoItems(startIndex: number, pageSize: number): Promise<any> {
+    const client = await pool.connect();
+
+    const MUNICIPALITY_QUERY = `
+      SELECT *
+      FROM brs.postal_information
+      WHERE index_number BETWEEN ${startIndex} AND ${startIndex + pageSize - 1}
+      ORDER BY index_number ASC`;
+
+    try {
+      return client.query(MUNICIPALITY_QUERY);
+    } finally {
+      client.release();
+    }
+  }
+
+  public async getStreetNameItems(startIndex: number, pageSize: number): Promise<any> {
+    const client = await pool.connect();
+
+    const STREETNAME_QUERY = `
+      SELECT *
+      FROM brs.street_names
+      WHERE index_number BETWEEN ${startIndex} AND ${startIndex + pageSize - 1}
+      ORDER BY index_number ASC`;
+
+    try {
+      return client.query(STREETNAME_QUERY);
     } finally {
       client.release();
     }

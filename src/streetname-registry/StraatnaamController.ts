@@ -1,33 +1,31 @@
+import type { Request, Response } from 'express';
 import { configuration } from '../utils/Configuration';
-import { db } from '../utils/DatabaseQueries';
-import { addContentTypeHeader, addHeaders, setCacheControl } from '../utils/Headers';
-import { addNext, addPrevious } from '../utils/HypermediaControls';
+import { db, DbTable } from '../utils/DatabaseQueries';
+import { addContentTypeHeader, addResponseHeaders, setCacheControl } from '../utils/Headers';
+import { buildFragment, handleRequestAndGetFragmentMetadata } from '../utils/Utils';
 import { StraatnaamUtils } from './StraatnaamUtils';
 
 const STREETNAME_PAGE_BASE_URL = `${configuration.domainName}/straatnaam`;
 const STREETNAME_SHACL_BASE_URL = `${configuration.domainName}/straatnaam/shape`;
 const MUNICIPALITY_NAMESPACE = `https://data.vlaanderen.be/id/gemeente`;
 const STREETNAME_CONTEXT_URL = `${configuration.domainName}/straatnaam/context`;
-const PAGE_SIZE = 250;
 
-// Get all events for all street names
-export async function getStreetNamePage(req, res): Promise<void> {
-  const page = Number.parseInt(req.query.page, 10);
+export async function getStreetNameFragment(req: Request, res: Response): Promise<void> {
+  const fragmentMetadata = await handleRequestAndGetFragmentMetadata(req, res, DbTable.StreetName);
 
-  if (!page) {
-    res.redirect('?page=1');
-  } else {
-    const items = [];
-    const stream = await db.getStreetNamesPaged(page, PAGE_SIZE);
-    stream.on('data', data => {
-      items.push(createStreetNameEvent(data));
-    });
+  // Redirects will have no metadata, so will not pass this check
+  if (fragmentMetadata) {
+    const items = (await db.getStreetNameItems(fragmentMetadata.index, configuration.pageSize)).rows;
+    addResponseHeaders(res, fragmentMetadata);
 
-    stream.on('end', () => {
-      console.log(`[StraatnaamController]: Done transforming objects. Start creating page ${page}.`);
-      addHeaders(res, PAGE_SIZE, items.length);
-      res.json(buildStreetNamePageResponse(items, PAGE_SIZE, page));
-    });
+    res.json(buildFragment(
+      items,
+      fragmentMetadata,
+      STREETNAME_PAGE_BASE_URL,
+      STREETNAME_CONTEXT_URL,
+      STREETNAME_SHACL_BASE_URL,
+      createStreetNameEvent,
+    ));
   }
 }
 
@@ -41,36 +39,6 @@ export async function getStreetNameContext(req, res): Promise<void> {
   addContentTypeHeader(res);
   setCacheControl(res);
   res.json(StraatnaamUtils.getStreetNameContext());
-}
-
-function buildStreetNamePageResponse(items: any[], pageSize: number, page: number): any {
-  const response: any = {};
-  response['@context'] = `${STREETNAME_CONTEXT_URL}`;
-
-  response['@id'] = `${STREETNAME_PAGE_BASE_URL}?page=${page}`;
-  response['@type'] = 'Node';
-  response.viewOf = `${STREETNAME_PAGE_BASE_URL}`;
-
-  const tree = [];
-
-  addNext(tree, items.length, pageSize, page, STREETNAME_PAGE_BASE_URL);
-  addPrevious(tree, items.length, page, STREETNAME_PAGE_BASE_URL);
-
-  if (tree.length > 0) {
-    response['tree:relation'] = tree;
-  }
-
-  response.collectionInfo = {
-    '@id': STREETNAME_PAGE_BASE_URL,
-    shape: STREETNAME_SHACL_BASE_URL,
-    '@type': 'EventStream',
-    timestampPath: 'prov:generatedAtTime',
-    versionOfPath: 'dct:isVersionOf',
-  };
-
-  response.items = items;
-
-  return response;
 }
 
 function buildStreetNameShaclResponse(): any {
