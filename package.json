@@ -1,6 +1,6 @@
 {
   "name": "base-registries-event-stream",
-  "version": "3.3.0",
+  "version": "4.0.0",
   "description": "Base registries event stream",
   "main": "index.js",
   "scripts": {
