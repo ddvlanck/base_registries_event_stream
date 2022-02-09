@@ -53,10 +53,10 @@ The API is available through its own port `3000` or through nginx (port `5000`)
 
 The API endpoints that are available are the following:
 
-- `/adres{?page}` - This endpoint will return all events for **all addresses**
-- `/straatnaam{?page}` - This endpoint will return all events for **all street names**
-- `/postinfo{?page}` - This endpoint will return all events for **all postal info events**
-- `/gemeente{?page}`- This endpoint will return all events for **all municipality events**
+- `/adres{?generatedAtTime}` - This endpoint will return all events for **all addresses**
+- `/straatnaam{?generatedAtTime}` - This endpoint will return all events for **all street names**
+- `/postinfo{?generatedAtTime}` - This endpoint will return all events for **all postal info events**
+- `/gemeente{?generatedAtTime}`- This endpoint will return all events for **all municipality events**
 
 ## Important note
 
