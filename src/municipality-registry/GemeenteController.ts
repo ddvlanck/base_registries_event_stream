@@ -2,12 +2,13 @@ import type { Request, Response } from 'express';
 import { configuration } from '../utils/Configuration';
 import { db, DbTable } from '../utils/DatabaseQueries';
 import { addContentTypeHeader, addResponseHeaders, setCacheControl } from '../utils/Headers';
-import { buildFragment, handleRequestAndGetFragmentMetadata } from '../utils/Utils';
+import { buildFragment, buildVersionObjectSubjectPage, handleRequestAndGetFragmentMetadata } from '../utils/Utils';
 import { GemeenteUtils } from './GemeenteUtils';
 
 const MUNICIPALITY_PAGE_BASE_URL = `${configuration.domainName}/gemeente`;
 const MUNICIPALITY_SHACL_BASE_URL = `${configuration.domainName}/gemeente/shape`;
 const MUNICIPALITY_CONTEXT_URL = `${configuration.domainName}/gemeente/context`;
+const MUNICIPALITY_ID = `${configuration.domainName}/id/gemeente`;
 
 export async function getMunicipalityFragment(req: Request, res: Response): Promise<void> {
   const fragmentMetadata = await handleRequestAndGetFragmentMetadata(req, res, DbTable.Municipality);
@@ -40,6 +41,16 @@ export async function getMunicipalityContext(req: Request, res: Response): Promi
   res.json(GemeenteUtils.getMunicipalityContext());
 }
 
+export async function getMunicipalityVersionObject(req: Request, res: Response): Promise<void> {
+  const municipalityId = req.params.municipalityId;
+  const versionTimestamp = req.params.versionTimestamp;
+
+  const versionObjectData = (await db.getVersionObject(DbTable.Municipality, municipalityId, versionTimestamp)).rows[0];
+  const versionObject = createMunicipalityEvent(versionObjectData);
+
+  res.json(buildVersionObjectSubjectPage(versionObject, MUNICIPALITY_CONTEXT_URL));
+}
+
 function buildMunicipalityShaclResponse(): any {
   const response: any = GemeenteUtils.getMunicipalityShaclContext();
 
@@ -56,7 +67,8 @@ function createMunicipalityEvent(data: any): any {
 
   const hash = GemeenteUtils.createObjectHash(data);
 
-  municipalityEvent['@id'] = `${MUNICIPALITY_PAGE_BASE_URL}#${hash}`;
+  //municipalityEvent['@id'] = `${MUNICIPALITY_PAGE_BASE_URL}#${hash}`;
+  municipalityEvent['@id'] = `${MUNICIPALITY_ID}/${data.object_id}/${data.record_generated_time}`;
   municipalityEvent.isVersionOf = data.object_uri;
   municipalityEvent.generatedAtTime = data.record_generated_time;
   municipalityEvent.created = data.timestamp;

@@ -2,13 +2,14 @@ import type { Request, Response } from 'express';
 import { configuration } from '../utils/Configuration';
 import { db, DbTable } from '../utils/DatabaseQueries';
 import { addContentTypeHeader, addResponseHeaders, setCacheControl } from '../utils/Headers';
-import { buildFragment, handleRequestAndGetFragmentMetadata } from '../utils/Utils';
+import { buildFragment, buildVersionObjectSubjectPage, handleRequestAndGetFragmentMetadata } from '../utils/Utils';
 import { StraatnaamUtils } from './StraatnaamUtils';
 
 const STREETNAME_PAGE_BASE_URL = `${configuration.domainName}/straatnaam`;
 const STREETNAME_SHACL_BASE_URL = `${configuration.domainName}/straatnaam/shape`;
 const MUNICIPALITY_NAMESPACE = `https://data.vlaanderen.be/id/gemeente`;
 const STREETNAME_CONTEXT_URL = `${configuration.domainName}/straatnaam/context`;
+const STREETNAME_ID = `${configuration.domainName}/id/straatnaam`;
 
 export async function getStreetNameFragment(req: Request, res: Response): Promise<void> {
   const fragmentMetadata = await handleRequestAndGetFragmentMetadata(req, res, DbTable.StreetName);
@@ -41,6 +42,16 @@ export async function getStreetNameContext(req, res): Promise<void> {
   res.json(StraatnaamUtils.getStreetNameContext());
 }
 
+export async function getStreetNameVersionObject(req: Request, res: Response): Promise<void> {
+  const streetNameId = req.params.streetNameId;
+  const versionTimestamp = req.params.versionTimestamp;
+
+  const versionObjectData = (await db.getVersionObject(DbTable.StreetName, streetNameId, versionTimestamp)).rows[0];
+  const versionObject = createStreetNameEvent(versionObjectData);
+
+  res.json(buildVersionObjectSubjectPage(versionObject, STREETNAME_CONTEXT_URL));
+}
+
 function buildStreetNameShaclResponse(): any {
   const response: any = StraatnaamUtils.getStreetNameShaclContext();
 
@@ -57,7 +68,8 @@ function createStreetNameEvent(data): any {
 
   const hash = StraatnaamUtils.createObjectHash(data);
 
-  streetNameEvent['@id'] = `${STREETNAME_PAGE_BASE_URL}#${hash}`;
+  //streetNameEvent['@id'] = `${STREETNAME_PAGE_BASE_URL}#${hash}`;
+  streetNameEvent['@id'] = `${STREETNAME_ID}/${data.object_id}/${data.record_generated_time}`;
   streetNameEvent.isVersionOf = data.object_uri;
   streetNameEvent.generatedAtTime = data.record_generated_time;
   streetNameEvent.created = data.timestamp;

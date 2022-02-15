@@ -123,6 +123,42 @@ export default class DatabaseQueries {
     }
   }
 
+  public async getVersionObject(table: DbTable, objectId: string, versionTimestamp: string): Promise<any> {
+    const client = await pool.connect();
+
+    const VERSION_OBJECT_QUERY = `
+      SELECT *
+      FROM ${table}
+      WHERE object_id = $1 and record_generated_time = $2`;
+
+    try {
+      return client.query(VERSION_OBJECT_QUERY, [objectId, versionTimestamp]);
+    } finally {
+      client.release();
+    }
+  }
+
+  public async getAddressVersionObject(objectId: string, versionTimestamp: string): Promise<any> {
+    const client = await pool.connect();
+
+    const ADDRESS_VERSION_OBJECT_QUERY = `
+      SELECT *,
+        brs.address_streetname.persistent_identifier AS streetname_puri,
+        brs.address_municipality.persistent_identifier AS municipality_puri,
+        brs.address_municipality.municipality_name AS municipality_name
+      FROM (
+        SELECT * FROM brs.addresses
+        WHERE object_id = $1 and record_generated_time = $2) AS T1
+      INNER JOIN brs.address_streetname ON T1.streetname_id = brs.address_streetname.streetname_id
+      INNER JOIN brs.address_municipality ON brs.address_streetname.nis_code = brs.address_municipality.nis_code`;
+
+    try {
+      return client.query(ADDRESS_VERSION_OBJECT_QUERY, [objectId, versionTimestamp]);
+    } finally {
+      client.release();
+    }
+  }
+
   // #endregion "Select queries"
 
   // #region "Database utils"

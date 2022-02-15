@@ -2,12 +2,13 @@ import type { Request, Response } from 'express';
 import { configuration } from '../utils/Configuration';
 import { db, DbTable } from '../utils/DatabaseQueries';
 import { addContentTypeHeader, addResponseHeaders, setCacheControl } from '../utils/Headers';
-import { buildFragment, handleRequestAndGetFragmentMetadata } from '../utils/Utils';
+import { buildFragment, buildVersionObjectSubjectPage, handleRequestAndGetFragmentMetadata } from '../utils/Utils';
 import { PostinfoUtils } from './PostinfoUtils';
 
 const POSTAL_INFO_PAGE_BASE_URL = `${configuration.domainName}/postinfo`;
 const POSTAL_INFO_SHACL_BASE_URL = `${configuration.domainName}/postinfo/shape`;
 const POSTAL_INFO_CONTEXT_URL = `${configuration.domainName}/postinfo/context`;
+const POSTAL_INFO_ID = `${configuration.domainName}/id/postinfo`;
 
 export async function getPostalInfoFragment(req: Request, res: Response): Promise<void> {
   const fragmentMetadata = await handleRequestAndGetFragmentMetadata(req, res, DbTable.PostalInformation);
@@ -40,6 +41,16 @@ export async function getPostalInfoContext(req: Request, res: Response): Promise
   res.json(PostinfoUtils.getPostalInfoContext());
 }
 
+export async function getPostalInformationVersionObject(req: Request, res: Response): Promise<void> {
+  const postalInfoId = req.params.postalInfoId;
+  const timestamp = req.params.versionTimestamp;
+
+  const versionObjectData = (await db.getVersionObject(DbTable.PostalInformation, postalInfoId, timestamp)).rows[0];
+  const versionObject = createPostalInformationEvent(versionObjectData);
+
+  res.json(buildVersionObjectSubjectPage(versionObject, POSTAL_INFO_CONTEXT_URL));
+}
+
 function buildPostalInfoShaclResponse(): any {
   const response: any = PostinfoUtils.getPostalInfoShaclContext();
 
@@ -56,7 +67,8 @@ function createPostalInformationEvent(data: any): any {
 
   const hash = PostinfoUtils.createObjectHash(data);
 
-  postInfoEvent['@id'] = `${POSTAL_INFO_PAGE_BASE_URL}#${hash}`;
+  //postInfoEvent['@id'] = `${POSTAL_INFO_PAGE_BASE_URL}#${hash}`;
+  postInfoEvent['@id'] = `${POSTAL_INFO_ID}/${data.object_id}/${data.record_generated_time}`;
   postInfoEvent.isVersionOf = data.object_uri;
   postInfoEvent.generatedAtTime = data.record_generated_time;
   postInfoEvent.created = data.timestamp;

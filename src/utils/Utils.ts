@@ -102,3 +102,12 @@ export function buildFragment(
 
   return fragment;
 }
+
+export function buildVersionObjectSubjectPage(versionObject: any, contextUrl: string): any {
+  let subjectPage: any = {};
+
+  subjectPage['@context'] = contextUrl;
+  subjectPage = { ...subjectPage, ...versionObject };
+
+  return subjectPage;
+}

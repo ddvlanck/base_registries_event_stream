@@ -2,12 +2,13 @@ import type { Request, Response } from 'express';
 import { configuration } from '../utils/Configuration';
 import { db, DbTable } from '../utils/DatabaseQueries';
 import { addContentTypeHeader, setCacheControl, addResponseHeaders } from '../utils/Headers';
-import { buildFragment, handleRequestAndGetFragmentMetadata } from '../utils/Utils';
+import { buildFragment, buildVersionObjectSubjectPage, handleRequestAndGetFragmentMetadata } from '../utils/Utils';
 import { AdresUtils } from './AdresUtils';
 
 const ADDRESS_PAGE_BASE_URL = `${configuration.domainName}/adres`;
 const ADDRESS_SHACL_BASE_URL = `${configuration.domainName}/adres/shape`;
 const ADDRESS_CONTEXT_URL = `${configuration.domainName}/adres/context`;
+const ADDRESS_ID = `${configuration.domainName}/id/adres`;
 
 export async function getAddressFragment(req: Request, res: Response): Promise<void> {
   const fragmentMetadata = await handleRequestAndGetFragmentMetadata(req, res, DbTable.Address);
@@ -41,6 +42,16 @@ export async function getAddressContext(req: Request, res: Response): Promise<vo
   res.json(AdresUtils.getAddressContext());
 }
 
+export async function getAddressVersionObject(req: Request, res: Response): Promise<void> {
+  const addressId = req.params.addressId;
+  const versionTimestamp = req.params.versionTimestamp;
+
+  const versionObjectData = (await db.getAddressVersionObject(addressId, versionTimestamp)).rows[0];
+  const versionObject = createAddressEvent(versionObjectData);
+
+  res.json(buildVersionObjectSubjectPage(versionObject, ADDRESS_CONTEXT_URL));
+}
+
 function buildAddressShaclResponse(): any {
   const response: any = AdresUtils.getAddressShaclContext();
 
@@ -57,7 +68,8 @@ function createAddressEvent(data: any): any {
 
   const hash = AdresUtils.createObjectHash(data);
 
-  addressEvent['@id'] = `${ADDRESS_PAGE_BASE_URL}#${hash}`;
+  //addressEvent['@id'] = `${ADDRESS_PAGE_BASE_URL}#${hash}`;
+  addressEvent['@id'] = `${ADDRESS_ID}/${data.object_id}/${data.record_generated_time}`;
   addressEvent.isVersionOf = data.object_uri;
   addressEvent.generatedAtTime = data.record_generated_time;
   addressEvent.created = data.timestamp;
