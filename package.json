@@ -22,7 +22,7 @@
     "@types/pg": "8.6.4",
     "@types/xml2js": "0.4.9",
     "eslint": "8.10.0",
-    "eslint-config-es": "4.1.0",
+    "eslint-config-es": "4.2.0",
     "eslint-import-resolver-typescript": "2.5.0",
     "eslint-plugin-import": "2.25.4",
     "eslint-plugin-tsdoc": "0.2.14",
