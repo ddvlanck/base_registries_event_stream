@@ -55,10 +55,13 @@ export async function getAddressVersionObject(req: Request, res: Response): Prom
 function buildAddressShaclResponse(): any {
   const response: any = AdresUtils.getAddressShaclContext();
 
-  response['@id'] = ADDRESS_SHACL_BASE_URL;
-  response['@type'] = 'NodeShape';
-  response.shapeOf = ADDRESS_PAGE_BASE_URL;
-  response['sh:property'] = AdresUtils.getAddressShape();
+  response['@id'] = ADDRESS_PAGE_BASE_URL;
+  response['@type'] = 'EventStream';
+  response.shape = {
+    '@id': ADDRESS_SHACL_BASE_URL,
+    '@type': 'NodeShape',
+    'sh:property': AdresUtils.getAddressShape()
+  }
 
   return response;
 }
@@ -66,15 +69,11 @@ function buildAddressShaclResponse(): any {
 function createAddressEvent(data: any): any {
   const addressEvent: any = {};
 
-  const hash = AdresUtils.createObjectHash(data);
-
-  //addressEvent['@id'] = `${ADDRESS_PAGE_BASE_URL}#${hash}`;
   addressEvent['@id'] = `${ADDRESS_ID}/${data.object_id}/${data.record_generated_time}`;
   addressEvent.isVersionOf = data.object_uri;
   addressEvent.generatedAtTime = data.record_generated_time;
   addressEvent.created = data.timestamp;
   addressEvent.eventName = data.event_name;
-  addressEvent.memberOf = ADDRESS_PAGE_BASE_URL;
 
   addressEvent['@type'] = 'BelgischAdres';
 
@@ -86,7 +85,7 @@ function createAddressEvent(data: any): any {
     addressEvent.huisnummer = data.house_number;
   }
 
-  addressEvent.heeftStreetnaam = data.streetname_puri;
+  addressEvent.heeftStraatnaam = data.streetname_puri;
   addressEvent.heeftGemeentenaam = {
     '@type': 'Gemeentenaam',
     gemeentenaam: JSON.parse(data.municipality_name),

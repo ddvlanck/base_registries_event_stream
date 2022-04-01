@@ -112,32 +112,48 @@ export const StraatnaamUtils = {
     return {
       '@context': [
         {
+          ldes: 'https://w3id.org/ldes#',
           tree: 'https://w3id.org/tree#',
+          adres: 'https://data.vlaanderen.be/ns/adres#',
           xsd: 'http://www.w3.org/2001/XMLSchema#',
           prov: 'http://www.w3.org/ns/prov#',
           dct: 'http://purl.org/dc/terms/',
           adms: 'http://www.w3.org/ns/adms#',
           rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
           rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
-          adres: 'https://data.vlaanderen.be/ns/adres#',
-          ldes: 'https://w3id.org/ldes#',
-          items: '@included',
-          collectionInfo: '@included',
-          isVersionOf: {
-            '@id': 'dct:isVersionOf',
+          EventStream: 'ldes:EventStream',
+          Node: 'tree:Node',
+          eventName: 'adms:versionNotes',
+          view: 'tree:view',
+          member: 'tree:member',
+          relation: 'tree:relation',
+          timestampPath: {
+            '@id': 'ldes:timestampPath',
             '@type': '@id',
+          },
+          versionOfPath: {
+            '@id': 'ldes:versionOfPath',
+            '@type': '@id',
+          },
+          shape: {
+            '@id': 'tree:shape',
+            '@type': '@id'
+          },
+          "tree:node": {
+            "@type": "@id"
+          },
+          "tree:path": {
+            "@type": "@id"
+          },
+          "tree:value": {
+            "@type": "xsd:dateTime"
           },
           generatedAtTime: {
             '@id': 'prov:generatedAtTime',
             '@type': 'xsd:dateTime',
           },
-          eventName: 'adms:versionNotes',
-          memberOf: {
-            '@reverse': 'tree:member',
-            '@type': '@id',
-          },
-          viewOf: {
-            '@reverse': 'tree:view',
+          isVersionOf: {
+            '@id': 'dct:isVersionOf',
             '@type': '@id',
           },
           Straatnaam: 'adres:Straatnaam',
@@ -158,27 +174,10 @@ export const StraatnaamUtils = {
             '@id': 'adres:Straatnaam.homoniemToevoeging',
             '@type': 'xsd:string',
           },
-          shape: {
-            '@id': 'tree:shape',
-            '@type': '@id',
-          },
-          'tree:node': {
-            '@type': '@id',
-          },
           created: {
             '@id': 'dct:created',
             '@type': 'xsd:dateTime',
           },
-          timestampPath: {
-            '@id': 'ldes:timestampPath',
-            '@type': '@id',
-          },
-          versionOfPath: {
-            '@id': 'ldes:versionOfPath',
-            '@type': '@id',
-          },
-          EventStream: 'ldes:EventStream',
-          Node: 'tree:Node',
         },
       ],
     };
@@ -190,17 +189,16 @@ export const StraatnaamUtils = {
         rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
         xsd: 'http://www.w3.org/2001/XMLSchema#',
         tree: 'https://w3id.org/tree#',
+        ldes: 'https://w3id.org/ldes#',
         skos: 'http://www.w3.org/2004/02/skos/core#',
         prov: 'http://www.w3.org/ns/prov#',
         dct: 'http://purl.org/dc/terms/',
         adms: 'http://www.w3.org/ns/adms#',
         adres: 'https://data.vlaanderen.be/ns/adres#',
         rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
-        shapeOf: {
-          '@reverse': 'tree:shape',
-          '@type': '@id',
-        },
+        EventStream: 'ldes:EventStream',
         NodeShape: 'sh:NodeShape',
+        shape: 'tree:shape',
         'sh:nodeKind': {
           '@type': '@id',
         },

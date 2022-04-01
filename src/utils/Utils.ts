@@ -80,25 +80,21 @@ export function buildFragment(
   const fragment: any = {};
 
   fragment['@context'] = contextUrl;
-  fragment['@id'] = `${pageUrl}?generatedAtTime=${fragmentMetadata.time.toISOString()}`;
-  fragment['@type'] = 'Node';
-  fragment.viewOf = pageUrl;
+  fragment['@id'] = pageUrl;
+  fragment['@type'] = 'EventStream';
+  fragment.shape = shaclUrl;
+  fragment.timestampPath = `prov:generatedAtTime`;
+  fragment.versionOfPath = `dct:isVersionOf`;
 
   const relations = addTreeRelations(fragmentMetadata, pageUrl);
 
-  if (relations.length > 0) {
-    fragment['tree:relation'] = relations;
+  fragment.view = {
+    '@id': `${pageUrl}?generatedAtTime=${fragmentMetadata.time.toISOString()}`,
+    '@type': 'Node',
+    ...relations.length > 0 && { 'tree:relation': relations }
   }
 
-  fragment.collectionInfo = {
-    '@id': pageUrl,
-    '@type': 'EventStream',
-    shape: shaclUrl,
-    timestampPath: 'prov:generatedAtTime',
-    versionOfPath: 'dct:isVersionOf',
-  };
-
-  fragment.items = items.map(item => createMember(item));
+  fragment['tree:member'] = items.map(item => createMember(item));
 
   return fragment;
 }

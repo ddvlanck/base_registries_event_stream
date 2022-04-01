@@ -54,10 +54,13 @@ export async function getMunicipalityVersionObject(req: Request, res: Response):
 function buildMunicipalityShaclResponse(): any {
   const response: any = GemeenteUtils.getMunicipalityShaclContext();
 
-  response['@id'] = MUNICIPALITY_SHACL_BASE_URL;
-  response['@type'] = 'NodeShape';
-  response.shapeOf = MUNICIPALITY_PAGE_BASE_URL;
-  response['sh:property'] = GemeenteUtils.getMunicipalityShape();
+  response['@id'] = MUNICIPALITY_PAGE_BASE_URL;
+  response['@type'] = 'EventStream'
+  response.shape = {
+    '@id': MUNICIPALITY_SHACL_BASE_URL,
+    '@type': 'NodeShape',
+    'sh:property': GemeenteUtils.getMunicipalityShape()
+  }
 
   return response;
 }
@@ -65,15 +68,11 @@ function buildMunicipalityShaclResponse(): any {
 function createMunicipalityEvent(data: any): any {
   const municipalityEvent: any = {};
 
-  const hash = GemeenteUtils.createObjectHash(data);
-
-  //municipalityEvent['@id'] = `${MUNICIPALITY_PAGE_BASE_URL}#${hash}`;
   municipalityEvent['@id'] = `${MUNICIPALITY_ID}/${data.object_id}/${data.record_generated_time}`;
   municipalityEvent.isVersionOf = data.object_uri;
   municipalityEvent.generatedAtTime = data.record_generated_time;
   municipalityEvent.created = data.timestamp;
   municipalityEvent.eventName = data.event_name;
-  municipalityEvent.memberOf = MUNICIPALITY_PAGE_BASE_URL;
 
   municipalityEvent['@type'] = 'Gemeente';
   municipalityEvent.gemeentenaam = data.municipality_name;

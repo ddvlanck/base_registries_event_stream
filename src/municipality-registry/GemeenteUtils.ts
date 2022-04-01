@@ -106,26 +106,42 @@ export const GemeenteUtils = {
   getMunicipalityContext() {
     return {
       '@context': {
+        tree: 'https://w3id.org/tree#',
+        ldes: 'https://w3id.org/ldes#',
+        br: 'https://basisregisters.vlaanderen.be/ns/adres#',
         xsd: 'http://www.w3.org/2001/XMLSchema#',
         prov: 'http://www.w3.org/ns/prov#',
-        tree: 'https://w3id.org/tree#',
         skos: 'http://www.w3.org/2004/02/skos/core#',
         dct: 'http://purl.org/dc/terms/',
         adms: 'http://www.w3.org/ns/adms#',
-        br: 'https://basisregisters.vlaanderen.be/ns/adres#',
         rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
         rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
-        ldes: 'https://w3id.org/ldes#',
-        items: '@included',
-        collectionInfo: '@included',
+        "Node": "tree:Node",
+        "EventStream": "ldes:EventStream",
         eventName: 'adms:versionNotes',
-        viewOf: {
-          '@reverse': 'tree:view',
+        view: 'tree:view',
+        member: 'tree:member',
+        relation: 'tree:relation',
+        timestampPath: {
+          '@id': 'ldes:timestampPath',
           '@type': '@id',
         },
-        memberOf: {
-          '@reverse': 'tree:member',
+        versionOfPath: {
+          '@id': 'ldes:versionOfPath',
           '@type': '@id',
+        },
+        shape: {
+          '@id': 'tree:shape',
+          '@type': '@id',
+        },
+        "tree:node": {
+          "@type": "@id"
+        },
+        "tree:path": {
+          "@type": "@id"
+        },
+        "tree:value": {
+          "@type": "xsd:dateTime"
         },
         generatedAtTime: {
           '@id': 'prov:generatedAtTime',
@@ -155,27 +171,10 @@ export const GemeenteUtils = {
           '@id': 'dct:isVersionOf',
           '@type': '@id',
         },
-        'tree:node': {
-          '@type': '@id',
-        },
-        shape: {
-          '@id': 'tree:shape',
-          '@type': '@id',
-        },
         created: {
           '@id': 'dct:created',
           '@type': 'xsd:dateTime',
         },
-        timestampPath: {
-          '@id': 'ldes:timestampPath',
-          '@type': '@id',
-        },
-        versionOfPath: {
-          '@id': 'ldes:versionOfPath',
-          '@type': '@id',
-        },
-        EventStream: 'ldes:EventStream',
-        Node: 'tree:Node',
       },
     };
   },
@@ -192,11 +191,10 @@ export const GemeenteUtils = {
         rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
         rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
         tree: 'https://w3id.org/tree#',
-        shapeOf: {
-          '@reverse': 'tree:shape',
-          '@type': '@id',
-        },
+        ldes: 'https://w3id.org/ldes#',
+        EventStream: 'ldes:EventStream',
         NodeShape: 'sh:NodeShape',
+        shape: 'tree:shape',
         'sh:nodeKind': {
           '@type': '@id',
         },

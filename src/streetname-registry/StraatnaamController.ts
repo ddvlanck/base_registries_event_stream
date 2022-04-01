@@ -55,10 +55,13 @@ export async function getStreetNameVersionObject(req: Request, res: Response): P
 function buildStreetNameShaclResponse(): any {
   const response: any = StraatnaamUtils.getStreetNameShaclContext();
 
-  response['@id'] = STREETNAME_SHACL_BASE_URL;
-  response['@type'] = 'NodeShape';
-  response.shapeOf = STREETNAME_PAGE_BASE_URL;
-  response['sh:property'] = StraatnaamUtils.getStreetNameShape();
+  response['@id'] = STREETNAME_PAGE_BASE_URL;
+  response['@type'] = 'EventStream',
+  response.shape = {
+    '@id': STREETNAME_SHACL_BASE_URL,
+    '@type': 'NodeShape',
+    'sh:property': StraatnaamUtils.getStreetNameShape()
+  }
 
   return response;
 }
@@ -66,15 +69,11 @@ function buildStreetNameShaclResponse(): any {
 function createStreetNameEvent(data): any {
   const streetNameEvent: any = {};
 
-  const hash = StraatnaamUtils.createObjectHash(data);
-
-  //streetNameEvent['@id'] = `${STREETNAME_PAGE_BASE_URL}#${hash}`;
   streetNameEvent['@id'] = `${STREETNAME_ID}/${data.object_id}/${data.record_generated_time}`;
   streetNameEvent.isVersionOf = data.object_uri;
   streetNameEvent.generatedAtTime = data.record_generated_time;
   streetNameEvent.created = data.timestamp;
   streetNameEvent.eventName = data.event_name;
-  streetNameEvent.memberOf = STREETNAME_PAGE_BASE_URL;
 
   streetNameEvent['@type'] = 'Straatnaam';
   streetNameEvent.straatnaam = data.geographical_name;

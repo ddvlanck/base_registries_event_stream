@@ -77,30 +77,46 @@ export const PostinfoUtils = {
   getPostalInfoContext() {
     return {
       '@context': {
+        tree: 'https://w3id.org/tree#',
+        ldes: 'https://w3id.org/ldes#',
+        br: 'https://basisregisters.vlaanderen.be/ns/adres#',
+        adres: 'https://data.vlaanderen.be/ns/adres#',
         xsd: 'http://www.w3.org/2001/XMLSchema#',
         prov: 'http://www.w3.org/ns/prov#',
-        tree: 'https://w3id.org/tree#',
         skos: 'http://www.w3.org/2004/02/skos/core#',
         dct: 'http://purl.org/dc/terms/',
         adms: 'http://www.w3.org/ns/adms#',
-        adres: 'https://data.vlaanderen.be/ns/adres#',
-        br: 'https://basisregisters.vlaanderen.be/ns/adres#',
-        ldes: 'https://w3id.org/ldes#',
-        items: '@included',
-        collectionInfo: '@included',
-        viewOf: {
-          '@reverse': 'tree:view',
+        Node: "tree:Node",
+        EventStream: 'ldes:EventStream',
+        eventName: 'adms:versionNotes',
+        view: 'tree:view', 
+        member: 'tree:member',
+        relation: 'tree:relation',
+        timestampPath: {
+          '@id': 'ldes:timestampPath',
           '@type': '@id',
         },
-        memberOf: {
-          '@reverse': 'tree:member',
+        versionOfPath: {
+          '@id': 'ldes:versionOfPath',
           '@type': '@id',
+        },
+        shape: {
+          '@id': 'tree:shape',
+          '@type': '@id',
+        },
+        "tree:node": {
+          "@type": "@id"
+        },
+        "tree:path": {
+          "@type": "@id"
+        },
+        "tree:value": {
+          "@type": "xsd:dateTime"
         },
         generatedAtTime: {
           '@id': 'prov:generatedAtTime',
           '@type': 'xsd:dateTime',
         },
-        eventName: 'adms:versionNotes',
         Postinfo: 'adres:Postinfo',
         postcode: 'adres:postcode',
         postnaam: 'adres:postnaam',
@@ -112,27 +128,10 @@ export const PostinfoUtils = {
           '@id': 'dct:isVersionOf',
           '@type': '@id',
         },
-        'tree:node': {
-          '@type': '@id',
-        },
-        shape: {
-          '@id': 'tree:shape',
-          '@type': '@id',
-        },
         created: {
           '@id': 'dct:created',
           '@type': 'xsd:dateTime',
         },
-        timestampPath: {
-          '@id': 'ldes:timestampPath',
-          '@type': '@id',
-        },
-        versionOfPath: {
-          '@id': 'ldes:versionOfPath',
-          '@type': '@id',
-        },
-        EventStream: 'ldes:EventStream',
-        Node: 'tree:Node',
       },
     };
   },
@@ -143,11 +142,10 @@ export const PostinfoUtils = {
         rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
         xsd: 'http://www.w3.org/2001/XMLSchema#',
         tree: 'https://w3id.org/tree#',
+        ldes: 'https://w3id.org/ldes#',
         skos: 'http://www.w3.org/2004/02/skos/core#',
-        shapeOf: {
-          '@reverse': 'tree:shape',
-          '@type': '@id',
-        },
+        EventStream: 'ldes:EventStream',
+        shape: 'tree:shape',
         NodeShape: 'sh:NodeShape',
         'sh:nodeKind': {
           '@type': '@id',

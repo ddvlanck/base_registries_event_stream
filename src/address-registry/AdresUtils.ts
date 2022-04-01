@@ -15,14 +15,14 @@ export const AdresUtils = {
     let versionCanBePublished = true;
 
     if (straatnaamId === null ||
-            postalCode === null ||
-            houseNumber === null ||
-            !officiallyAssigned ||
-            geometry === null ||
-            geometryMethod === null ||
-            geometrySpecification === null ||
-            addressStatus === null ||
-            typeof objectId === 'object') {
+      postalCode === null ||
+      houseNumber === null ||
+      !officiallyAssigned ||
+      geometry === null ||
+      geometryMethod === null ||
+      geometrySpecification === null ||
+      addressStatus === null ||
+      typeof objectId === 'object') {
       versionCanBePublished = false;
     }
 
@@ -94,22 +94,21 @@ export const AdresUtils = {
   getAddressShaclContext() {
     return {
       '@context': {
+        tree: 'https://w3id.org/tree#',
+        ldes: 'https://w3id.org/ldes#',
+        adres: 'https://data.vlaanderen.be/ns/adres#',
         sh: 'https://www.w3.org/ns/shacl#',
         xsd: 'http://www.w3.org/2001/XMLSchema#',
         skos: 'http://www.w3.org/2004/02/skos/core#',
         prov: 'http://www.w3.org/ns/prov#',
         dct: 'http://purl.org/dc/terms/',
         adms: 'http://www.w3.org/ns/adms#',
-        adres: 'https://data.vlaanderen.be/ns/adres#',
         generiek: 'https://data.vlaanderen.be/ns/generiek#',
         rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
         rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
-        tree: 'https://w3id.org/tree#',
-        shapeOf: {
-          '@reverse': 'tree:shape',
-          '@type': '@id',
-        },
+        EventStream: 'ldes:EventStream',
         NodeShape: 'sh:NodeShape',
+        shape: 'tree:shape',
         'sh:nodeKind': {
           '@type': '@id',
         },
@@ -131,27 +130,47 @@ export const AdresUtils = {
         // eslint-disable-next-line max-len
         'https://data.vlaanderen.be/doc/applicatieprofiel/generiek-basis/zonderstatus/2019-07-01/context/generiek-basis.jsonld',
         {
+          ldes: 'https://w3id.org/ldes#',
+          tree: 'https://w3id.org/tree#',
+          adres: 'https://data.vlaanderen.be/ns/adres#',
           xsd: 'http://www.w3.org/2001/XMLSchema#',
           prov: 'http://www.w3.org/ns/prov#',
-          tree: 'https://w3id.org/tree#',
           dct: 'http://purl.org/dc/terms/',
           adms: 'http://www.w3.org/ns/adms#',
           rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-          adres: 'https://data.vlaanderen.be/ns/adres#',
-          ldes: 'https://w3id.org/ldes#',
-          items: '@included',
-          collectionInfo: '@included',
-          isVersionOf: {
-            '@id': 'dct:isVersionOf',
+          Node: 'tree:Node',
+          EventStream: 'ldes:EventStream',
+          eventName: 'http://www.w3.org/ns/adms#versionNotes',
+          view: 'tree:view',
+          member: 'tree:member',
+          relation: 'tree:relation',
+          timestampPath: {
+            '@id': 'ldes:timestampPath',
             '@type': '@id',
+          },
+          versionOfPath: {
+            '@id': 'ldes:versionOfPath',
+            '@type': '@id',
+          },
+          shape: {
+            '@id': 'tree:shape',
+            '@type': '@id'
+          },
+          "tree:node": {
+            "@type": "@id"
+          },
+          "tree:path": {
+            "@type": "@id"
+          },
+          "tree:value": {
+            "@type": "xsd:dateTime"
           },
           generatedAtTime: {
             '@id': 'prov:generatedAtTime',
             '@type': 'xsd:dateTime',
           },
-          eventName: 'http://www.w3.org/ns/adms#versionNotes',
-          memberOf: {
-            '@reverse': 'tree:member',
+          isVersionOf: {
+            '@id': 'dct:isVersionOf',
             '@type': '@id',
           },
           BelgischAdres: 'adres:Adres',
@@ -229,34 +248,10 @@ export const AdresUtils = {
             '@id': 'https://data.vlaanderen.be/ns/generiek#specificatie',
             '@type': '@id',
           },
-          viewOf: {
-            '@reverse': 'tree:view',
-            '@type': '@id',
-          },
-          shape: {
-            '@id': 'tree:shape',
-            '@type': '@id',
-          },
-          'tree:node': {
-            '@type': '@id',
-          },
-          'tree:path': {
-            '@type': '@id',
-          },
           created: {
             '@id': 'dct:created',
             '@type': 'xsd:dateTime',
           },
-          timestampPath: {
-            '@id': 'ldes:timestampPath',
-            '@type': '@id',
-          },
-          versionOfPath: {
-            '@id': 'ldes:versionOfPath',
-            '@type': '@id',
-          },
-          EventStream: 'ldes:EventStream',
-          Node: 'tree:Node',
         },
       ],
     };

@@ -54,10 +54,13 @@ export async function getPostalInformationVersionObject(req: Request, res: Respo
 function buildPostalInfoShaclResponse(): any {
   const response: any = PostinfoUtils.getPostalInfoShaclContext();
 
-  response['@id'] = POSTAL_INFO_SHACL_BASE_URL;
-  response['@type'] = 'NodeShape';
-  response.shapeOf = POSTAL_INFO_PAGE_BASE_URL;
-  response['sh:property'] = PostinfoUtils.getPostalInfoShape();
+  response['@id'] = POSTAL_INFO_PAGE_BASE_URL;
+  response['@type'] = 'EventStream',
+  response.shape = {
+    '@id': POSTAL_INFO_SHACL_BASE_URL,
+    '@type': 'NodeShape',
+    'sh:property': PostinfoUtils.getPostalInfoShape()
+  }
 
   return response;
 }
@@ -65,15 +68,11 @@ function buildPostalInfoShaclResponse(): any {
 function createPostalInformationEvent(data: any): any {
   const postInfoEvent: any = {};
 
-  const hash = PostinfoUtils.createObjectHash(data);
-
-  //postInfoEvent['@id'] = `${POSTAL_INFO_PAGE_BASE_URL}#${hash}`;
   postInfoEvent['@id'] = `${POSTAL_INFO_ID}/${data.object_id}/${data.record_generated_time}`;
   postInfoEvent.isVersionOf = data.object_uri;
   postInfoEvent.generatedAtTime = data.record_generated_time;
   postInfoEvent.created = data.timestamp;
   postInfoEvent.eventName = data.event_name;
-  postInfoEvent.memberOf = POSTAL_INFO_PAGE_BASE_URL;
 
   postInfoEvent['@type'] = 'Postinfo';
   postInfoEvent.postcode = Number.parseInt(data.postal_code, 10);
