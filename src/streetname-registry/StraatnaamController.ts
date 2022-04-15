@@ -5,7 +5,8 @@ import { addContentTypeHeader, addResponseHeaders, setCacheControl } from '../ut
 import { buildFragment, buildVersionObjectSubjectPage, handleRequestAndGetFragmentMetadata } from '../utils/Utils';
 import { StraatnaamUtils } from './StraatnaamUtils';
 
-const STREETNAME_PAGE_BASE_URL = `${configuration.domainName}/straatnaam`;
+const STREETNAME_LDES_URL = `${configuration.domainName}/straatnaam`;
+const STREETNAME_PAGE_BASE_URL = `${configuration.domainName}/straatnaam/time`;
 const STREETNAME_SHACL_BASE_URL = `${configuration.domainName}/straatnaam/shape`;
 const MUNICIPALITY_NAMESPACE = `https://data.vlaanderen.be/id/gemeente`;
 const STREETNAME_CONTEXT_URL = `${configuration.domainName}/straatnaam/context`;
@@ -22,6 +23,7 @@ export async function getStreetNameFragment(req: Request, res: Response): Promis
     res.json(buildFragment(
       items,
       fragmentMetadata,
+      STREETNAME_LDES_URL,
       STREETNAME_PAGE_BASE_URL,
       STREETNAME_CONTEXT_URL,
       STREETNAME_SHACL_BASE_URL,
@@ -55,7 +57,7 @@ export async function getStreetNameVersionObject(req: Request, res: Response): P
 function buildStreetNameShaclResponse(): any {
   const response: any = StraatnaamUtils.getStreetNameShaclContext();
 
-  response['@id'] = STREETNAME_PAGE_BASE_URL;
+  response['@id'] = STREETNAME_LDES_URL;
   response['@type'] = 'EventStream',
   response.shape = {
     '@id': STREETNAME_SHACL_BASE_URL,

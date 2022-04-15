@@ -72,6 +72,7 @@ export async function handleRequestAndGetFragmentMetadata(
 export function buildFragment(
   items: any[],
   fragmentMetadata: IFragmentMetadata,
+  collectionUrl: string,
   pageUrl: string,
   contextUrl: string,
   shaclUrl: string,
@@ -80,7 +81,7 @@ export function buildFragment(
   const fragment: any = {};
 
   fragment['@context'] = contextUrl;
-  fragment['@id'] = pageUrl;
+  fragment['@id'] = collectionUrl;
   fragment['@type'] = 'EventStream';
   fragment.shape = shaclUrl;
   fragment.timestampPath = `prov:generatedAtTime`;

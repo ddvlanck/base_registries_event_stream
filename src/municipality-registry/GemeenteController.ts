@@ -5,7 +5,8 @@ import { addContentTypeHeader, addResponseHeaders, setCacheControl } from '../ut
 import { buildFragment, buildVersionObjectSubjectPage, handleRequestAndGetFragmentMetadata } from '../utils/Utils';
 import { GemeenteUtils } from './GemeenteUtils';
 
-const MUNICIPALITY_PAGE_BASE_URL = `${configuration.domainName}/gemeente`;
+const MUNICIPALITY_LDES_URL = `${configuration.domainName}/gemeente`;
+const MUNICIPALITY_PAGE_BASE_URL = `${configuration.domainName}/gemeente/time`;
 const MUNICIPALITY_SHACL_BASE_URL = `${configuration.domainName}/gemeente/shape`;
 const MUNICIPALITY_CONTEXT_URL = `${configuration.domainName}/gemeente/context`;
 const MUNICIPALITY_ID = `${configuration.domainName}/id/gemeente`;
@@ -21,6 +22,7 @@ export async function getMunicipalityFragment(req: Request, res: Response): Prom
     res.json(buildFragment(
       items,
       fragmentMetadata,
+      MUNICIPALITY_LDES_URL,
       MUNICIPALITY_PAGE_BASE_URL,
       MUNICIPALITY_CONTEXT_URL,
       MUNICIPALITY_SHACL_BASE_URL,
@@ -54,7 +56,7 @@ export async function getMunicipalityVersionObject(req: Request, res: Response):
 function buildMunicipalityShaclResponse(): any {
   const response: any = GemeenteUtils.getMunicipalityShaclContext();
 
-  response['@id'] = MUNICIPALITY_PAGE_BASE_URL;
+  response['@id'] = MUNICIPALITY_LDES_URL;
   response['@type'] = 'EventStream'
   response.shape = {
     '@id': MUNICIPALITY_SHACL_BASE_URL,

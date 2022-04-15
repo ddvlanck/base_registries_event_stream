@@ -5,7 +5,8 @@ import { addContentTypeHeader, addResponseHeaders, setCacheControl } from '../ut
 import { buildFragment, buildVersionObjectSubjectPage, handleRequestAndGetFragmentMetadata } from '../utils/Utils';
 import { PostinfoUtils } from './PostinfoUtils';
 
-const POSTAL_INFO_PAGE_BASE_URL = `${configuration.domainName}/postinfo`;
+const POSTAL_INFO_LDES_URL = `${configuration.domainName}/postinfo`;
+const POSTAL_INFO_PAGE_BASE_URL = `${configuration.domainName}/postinfo/time`;
 const POSTAL_INFO_SHACL_BASE_URL = `${configuration.domainName}/postinfo/shape`;
 const POSTAL_INFO_CONTEXT_URL = `${configuration.domainName}/postinfo/context`;
 const POSTAL_INFO_ID = `${configuration.domainName}/id/postinfo`;
@@ -21,6 +22,7 @@ export async function getPostalInfoFragment(req: Request, res: Response): Promis
     res.json(buildFragment(
       items,
       fragmentMetadata,
+      POSTAL_INFO_LDES_URL,
       POSTAL_INFO_PAGE_BASE_URL,
       POSTAL_INFO_CONTEXT_URL,
       POSTAL_INFO_SHACL_BASE_URL,
@@ -54,13 +56,13 @@ export async function getPostalInformationVersionObject(req: Request, res: Respo
 function buildPostalInfoShaclResponse(): any {
   const response: any = PostinfoUtils.getPostalInfoShaclContext();
 
-  response['@id'] = POSTAL_INFO_PAGE_BASE_URL;
+  response['@id'] = POSTAL_INFO_LDES_URL;
   response['@type'] = 'EventStream',
-  response.shape = {
-    '@id': POSTAL_INFO_SHACL_BASE_URL,
-    '@type': 'NodeShape',
-    'sh:property': PostinfoUtils.getPostalInfoShape()
-  }
+    response.shape = {
+      '@id': POSTAL_INFO_SHACL_BASE_URL,
+      '@type': 'NodeShape',
+      'sh:property': PostinfoUtils.getPostalInfoShape()
+    }
 
   return response;
 }
