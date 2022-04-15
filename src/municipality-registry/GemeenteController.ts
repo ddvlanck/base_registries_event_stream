@@ -17,13 +17,14 @@ export async function getMunicipalityFragment(req: Request, res: Response): Prom
   // Redirects will have no metadata, so will not pass this check
   if (fragmentMetadata) {
     const items = (await db.getMunicipalityItems(fragmentMetadata.index, configuration.pageSize)).rows;
+    const path = `${configuration.domainName}${req.path}`;
     addResponseHeaders(res, fragmentMetadata);
 
     res.json(buildFragment(
       items,
       fragmentMetadata,
       MUNICIPALITY_LDES_URL,
-      MUNICIPALITY_PAGE_BASE_URL,
+      path,
       MUNICIPALITY_CONTEXT_URL,
       MUNICIPALITY_SHACL_BASE_URL,
       createMunicipalityEvent,

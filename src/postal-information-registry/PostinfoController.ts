@@ -17,13 +17,14 @@ export async function getPostalInfoFragment(req: Request, res: Response): Promis
   // Redirects will have no metadata, so will not pass this check
   if (fragmentMetadata) {
     const items = (await db.getPostalInfoItems(fragmentMetadata.index, configuration.pageSize)).rows;
+    const path = `${configuration.domainName}${req.path}`;
     addResponseHeaders(res, fragmentMetadata);
 
     res.json(buildFragment(
       items,
       fragmentMetadata,
       POSTAL_INFO_LDES_URL,
-      POSTAL_INFO_PAGE_BASE_URL,
+      path,
       POSTAL_INFO_CONTEXT_URL,
       POSTAL_INFO_SHACL_BASE_URL,
       createPostalInformationEvent,

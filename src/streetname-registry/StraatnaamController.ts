@@ -18,13 +18,14 @@ export async function getStreetNameFragment(req: Request, res: Response): Promis
   // Redirects will have no metadata, so will not pass this check
   if (fragmentMetadata) {
     const items = (await db.getStreetNameItems(fragmentMetadata.index, configuration.pageSize)).rows;
+    const path = `${configuration.domainName}${req.path}`;
     addResponseHeaders(res, fragmentMetadata);
 
     res.json(buildFragment(
       items,
       fragmentMetadata,
       STREETNAME_LDES_URL,
-      STREETNAME_PAGE_BASE_URL,
+      path,
       STREETNAME_CONTEXT_URL,
       STREETNAME_SHACL_BASE_URL,
       createStreetNameEvent,

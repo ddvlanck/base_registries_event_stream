@@ -17,13 +17,14 @@ export async function getAddressFragment(req: Request, res: Response): Promise<v
   // Redirects will have no metadata, so will not pass this check
   if (fragmentMetadata) {
     const items = (await db.getAddressItems(fragmentMetadata.index, configuration.pageSize)).rows;
+    const path = `${configuration.domainName}${req.path}`;
     addResponseHeaders(res, fragmentMetadata);
 
     res.json(buildFragment(
       items,
       fragmentMetadata,
       ADDRESS_LDES_URL,
-      ADDRESS_PAGE_BASE_URL,
+      path,
       ADDRESS_CONTEXT_URL,
       ADDRESS_SHACL_BASE_URL,
       createAddressEvent,
