@@ -2,5 +2,6 @@
     "extends" : [
         "github>informatievlaanderen/renovate-presets:presets"
     ],
-    "requiredStatusChecks" : null
+    "requiredStatusChecks" : null,
+    "ignoreDeps": ["eslint-config-es", "eslint-plugin-import"]
 }
