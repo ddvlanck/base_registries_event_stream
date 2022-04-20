@@ -1,6 +1,9 @@
 import { Router } from 'express';
 
-import { getAddressContext, getAddressFragment, getAddressShape, getAddressVersionObject } from '../address-registry/AdresController';
+import {
+  getAddressContext,
+  getAddressFragment, getAddressShape, getAddressVersionObject
+} from '../address-registry/AdresController';
 import { getDataCatalogContext, getDataCatalogPage } from '../data-catalog/DataCatalogController';
 import { getMunicipalityContext, getMunicipalityFragment, getMunicipalityShape, getMunicipalityVersionObject } from
   '../municipality-registry/GemeenteController';
