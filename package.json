@@ -23,7 +23,7 @@
     "@types/xml2js": "0.4.11",
     "eslint": "8.19.0",
     "eslint-config-es": "4.1.0",
-    "eslint-import-resolver-typescript": "3.2.2",
+    "eslint-import-resolver-typescript": "3.2.4",
     "eslint-plugin-import": "2.25.4",
     "eslint-plugin-tsdoc": "0.2.16",
     "eslint-plugin-unused-imports": "2.0.0",
