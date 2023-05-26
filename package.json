@@ -41,6 +41,6 @@
     "pg-query-stream": "^4.1.0",
     "sleep-promise": "^9.0.0",
     "winston": "^3.5.1",
-    "xml2js": "^0.5.0"
+    "xml2js": "^0.6.0"
   }
 }
