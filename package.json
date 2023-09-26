@@ -21,7 +21,7 @@
     "@types/node-fetch": "2.6.6",
     "@types/pg": "8.10.3",
     "@types/xml2js": "0.4.12",
-    "eslint": "8.49.0",
+    "eslint": "8.50.0",
     "eslint-config-es": "4.1.0",
     "eslint-import-resolver-typescript": "3.6.0",
     "eslint-plugin-import": "2.25.4",
