@@ -1,4 +1,4 @@
-FROM node:16
+FROM node:21
 
 LABEL maintainer "Informatie Vlaanderen <informatievlaanderen@vlaanderen.be>"
 
