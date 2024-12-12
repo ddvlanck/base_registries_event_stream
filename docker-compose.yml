@@ -50,7 +50,7 @@ services:
       - 5432:5432
 
   dba:
-    image: dpage/pgadmin4:5.7
+    image: dpage/pgadmin4:8.14
     container_name: base-registries-dba
     hostname: base-registries-dba
     environment:
