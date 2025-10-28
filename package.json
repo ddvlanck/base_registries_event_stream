@@ -16,7 +16,7 @@
   "author": "Dwight Van Lancker",
   "license": "ISC",
   "devDependencies": {
-    "@types/express": "4.17.25",
+    "@types/express": "5.0.5",
     "@types/node": "18.19.130",
     "@types/node-fetch": "2.6.13",
     "@types/pg": "8.15.5",
@@ -32,7 +32,7 @@
   "dependencies": {
     "commander": "^8.0.0",
     "debug": "^4.1.1",
-    "express": "^4.17.1",
+    "express": "^5.0.0",
     "influx": "^5.5.2",
     "node-fetch": "^2.6.1",
     "object-hash": "^2.1.1",
